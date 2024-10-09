@@ -41,8 +41,13 @@ constexpr bool is_zero(const z<C, B>& num) noexcept {
 }
 
 template <z_digit_container C, size_t B>
-constexpr void z_init_ui(z<C, B>& num, std::unsigned_integral auto val) {
+constexpr z<C, B>& init_ui(z<C, B>& num, std::unsigned_integral auto val) {
   num.sign = false;  // positive
+  while (val > 0) {
+    num.digits.push_back(val % B);
+    val /= B;
+  }
+  return num;
 }
 
 }  // namespace real
