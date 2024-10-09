@@ -13,6 +13,11 @@ static_assert([] {
   real::init_z(num, 1u);
   return !real::is_zero(num);
 }());
+static_assert([] {
+  real::z num;
+  real::init_z(num, -2);
+  return !real::is_zero(num);
+}());
 
 }  // namespace n_tests_is_zero
 }  // namespace
@@ -90,5 +95,12 @@ TEST(n_tests, init_z_signed) {
     EXPECT_EQ(dec.digits.size(), 2);
     EXPECT_EQ(dec.digits[0], 0);
     EXPECT_EQ(dec.digits[1], 2);
+  }
+}
+
+TEST(n_tests, init_z_decstr) {
+  {
+    real::z<std::vector<unsigned>, 10> dec;
+    real::init_z_decstr(dec, std::string_view{" 0 "});
   }
 }
