@@ -70,3 +70,30 @@ TEST(n_tests, add_n) {
     EXPECT_EQ(real::cmp_n(sum, expected), 0);
   }
 }
+
+TEST(n_tests, sub_n) {
+  {
+    real::z<std::vector<unsigned char>> num, zero;
+    real::init(num, 12345u);
+    auto diff = real::sub_n(num, zero);
+    EXPECT_EQ(real::cmp_n(diff, num), 0);
+    diff = real::sub_n(zero, num);
+    EXPECT_EQ(real::cmp_n(diff, num), 0);
+  }
+  {
+    real::z<std::vector<unsigned char>> num, one, expected;
+    real::init(one, 1u);
+    real::init(num, 12345u);
+    real::init(expected, 12344u);
+    auto diff = real::sub_n(num, one);
+    EXPECT_EQ(real::cmp_n(diff, expected), 0);
+  }
+  {
+    real::z<std::vector<unsigned char>> minuend, subtrahend, expected;
+    real::init(minuend, 1323065u);
+    real::init(subtrahend, 12346u);
+    real::init(expected, 1310719u);
+    auto diff = real::sub_n(minuend, subtrahend);
+    EXPECT_EQ(real::cmp_n(diff, expected), 0);
+  }
+}

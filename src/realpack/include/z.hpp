@@ -88,7 +88,7 @@ constexpr z<C>& init(z<C>& num, T val) {
   return num;
 }
 
-// assumes: both lhs and rhs are non-negative integers
+// requires: both lhs and rhs are non-negative integers
 // returns: 0 if lhs is exactly equal to rhs
 //          + if lhs is greater than rhs
 //          - if lhs is less than rhs
@@ -106,32 +106,60 @@ constexpr int cmp_n(const z<C>& lhs, const z<C>& rhs) {
   return 0;
 }
 
-// assumes: both lhs and rhs are non-negative integers
+// requires: both lhs and rhs are non-negative integers
 // returns: r = lhs + rhs;
 template <z_digit_container C>
 constexpr z<C> add_n(const z<C>& lhs, const z<C>& rhs) {
+  assert(lhs.sign == false && rhs.sign == false);
   using D = typename z<C>::digit_type;
   z<C> r;
-  // ensure a <= b
-  auto& a = lhs.digits.size() < rhs.digits.size() ? lhs : rhs;
-  auto& b = lhs.digits.size() < rhs.digits.size() ? rhs : lhs;
-  auto i = 0;
+  // ensure size(a.digits) <= size(b.digits)
+  auto& a = lhs.digits.size() <= rhs.digits.size() ? lhs : rhs;
+  auto& b = lhs.digits.size() <= rhs.digits.size() ? rhs : lhs;
+  size_t i = 0;
   D cy = 0;
   for (; i < a.digits.size(); ++i) {
-    auto t = a.digits[i] + b.digits[i] + cy;
+    D t = a.digits[i] + b.digits[i] + cy;
     cy = t >= a.digits[i] && t >= b.digits[i] ? 0 : 1;
     r.digits.push_back(t);
   }
   for (; i < b.digits.size(); ++i) {
-    auto t = b.digits[i] + cy;
+    D t = b.digits[i] + cy;
     cy = t >= b.digits[i] && t >= cy ? 0 : 1;
     r.digits.push_back(t);
   }
   if (cy > 0) {
-    r.digits.push_back(1u);
+    r.digits.push_back(1);
   }
   return r;
 }
+
+// requires: both lhs and rhs are non-negative integers, and
+//           lhs >= rhs
+// returns: r = lhs - rhs;
+template <z_digit_container C>
+constexpr z<C> sub_n(const z<C>& lhs, const z<C>& rhs) {
+  assert(lhs.sign == false && rhs.sign == false);
+  using D = typename z<C>::digit_type;
+  z<C> r;
+  // ensure size(a.digits) >= size(b.digits)
+  auto& a = lhs.digits.size() >= rhs.digits.size() ? lhs : rhs;
+  auto& b = lhs.digits.size() >= rhs.digits.size() ? rhs : lhs;
+  size_t i = 0;
+  D cy = 0;
+  for (; i < b.digits.size(); ++i) {
+    D t = a.digits[i] - b.digits[i] - cy;
+    cy = t > a.digits[i];
+    r.digits.push_back(t);
+  }
+  for (; i < a.digits.size(); ++i) {
+    D t = a.digits[i] - cy;
+    cy = t > a.digits[i];
+    r.digits.push_back(t);
+  }
+  assert(cy == 0);
+  return r;
+};
 
 template <z_digit_container C>
 constexpr z<C>& init_decstr(z<C>& num, std::string_view str) {
