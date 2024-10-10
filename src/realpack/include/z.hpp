@@ -3,6 +3,7 @@
 
 // std headers
 #include <algorithm>
+#include <cassert>
 #include <concepts>
 #include <limits>
 #include <optional>
@@ -55,8 +56,27 @@ constexpr bool is_zero(const z<C, B>& num) noexcept {
   return std::ranges::all_of(num.digits, [](typename z<C, B>::digit_type x) { return x == 0; });
 }
 
+// assumes: both lhs and rhs are non-negative integers
+// returns: 0 if lhs is exactly equal to rhs
+//          + if lhs is greater than rhs
+//          - if lhs is less than rhs
+template <z_digit_container C, size_t B>
+constexpr int cmp_n(const z<C, B>& lhs, const z<C, B>& rhs) {
+  assert(lhs.sign == false && rhs.sign == false);
+  if (lhs.digits.size() != rhs.digits.size()) return lhs.digits.size() < rhs.digits.size() ? -1 : 1;
+  auto l = lhs.digits.crbegin();
+  auto r = rhs.digits.crbegin();
+  for (; l != lhs.digits.crend(); ++l, ++r) {
+    if (*l != *r) {
+      return *l < *r ? -1 : 1;
+    }
+  }
+  return 0;
+}
+
+// assumes: is_zero(num) == true && num.sign == false
 template <z_digit_container C, size_t B, std::integral T>
-constexpr z<C, B>& init_z(z<C, B>& num, T val) {
+constexpr z<C, B>& init(z<C, B>& num, T val) {
   if constexpr (std::is_signed_v<T>) {
     num.sign = val < 0;
     val = num.sign ? -val : val;
@@ -68,8 +88,15 @@ constexpr z<C, B>& init_z(z<C, B>& num, T val) {
   return num;
 }
 
+// effects: r = lhs + rhs;
 template <z_digit_container C, size_t B>
-constexpr z<C, B>& init_z_decstr(z<C, B>& num, std::string_view str) {
+constexpr z<C, B> add(const z<C, B>& lhs, const z<C, B>& rhs) {
+  z<C, B> r;
+  return r;
+}
+
+template <z_digit_container C, size_t B>
+constexpr z<C, B>& init_decstr(z<C, B>& num, std::string_view str) {
   // illustration:
   // "    -       2024"
   //  sign | gap |num
@@ -126,8 +153,7 @@ constexpr z<C, B>& init_z_decstr(z<C, B>& num, std::string_view str) {
     }
   }
   if (!all0) {
-    for (auto x : digits | std::views::reverse) {
-    }
+    // TODO: convert the base 10 number to other bases.
   }
   return num;
 }

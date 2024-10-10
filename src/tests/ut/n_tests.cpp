@@ -10,12 +10,12 @@ namespace n_tests_is_zero {
 static_assert(real::is_zero(real::z{}));
 static_assert([] {
   real::z num;
-  real::init_z(num, 1u);
+  real::init(num, 1u);
   return !real::is_zero(num);
 }());
 static_assert([] {
   real::z num;
-  real::init_z(num, -2);
+  real::init(num, -2);
   return !real::is_zero(num);
 }());
 
@@ -28,7 +28,7 @@ TEST(n_tests, is_zero) {
   }
   {
     real::z num;
-    real::init_z(num, 1u);
+    real::init(num, 1u);
     EXPECT_FALSE(real::is_zero(num));
   }
 }
@@ -36,20 +36,20 @@ TEST(n_tests, is_zero) {
 TEST(n_tests, init_z_unsigned) {
   {
     real::z<std::vector<unsigned>, 10> dec;
-    real::init_z(dec, 0u);
+    real::init(dec, 0u);
     EXPECT_TRUE(dec.digits.empty());
     EXPECT_FALSE(dec.sign);
   }
   {
     real::z<std::vector<unsigned char>, 10> dec;
-    real::init_z(dec, 1u);
+    real::init(dec, 1u);
     EXPECT_FALSE(dec.sign);
     EXPECT_EQ(dec.digits.size(), 1);
     EXPECT_EQ(dec.digits[0], 1);
   }
   {
     real::z<std::vector<unsigned long long>, 3> dec;
-    real::init_z(dec, 5u);
+    real::init(dec, 5u);
     EXPECT_FALSE(dec.sign);
     EXPECT_EQ(dec.digits.size(), 2);
     EXPECT_EQ(dec.digits[0], 2);
@@ -57,7 +57,7 @@ TEST(n_tests, init_z_unsigned) {
   }
   {
     real::z<std::vector<unsigned>, 3> dec;
-    real::init_z(dec, 6u);
+    real::init(dec, 6u);
     EXPECT_FALSE(dec.sign);
     EXPECT_EQ(dec.digits.size(), 2);
     EXPECT_EQ(dec.digits[0], 0);
@@ -68,13 +68,13 @@ TEST(n_tests, init_z_unsigned) {
 TEST(n_tests, init_z_signed) {
   {
     real::z<std::vector<unsigned>, 10> dec;
-    real::init_z(dec, 0);
+    real::init(dec, 0);
     EXPECT_TRUE(dec.digits.empty());
     EXPECT_FALSE(dec.sign);
   }
   {
     real::z<std::vector<unsigned>, 10> dec;
-    real::init_z(dec, -1);
+    real::init(dec, -1);
     EXPECT_FALSE(dec.digits.empty());
     EXPECT_TRUE(dec.sign);
     EXPECT_EQ(dec.digits.size(), 1);
@@ -82,7 +82,7 @@ TEST(n_tests, init_z_signed) {
   }
   {
     real::z<std::vector<unsigned long long>, 3> dec;
-    real::init_z(dec, -5);
+    real::init(dec, -5);
     EXPECT_TRUE(dec.sign);
     EXPECT_EQ(dec.digits.size(), 2);
     EXPECT_EQ(dec.digits[0], 2);
@@ -90,7 +90,7 @@ TEST(n_tests, init_z_signed) {
   }
   {
     real::z<std::vector<unsigned>, 3> dec;
-    real::init_z(dec, -6);
+    real::init(dec, -6);
     EXPECT_TRUE(dec.sign);
     EXPECT_EQ(dec.digits.size(), 2);
     EXPECT_EQ(dec.digits[0], 0);
@@ -98,9 +98,31 @@ TEST(n_tests, init_z_signed) {
   }
 }
 
+TEST(n_tests, cmp_n) {
+  real::z zero;
+  {
+    real::z num;
+    EXPECT_EQ(real::cmp_n(num, zero), 0);
+    EXPECT_EQ(real::cmp_n(zero, num), 0);
+  }
+  {
+    real::z num;
+    real::init(num, 1);
+    EXPECT_GT(real::cmp_n(num, zero), 0);
+    EXPECT_LT(real::cmp_n(zero, num), 0);
+  }
+  {
+    real::z a, b;
+    real::init(a, 654321);
+    real::init(b, 664321);
+    EXPECT_LT(real::cmp_n(a, b), 0);
+    EXPECT_GT(real::cmp_n(b, a), 0);
+  }
+}
+
 TEST(n_tests, init_z_decstr) {
   {
     real::z<std::vector<unsigned>, 10> dec;
-    real::init_z_decstr(dec, std::string_view{" 0 "});
+    real::init_decstr(dec, std::string_view{" 0 "});
   }
 }
