@@ -115,12 +115,20 @@ constexpr z<C> add_n(const z<C>& lhs, const z<C>& rhs) {
   // ensure a <= b
   auto& a = lhs.digits.size() < rhs.digits.size() ? lhs : rhs;
   auto& b = lhs.digits.size() < rhs.digits.size() ? rhs : lhs;
-  auto i = a.digits.size();
+  auto i = 0;
   D cy = 0;
   for (; i < a.digits.size(); ++i) {
-    auto t = a.digits[i] + b.digits[i];
-    if (t < a.digits[i] || t < b.digits[i]) {
-    }
+    auto t = a.digits[i] + b.digits[i] + cy;
+    cy = t >= a.digits[i] && t >= b.digits[i] ? 0 : 1;
+    r.digits.push_back(t);
+  }
+  for (; i < b.digits.size(); ++i) {
+    auto t = b.digits[i] + cy;
+    cy = t >= b.digits[i] && t >= cy ? 0 : 1;
+    r.digits.push_back(t);
+  }
+  if (cy > 0) {
+    r.digits.push_back(1u);
   }
   return r;
 }
