@@ -114,10 +114,21 @@ constexpr int cmp(const z<C>& lhs, const z<C>& rhs) {
 }
 
 // effects: num = -num
-// returns: the ref to `num`
+// returns: ref to `num`
 template <z_digit_container C>
 constexpr z<C>& neg(z<C>& num) {
   num.sign = !num.sign;
+  return num;
+}
+
+// effects: remove redundant zeros in digits.
+// returns: ref to `num`
+template <z_digit_container C>
+constexpr z<C>& norm_n(z<C>& num) {
+  using D = typename z<C>::digit_type;
+  auto view = num.digits | std::views::reverse | std::views::drop_while([](D x) { return x == 0; });
+  num.digits.resize(std::ranges::distance(view));
+  num.sign = num.digits.empty() == false ? num.sign : false;
   return num;
 }
 
@@ -155,9 +166,8 @@ template <z_digit_container C>
 constexpr z<C> sub_n(const z<C>& lhs, const z<C>& rhs) {
   using D = typename z<C>::digit_type;
   z<C> r;
-  // ensure size(a.digits) >= size(b.digits)
-  auto& a = lhs.digits.size() >= rhs.digits.size() ? lhs : rhs;
-  auto& b = lhs.digits.size() >= rhs.digits.size() ? rhs : lhs;
+  auto& a = lhs;
+  auto& b = rhs;
   size_t i = 0;
   D cy = 0;
   for (; i < b.digits.size(); ++i) {
@@ -171,6 +181,7 @@ constexpr z<C> sub_n(const z<C>& lhs, const z<C>& rhs) {
     r.digits.push_back(t);
   }
   assert(cy == 0);
+  norm_n(r);
   return r;
 };
 
@@ -189,7 +200,7 @@ constexpr z<C> add(const z<C>& lhs, const z<C>& rhs) {
       substrahend = &lhs;
     }
     r = sub_n(*minuend, *substrahend);
-    r.sign = sign(*minuend);
+    r.sign = r.digits.empty() == false ? sign(*minuend) : false;
   }
   return r;
 }

@@ -98,4 +98,33 @@ TEST(z_tests, add) {
     auto sum = real::add(num, zero);
     EXPECT_EQ(real::cmp(sum, num), 0);
   }
+  {
+    using zch = real::z<std::vector<unsigned char>>;
+    zch num;
+    zch expected;
+    real::init(num, 123456u);
+    real::init(expected, 246912u);
+    auto sum = real::add(num, num);
+    EXPECT_EQ(real::cmp(sum, expected), 0);
+  }
+  {
+    using zch = real::z<std::vector<unsigned char>>;
+    zch num, num2, zero;
+    real::init(num, 123456u);
+    real::init(num2, -123456);
+    auto sum = real::add(num, num2);
+    EXPECT_EQ(real::cmp(sum, zero), 0);
+    sum = real::add(num2, num);
+    EXPECT_EQ(real::cmp(sum, zero), 0);
+  }
+  {
+    using zch = real::z<std::vector<unsigned char>>;
+    zch num, num2;
+    zch expected;
+    real::init(num, 123456u);
+    real::init(num2, -928392780);
+    real::init(expected, -928269324);
+    auto sum = real::add(num, num2);
+    EXPECT_EQ(real::cmp(sum, expected), 0);
+  }
 }
