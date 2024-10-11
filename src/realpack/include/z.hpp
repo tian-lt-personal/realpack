@@ -27,17 +27,6 @@ constexpr std::optional<unsigned> char2decimal(char ch) {
     return std::nullopt;
 }
 
-template <std::unsigned_integral T>
-struct promoted_digit;
-template <>
-struct promoted_digit<unsigned char> {
-  using type = unsigned long;
-};
-template <>
-struct promoted_digit<unsigned short> {
-  using type = unsigned long;
-};
-
 }  // namespace details
 
 struct z_error : std::domain_error {
@@ -57,7 +46,7 @@ struct z {
   using digit_type = typename C::value_type;
 
   C digits;           // least significant digits (LSD) first
-  bool sign = false;  // false for positive
+  bool sign = false;  // false for non-negative. -0 is ill-formed.
 };
 
 template <z_digit_container C>
@@ -88,13 +77,18 @@ constexpr z<C>& init(z<C>& num, T val) {
   return num;
 }
 
-// requires: both lhs and rhs are non-negative integers
+// returns: the sign of `num`.
+template <z_digit_container C>
+constexpr bool sign(const z<C>& num) {
+  return num.sign;
+}
+
+// ignores: the sign of `lhs` ans `rhs`
 // returns: 0 if lhs is exactly equal to rhs
 //          + if lhs is greater than rhs
 //          - if lhs is less than rhs
 template <z_digit_container C>
 constexpr int cmp_n(const z<C>& lhs, const z<C>& rhs) {
-  assert(lhs.sign == false && rhs.sign == false);
   if (lhs.digits.size() != rhs.digits.size()) return lhs.digits.size() < rhs.digits.size() ? -1 : 1;
   auto l = lhs.digits.crbegin();
   auto r = rhs.digits.crbegin();
@@ -106,11 +100,31 @@ constexpr int cmp_n(const z<C>& lhs, const z<C>& rhs) {
   return 0;
 }
 
-// requires: both lhs and rhs are non-negative integers
+// returns: 0 if lhs is exactly equal to rhs
+//          + if lhs is greater than rhs
+//          - if lhs is less than rhs
+template <z_digit_container C>
+constexpr int cmp(const z<C>& lhs, const z<C>& rhs) {
+  if (sign(lhs) == sign(rhs)) {
+    auto abs_cmp = cmp_n(lhs, rhs);
+    return sign(lhs) == false ? abs_cmp : -abs_cmp;
+  } else {
+    return sign(lhs) == false ? 1 : -1;
+  }
+}
+
+// effects: num = -num
+// returns: the ref to `num`
+template <z_digit_container C>
+constexpr z<C>& neg(z<C>& num) {
+  num.sign = !num.sign;
+  return num;
+}
+
+// ignores: the sign of `lhs` ans `rhs`
 // returns: r = lhs + rhs;
 template <z_digit_container C>
 constexpr z<C> add_n(const z<C>& lhs, const z<C>& rhs) {
-  assert(lhs.sign == false && rhs.sign == false);
   using D = typename z<C>::digit_type;
   z<C> r;
   // ensure size(a.digits) <= size(b.digits)
@@ -134,12 +148,11 @@ constexpr z<C> add_n(const z<C>& lhs, const z<C>& rhs) {
   return r;
 }
 
-// requires: both lhs and rhs are non-negative integers, and
-//           lhs >= rhs
+// requires: lhs >= rhs
+// ignores: the sign of `lhs` ans `rhs`
 // returns: r = lhs - rhs;
 template <z_digit_container C>
 constexpr z<C> sub_n(const z<C>& lhs, const z<C>& rhs) {
-  assert(lhs.sign == false && rhs.sign == false);
   using D = typename z<C>::digit_type;
   z<C> r;
   // ensure size(a.digits) >= size(b.digits)
@@ -160,6 +173,26 @@ constexpr z<C> sub_n(const z<C>& lhs, const z<C>& rhs) {
   assert(cy == 0);
   return r;
 };
+
+template <z_digit_container C>
+constexpr z<C> add(const z<C>& lhs, const z<C>& rhs) {
+  z<C> r;
+  if (sign(lhs) == sign(rhs)) {
+    auto tmp_sign = sign(lhs);
+    r = add_n(lhs, rhs);
+    r.sign = tmp_sign;
+  } else {
+    const z<C>* minuend = &lhs;
+    const z<C>* substrahend = &rhs;
+    if (cmp_n(lhs, rhs) < 0) {
+      minuend = &rhs;
+      substrahend = &lhs;
+    }
+    r = sub_n(*minuend, *substrahend);
+    r.sign = sign(*minuend);
+  }
+  return r;
+}
 
 template <z_digit_container C>
 constexpr z<C>& init_decstr(z<C>& num, std::string_view str) {

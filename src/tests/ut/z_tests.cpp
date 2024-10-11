@@ -84,3 +84,18 @@ TEST(z_tests, init_signed) {
 TEST(z_tests, init_decstr) {
   // TODO
 }
+
+TEST(z_tests, add) {
+  {
+    real::z zero;
+    auto sum = real::add(zero, zero);
+    EXPECT_EQ(real::cmp_n(zero, sum), 0);
+  }
+  {
+    real::z zero;
+    real::z num;
+    real::init(num, 123456);
+    auto sum = real::add(num, zero);
+    EXPECT_EQ(real::cmp(sum, num), 0);
+  }
+}
