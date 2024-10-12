@@ -56,6 +56,16 @@ struct z_error : std::domain_error {
   z_error(const char* reason) : std::domain_error(reason) {}
 };
 
+struct z_operation_error : z_error {
+  z_operation_error(const char* reason) : z_error(reason) {}
+};
+struct z_divided_by_zero_error : z_operation_error {
+  z_divided_by_zero_error() : z_operation_error("divided by zero") {}
+};
+struct z_parse_error : z_error {
+  z_parse_error(const char* reason) : z_error(reason) {}
+};
+
 template <class T>
 concept z_digit_container = std::ranges::contiguous_range<T> && std::ranges::sized_range<T> && requires {
   typename T::value_type;
@@ -294,9 +304,9 @@ constexpr z<C>& init_decstr(z<C>& num, std::string_view str) {
                 all0 &= *v == 0;
                 digits.push_back(*v);
               } else
-                throw z_error{"bad number symbol."};
+                throw z_parse_error{"bad number symbol."};
             } else
-              throw z_error{"bad sign symbol."};
+              throw z_parse_error{"bad sign symbol."};
         }
         break;
       case parse_state::gap:
@@ -315,7 +325,7 @@ constexpr z<C>& init_decstr(z<C>& num, std::string_view str) {
           all0 &= *v == 0;
           digits.push_back(*v);
         } else
-          throw z_error{"bad number symbol."};
+          throw z_parse_error{"bad number symbol."};
         break;
       }
       default:
