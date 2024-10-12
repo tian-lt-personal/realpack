@@ -209,7 +209,7 @@ constexpr z<C> sub_n(const z<C>& lhs, const z<C>& rhs) {
 };
 
 // ignores: the signs of `lhs` and `rhs`
-// returns: r = lhs + rhs;
+// returns: r = lhs * rhs;
 template <z_digit_container C>
 constexpr z<C> mul_n(const z<C>& lhs, const z<C>& rhs) {
   // using the long multiplication method, which is
@@ -253,6 +253,15 @@ constexpr z<C> add(const z<C>& lhs, const z<C>& rhs) {
     r = sub_n(*minuend, *substrahend);
     r.sign = r.digits.empty() == false ? sign(*minuend) : false;
   }
+  return r;
+}
+
+// returns: r = lhs * rhs;
+template <z_digit_container C>
+constexpr z<C> mul(const z<C>& lhs, const z<C>& rhs) {
+  z<C> r;
+  r = mul_n(lhs, rhs);
+  r.sign = lhs.sign != rhs.sign;
   return r;
 }
 

@@ -89,7 +89,7 @@ TEST(z_tests, add) {
   {
     real::z zero;
     auto sum = real::add(zero, zero);
-    EXPECT_EQ(real::cmp_n(zero, sum), 0);
+    EXPECT_TRUE(real::is_zero(sum));
   }
   {
     real::z zero;
@@ -126,5 +126,49 @@ TEST(z_tests, add) {
     real::init(expected, -928269324);
     auto sum = real::add(num, num2);
     EXPECT_EQ(real::cmp(sum, expected), 0);
+  }
+}
+
+TEST(z_tests, mul) {
+  {
+    real::z zero;
+    auto prod = real::mul(zero, zero);
+    EXPECT_TRUE(real::is_zero(prod));
+  }
+  {
+    real::z zero, num;
+    real::init(num, 123456);
+    auto prod = real::mul(num, zero);
+    EXPECT_TRUE(real::is_zero(prod));
+    prod = real::mul(zero, num);
+    EXPECT_TRUE(real::is_zero(prod));
+  }
+  {
+    real::z one, num;
+    real::init(one, 1);
+    real::init(num, 123456);
+    auto prod = real::mul(num, one);
+    EXPECT_EQ(real::cmp(prod, num), 0);
+    prod = real::mul(one, num);
+    EXPECT_EQ(real::cmp(prod, num), 0);
+  }
+  {
+    real::z minus_one, num;
+    real::init(minus_one, -1);
+    real::init(num, 123456);
+    auto prod = real::mul(num, minus_one);
+    EXPECT_TRUE(real::is_zero(real::add(num, prod)));
+    prod = real::mul(minus_one, num);
+    EXPECT_TRUE(real::is_zero(real::add(num, prod)));
+  }
+  {
+    real::z num, num2, expected;
+    real::init(num, 123456);
+    real::init(num2, -4321);
+    real::init(expected, -533453376);
+    auto prod = real::mul(num, num2);
+    EXPECT_EQ(real::cmp(prod, expected), 0);
+    prod = real::mul(num2, num);
+    EXPECT_EQ(real::cmp(prod, expected), 0);
   }
 }

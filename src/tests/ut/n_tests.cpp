@@ -5,6 +5,7 @@
 #include <z.hpp>
 
 using small = std::vector<unsigned char>;
+using middle = std::vector<unsigned short>;
 
 TEST(n_tests, details_umul) {
   {
@@ -188,6 +189,36 @@ TEST(n_tests, mul_n) {
     real::init(num, 63847u);
     real::init(num2, 19383u);
     real::init(expected, 1237546401ui64);
+    auto prod = real::mul_n(num, num2);
+    EXPECT_EQ(real::cmp_n(prod, expected), 0);
+    prod = real::mul_n(num2, num);
+    EXPECT_EQ(real::cmp_n(prod, expected), 0);
+  }
+  {
+    real::z<small> num, num2, expected;
+    real::init(num, 8463732u);
+    real::init(num2, 2847463u);
+    real::init(expected, 24100163711916ui64);
+    auto prod = real::mul_n(num, num2);
+    EXPECT_EQ(real::cmp_n(prod, expected), 0);
+    prod = real::mul_n(num2, num);
+    EXPECT_EQ(real::cmp_n(prod, expected), 0);
+  }
+  {
+    real::z<middle> num, num2, expected;
+    real::init(num, 8463732u);
+    real::init(num2, 2847463u);
+    real::init(expected, 24100163711916ui64);
+    auto prod = real::mul_n(num, num2);
+    EXPECT_EQ(real::cmp_n(prod, expected), 0);
+    prod = real::mul_n(num2, num);
+    EXPECT_EQ(real::cmp_n(prod, expected), 0);
+  }
+  {
+    real::z num, num2, expected;
+    real::init(num, 8473u);
+    real::init(num2, 99281u);
+    real::init(expected, 841207913u);
     auto prod = real::mul_n(num, num2);
     EXPECT_EQ(real::cmp_n(prod, expected), 0);
     prod = real::mul_n(num2, num);
