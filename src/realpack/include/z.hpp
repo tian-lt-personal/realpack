@@ -16,7 +16,8 @@ namespace real {
 
 namespace details {
 
-using z_default_container = std::vector<unsigned long>;
+using z_max_digit_type = unsigned long;
+using z_default_container = std::vector<z_max_digit_type>;
 
 constexpr bool is_ws(char ch) { return ch == ' ' || ch == '\t' || ch == '\v' || ch == '\f'; }
 constexpr bool is_decimal(char ch) { return '0' <= ch && ch <= '9'; }
@@ -25,6 +26,28 @@ constexpr std::optional<unsigned> char2decimal(char ch) {
     return static_cast<unsigned>(ch - '0');
   else
     return std::nullopt;
+}
+
+template <class MaxD, std::unsigned_integral T>
+constexpr T umul(T lhs, T rhs, T& o) {
+  if constexpr (sizeof(T) >= sizeof(MaxD)) {
+    constexpr T s = sizeof(T) * 4u;
+    constexpr T mask = std::numeric_limits<T>::max() >> s;
+    T a0 = lhs & mask, b0 = rhs & mask;
+    T a1 = lhs >> s, b1 = rhs >> s;
+    T ll = a0 * b0, lh = a0 * b1, hl = a1 * b0, hh = a1 * b1;
+    T w = lh + (ll >> s);
+    w += hl;
+    if (w < hl) hh += mask + 1u;
+    o = hh + (w >> s);
+    return (w << s) + (ll & mask);
+  } else {
+    constexpr unsigned s = sizeof(T) * 8u;
+    MaxD l = lhs, r = rhs;
+    auto prod = l * r;
+    o = static_cast<T>(prod >> s);
+    return static_cast<T>(prod);
+  }
 }
 
 }  // namespace details
@@ -36,7 +59,7 @@ struct z_error : std::domain_error {
 template <class T>
 concept z_digit_container = std::ranges::contiguous_range<T> && std::ranges::sized_range<T> && requires {
   typename T::value_type;
-  sizeof(typename T::value_type) <= sizeof(unsigned long);  // the largest digit type is `unsigned long`
+  sizeof(typename T::value_type) <= sizeof(details::z_max_digit_type);  // the max digit type is `unsigned long`
   std::is_unsigned_v<typename T::value_type>;
 };
 
@@ -83,7 +106,7 @@ constexpr bool sign(const z<C>& num) {
   return num.sign;
 }
 
-// ignores: the sign of `lhs` ans `rhs`
+// ignores: the signs of `lhs` and `rhs`
 // returns: 0 if lhs is exactly equal to rhs
 //          + if lhs is greater than rhs
 //          - if lhs is less than rhs
@@ -132,7 +155,7 @@ constexpr z<C>& norm_n(z<C>& num) {
   return num;
 }
 
-// ignores: the sign of `lhs` ans `rhs`
+// ignores: the signs of `lhs` and `rhs`
 // returns: r = lhs + rhs;
 template <z_digit_container C>
 constexpr z<C> add_n(const z<C>& lhs, const z<C>& rhs) {
@@ -145,12 +168,12 @@ constexpr z<C> add_n(const z<C>& lhs, const z<C>& rhs) {
   D cy = 0;
   for (; i < a.digits.size(); ++i) {
     D t = a.digits[i] + b.digits[i] + cy;
-    cy = t >= a.digits[i] && t >= b.digits[i] ? 0 : 1;
+    cy = t >= a.digits[i] && t >= b.digits[i] ? 0u : 1u;
     r.digits.push_back(t);
   }
   for (; i < b.digits.size(); ++i) {
     D t = b.digits[i] + cy;
-    cy = t >= b.digits[i] && t >= cy ? 0 : 1;
+    cy = t >= b.digits[i] && t >= cy ? 0u : 1u;
     r.digits.push_back(t);
   }
   if (cy > 0) {
@@ -160,7 +183,7 @@ constexpr z<C> add_n(const z<C>& lhs, const z<C>& rhs) {
 }
 
 // requires: lhs >= rhs
-// ignores: the sign of `lhs` ans `rhs`
+// ignores: the signs of `lhs` and `rhs`
 // returns: r = lhs - rhs;
 template <z_digit_container C>
 constexpr z<C> sub_n(const z<C>& lhs, const z<C>& rhs) {
@@ -185,6 +208,33 @@ constexpr z<C> sub_n(const z<C>& lhs, const z<C>& rhs) {
   return r;
 };
 
+// ignores: the signs of `lhs` and `rhs`
+// returns: r = lhs + rhs;
+template <z_digit_container C>
+constexpr z<C> mul_n(const z<C>& lhs, const z<C>& rhs) {
+  // using the long multiplication method, which is
+  // the same one you learnt in grade school
+  // todo: use other fast muliplication algorithms
+  using D = typename z<C>::digit_type;
+  z<C> r;
+  r.digits.resize(lhs.digits.size() + rhs.digits.size());
+  for (size_t j = 0; j < rhs.digits.size(); ++j) {
+    D cy = 0;
+    for (size_t i = 0; i < lhs.digits.size(); ++i) {
+      D o;
+      auto prod = details::umul<details::z_max_digit_type>(lhs.digits[i], rhs.digits[j], o);
+      prod += cy;
+      cy = (prod < cy ? 1u : 0u) + o;
+      r.digits[i + j] = prod;
+    }
+    r.digits[j + lhs.digits.size()] = cy;
+  }
+  norm_n(r);
+  return r;
+}
+
+// returns: r = lhs + rhs;
+// notes: operands could be negative integers
 template <z_digit_container C>
 constexpr z<C> add(const z<C>& lhs, const z<C>& rhs) {
   z<C> r;
