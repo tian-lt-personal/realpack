@@ -225,7 +225,8 @@ constexpr z<C> mul_n(const z<C>& lhs, const z<C>& rhs) {
       auto prod = details::umul<details::z_max_digit_type>(lhs.digits[i], rhs.digits[j], o);
       prod += cy;
       cy = (prod < cy ? 1u : 0u) + o;
-      r.digits[i + j] = prod;
+      r.digits[i + j] += prod;
+      if (r.digits[i + j] < prod) ++cy;
     }
     r.digits[j + lhs.digits.size()] = cy;
   }

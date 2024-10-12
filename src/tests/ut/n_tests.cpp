@@ -183,4 +183,14 @@ TEST(n_tests, mul_n) {
     prod = real::mul_n(num2, num);
     EXPECT_EQ(real::cmp_n(prod, expected), 0);
   }
+  {
+    real::z<small> num, num2, expected;
+    real::init(num, 63847u);
+    real::init(num2, 19383u);
+    real::init(expected, 1237546401ui64);
+    auto prod = real::mul_n(num, num2);
+    EXPECT_EQ(real::cmp_n(prod, expected), 0);
+    prod = real::mul_n(num2, num);
+    EXPECT_EQ(real::cmp_n(prod, expected), 0);
+  }
 }
