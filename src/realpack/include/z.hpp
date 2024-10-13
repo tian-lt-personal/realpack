@@ -66,6 +66,13 @@ struct z_parse_error : z_error {
   z_parse_error(const char* reason) : z_error(reason) {}
 };
 
+#if defined(_DEBUG) || defined(DEBUG)
+#define _REAL_CHECK_ZERO(Z) \
+  if (is_zero(Z)) throw z_divided_by_zero_error{};
+#else
+#define _REAL_CHECK_ZERO(Z)
+#endif
+
 template <class T>
 concept z_digit_container = std::ranges::contiguous_range<T> && std::ranges::sized_range<T> && requires {
   typename T::value_type;
@@ -165,6 +172,25 @@ constexpr z<C>& norm_n(z<C>& num) {
   return num;
 }
 
+// effects: shift `num` with the `offset` digits towards msd or lsd.
+// returns: ref to `num`
+template <z_digit_container C>
+constexpr z<C>& shift_n(z<C>& num, size_t offset, bool lsd = false) {
+  using D = typename z<C>::digit_type;
+  // constexpr bool has_pop_front = ;
+  if (lsd) {
+    if (offset < num.digits.size()) {
+      num.digits.erase(num.digits.begin(), num.digits.begin() + offset);
+    } else {
+      num.digits.clear();
+    }
+  } else {
+    // msd
+    num.digits.insert(num.digits.begin(), offset, (D)0);
+  }
+  return num;
+}
+
 // ignores: the signs of `lhs` and `rhs`
 // returns: r = lhs + rhs;
 template <z_digit_container C>
@@ -223,8 +249,8 @@ constexpr z<C> sub_n(const z<C>& lhs, const z<C>& rhs) {
 template <z_digit_container C>
 constexpr z<C> mul_n(const z<C>& lhs, const z<C>& rhs) {
   // using the long multiplication method, which is
-  // the same one you learnt in grade school
-  // todo: use other fast muliplication algorithms
+  // the same one you learnt in grade school.
+  // todo: use other fast muliplication algorithms.
   using D = typename z<C>::digit_type;
   z<C> r;
   r.digits.resize(lhs.digits.size() + rhs.digits.size());
@@ -242,6 +268,20 @@ constexpr z<C> mul_n(const z<C>& lhs, const z<C>& rhs) {
   }
   norm_n(r);
   return r;
+}
+
+// ignores: the signs of `dividend` and `divisor`
+// returns: the quotient of (dividend / divisor), and out put its remainder
+template <z_digit_container C>
+constexpr z<C> div_n(const z<C>& dividend, const z<C>& divisor, z<C>& remainder) {
+  _REAL_CHECK_ZERO(divisor);
+  // long division.
+  z<C> q;  // quotient
+  z<C>& r = remainder;
+  const auto k = dividend.digits.size();
+  const auto l = divisor.digits.size();
+
+  return q;
 }
 
 // returns: r = lhs + rhs;
@@ -340,4 +380,5 @@ constexpr z<C>& init_decstr(z<C>& num, std::string_view str) {
 
 }  // namespace real
 
+#undef _REAL_CHECK_ZERO
 #endif  // !REALPACK_INC_Z_HPP

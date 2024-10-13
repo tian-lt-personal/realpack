@@ -74,6 +74,75 @@ TEST(n_tests, cmp_n) {
   }
 }
 
+TEST(n_tests, norm_n) {
+  {
+    real::z zero;
+    real::norm_n(zero);
+    EXPECT_TRUE(real::is_zero(zero));
+    EXPECT_FALSE(zero.sign);
+    EXPECT_TRUE(zero.digits.empty());
+  }
+  {
+    real::z zero{.sign = true};
+    for (auto _ : std::views::iota(1, 10)) {
+      zero.digits.push_back(0);
+    }
+    real::norm_n(zero);
+    EXPECT_TRUE(real::is_zero(zero));
+    EXPECT_FALSE(zero.sign);
+    EXPECT_TRUE(zero.digits.empty());
+  }
+  {
+    real::z num, expected;
+    real::init(num, -12345);
+    expected = num;
+    for (auto _ : std::views::iota(1, 20)) {
+      num.digits.push_back(0);
+    }
+    real::norm_n(num);
+    EXPECT_EQ(real::cmp_n(num, expected), 0);
+    EXPECT_EQ(num.sign, expected.sign);
+    EXPECT_EQ(num.digits.size(), expected.digits.size());
+  }
+}
+
+TEST(n_tests, shift_n) {
+  {
+    real::z zero;
+    real::shift_n(zero, 0);
+    EXPECT_TRUE(real::is_zero(zero));
+    EXPECT_FALSE(zero.sign);
+    EXPECT_TRUE(zero.digits.empty());
+  }
+  {
+    real::z zero;
+    real::shift_n(zero, 0, true);
+    EXPECT_TRUE(real::is_zero(zero));
+    EXPECT_FALSE(zero.sign);
+    EXPECT_TRUE(zero.digits.empty());
+  }
+  {
+    real::z<small> num, expected;
+    real::init(expected, 256);
+    real::init(num, 1);
+    real::shift_n(num, 1);
+    EXPECT_EQ(real::cmp_n(num, expected), 0);
+  }
+  {
+    real::z<small> num, expected;
+    real::init(expected, 65536);
+    real::init(num, 1);
+    real::shift_n(num, 2);
+    EXPECT_EQ(real::cmp_n(num, expected), 0);
+  }
+  {
+    real::z<small> num;
+    real::init(num, 1);
+    real::shift_n(num, 1, true);
+    EXPECT_TRUE(real::is_zero(num));
+  }
+}
+
 TEST(n_tests, add_n) {
   {
     real::z<small> num, zero;
