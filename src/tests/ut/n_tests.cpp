@@ -233,6 +233,17 @@ TEST(n_tests, sub_n) {
     auto diff = real::sub_n(minuend, subtrahend);
     EXPECT_EQ(real::cmp_n(diff, expected), 0);
   }
+  {
+    real::z<small> sum, num;
+    real::init(num, 9382239483u);
+    for (auto _ : std::views::iota(0, 1000)) {
+      sum = real::add_n(sum, num);
+    }
+    for (auto _ : std::views::iota(0, 1000)) {
+      sum = real::sub_n(sum, num);
+    }
+    EXPECT_TRUE(real::is_zero(sum));
+  }
 }
 
 TEST(n_tests, mul_n) {
@@ -306,5 +317,17 @@ TEST(n_tests, mul_n) {
     EXPECT_EQ(real::cmp_n(prod, expected), 0);
     prod = real::mul_n(num2, num);
     EXPECT_EQ(real::cmp_n(prod, expected), 0);
+  }
+  {
+    real::z num, num2, sum, expected;
+    real::init(num, 9384u);
+    real::init(num2, 281942u);
+    real::init(expected, 2645743728u);
+    auto prod = real::mul_n(num, num2);
+    EXPECT_EQ(real::cmp_n(prod, expected), 0);
+    for (auto _ : std::views::iota(0, 9384)) {
+      sum = real::add(sum, num2);
+    }
+    EXPECT_EQ(real::cmp_n(prod, sum), 0);
   }
 }

@@ -286,9 +286,14 @@ constexpr z<C> div_n(const z<C>& dividend, const z<C>& divisor, z<C>& remainder)
   // long division.
   // todo: use some views over z to avoid intermediate copies.
   z<C> q;  // quotient
-  z<C>& r = remainder;
   const auto k = dividend.digits.size();
   const auto l = divisor.digits.size();
+
+  // initialize remainder
+  z<C>& r = remainder;
+  for (size_t i = 0; i <= l - 2; ++i) {
+    // todo:
+  }
 
   return q;
 }
