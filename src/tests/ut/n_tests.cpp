@@ -143,6 +143,20 @@ TEST(n_tests, shift_n) {
   }
 }
 
+TEST(n_tests, digit_n) {
+  {
+    real::z zero;
+    EXPECT_EQ(real::digit_n(zero, 0), 0);
+    EXPECT_EQ(real::digit_n(zero, 100), 0);
+  }
+  {
+    real::z<small> num;
+    real::init(num, 41312);
+    EXPECT_EQ(real::digit_n(num, 0), 0x60);
+    EXPECT_EQ(real::digit_n(num, 1), 0xa1);
+    EXPECT_EQ(real::digit_n(num, 2), 0);
+  }
+}
 TEST(n_tests, add_n) {
   {
     real::z<small> num, zero;

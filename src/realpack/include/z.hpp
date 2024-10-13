@@ -153,8 +153,8 @@ constexpr int cmp(const z<C>& lhs, const z<C>& rhs) {
   }
 }
 
-// effects: num = -num
-// returns: ref to `num`
+// effects: num = -num.
+// returns: ref to `num`.
 template <z_digit_container C>
 constexpr z<C>& neg(z<C>& num) {
   num.sign = !num.sign;
@@ -173,7 +173,7 @@ constexpr z<C>& norm_n(z<C>& num) {
 }
 
 // effects: shift `num` with the `offset` digits towards msd or lsd.
-// returns: ref to `num`
+// returns: ref to `num`.
 template <z_digit_container C>
 constexpr z<C>& shift_n(z<C>& num, size_t offset, bool lsd = false) {
   using D = typename z<C>::digit_type;
@@ -191,13 +191,21 @@ constexpr z<C>& shift_n(z<C>& num, size_t offset, bool lsd = false) {
   return num;
 }
 
-// ignores: the signs of `lhs` and `rhs`
-// returns: r = lhs + rhs;
+// returns: the n-th digit of `num`.
+// notes: `n` is an index that starts counting from 0.
+template <z_digit_container C>
+constexpr auto digit_n(const z<C>& num, size_t n) {
+  using D = typename z<C>::digit_type;
+  return n < num.digits.size() ? num.digits[n] : (D)0;
+}
+
+// ignores: the signs of `lhs` and `rhs`.
+// returns: r = lhs + rhs.
 template <z_digit_container C>
 constexpr z<C> add_n(const z<C>& lhs, const z<C>& rhs) {
   using D = typename z<C>::digit_type;
   z<C> r;
-  // ensure size(a.digits) <= size(b.digits)
+  // ensure size(a.digits) <= size(b.digits).
   auto& a = lhs.digits.size() <= rhs.digits.size() ? lhs : rhs;
   auto& b = lhs.digits.size() <= rhs.digits.size() ? rhs : lhs;
   size_t i = 0;
@@ -276,6 +284,7 @@ template <z_digit_container C>
 constexpr z<C> div_n(const z<C>& dividend, const z<C>& divisor, z<C>& remainder) {
   _REAL_CHECK_ZERO(divisor);
   // long division.
+  // todo: use some views over z to avoid intermediate copies.
   z<C> q;  // quotient
   z<C>& r = remainder;
   const auto k = dividend.digits.size();
