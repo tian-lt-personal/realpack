@@ -52,6 +52,13 @@ TEST(n_tests, details_umul) {
   }
 }
 
+TEST(n_tests, details_nlz) {
+  EXPECT_EQ(real::details::nlz(1u), 31);
+  EXPECT_EQ(real::details::nlz(356u), 23);
+  EXPECT_EQ(real::details::nlz(213123u), 14);
+  EXPECT_EQ(real::details::nlz(84627813u), 5);
+}
+
 TEST(n_tests, cmp_n) {
   real::z zero;
   {

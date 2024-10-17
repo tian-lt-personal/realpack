@@ -50,6 +50,17 @@ constexpr T umul(T lhs, T rhs, T& o) {
   }
 }
 
+constexpr unsigned nlz(unsigned x) {
+  assert(x != 0 && "x must be greater than zero.");
+  unsigned count = 0;
+  unsigned mask = 1u << (sizeof(x) * CHAR_BIT - 1);
+  while ((x & mask) == 0) {
+    ++count;
+    mask >>= 1;
+  }
+  return count;
+}
+
 }  // namespace details
 
 struct z_error : std::domain_error {
