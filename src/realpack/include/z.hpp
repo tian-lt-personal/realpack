@@ -4,10 +4,12 @@
 // std headers
 #include <algorithm>
 #include <cassert>
+#include <climits>
 #include <concepts>
 #include <limits>
 #include <optional>
 #include <ranges>
+#include <span>
 #include <stack>
 #include <string_view>
 #include <vector>
@@ -50,15 +52,22 @@ constexpr T umul(T lhs, T rhs, T& o) {
   }
 }
 
-constexpr unsigned nlz(unsigned x) {
+template <std::unsigned_integral T>
+constexpr T nlz(T x) {
   assert(x != 0 && "x must be greater than zero.");
   unsigned count = 0;
-  unsigned mask = 1u << (sizeof(x) * CHAR_BIT - 1);
+  T mask = 1u << (sizeof(T) * CHAR_BIT - 1);
   while ((x & mask) == 0) {
     ++count;
     mask >>= 1;
   }
   return count;
+}
+
+template <std::unsigned_integral T>
+constexpr T knuth_algo_d_normalize(std::span<T> digits) {
+  assert(digits.size() >= 1 && "both dividend and divisor of the algo d must be greater than 1.");
+  // constexpr auto s = nlz();
 }
 
 }  // namespace details
