@@ -68,38 +68,56 @@ TEST(n_tests, details_nlz) {
   EXPECT_EQ(real::details::nlz<unsigned short>(0xffff), 0);
 }
 
-TEST(n_tests, details_knuth_algo_d_norm) {
-  constexpr auto run_small = [](unsigned val) {
-    assert(val > std::numeric_limits<small::value_type>::max() && "val shall be sufficiently large.");
+TEST(n_tests, pwr2_n) {
+  constexpr auto run_small = [](unsigned val, unsigned pwr) {
     real::z<small> num, times;
     real::init(num, val);
-    auto s = real::details::nlz(num.digits.back());
-    real::init(times, 1ul << s);
+    real::init(times, 1ul << pwr);
     auto expected = real::mul_n(num, times);
-    real::details::knuth_algo_d_norm<small::value_type>(num.digits);
+    auto cy = real::pwr2_n(num, pwr);
+    if (cy > 0) {
+      num.digits.push_back(cy);
+    }
     EXPECT_EQ(real::cmp_n(num, expected), 0);
   };
-
-  constexpr auto run_middle = [](unsigned val) {
-    assert(val > std::numeric_limits<middle::value_type>::max() && "val shall be sufficiently large.");
+  constexpr auto run_middle = [](unsigned val, unsigned pwr) {
     real::z<middle> num, times;
     real::init(num, val);
-    auto s = real::details::nlz(num.digits.back());
-    real::init(times, 1ul << s);
+    real::init(times, 1ul << pwr);
     auto expected = real::mul_n(num, times);
-    real::details::knuth_algo_d_norm<middle::value_type>(num.digits);
+    auto cy = real::pwr2_n(num, pwr);
+    if (cy > 0) {
+      num.digits.push_back(cy);
+    }
+    EXPECT_EQ(real::cmp_n(num, expected), 0);
+  };
+  constexpr auto run = [](unsigned val, unsigned pwr) {
+    real::z num, times;
+    real::init(num, val);
+    real::init(times, 1ul << pwr);
+    auto expected = real::mul_n(num, times);
+    auto cy = real::pwr2_n(num, pwr);
+    if (cy > 0) {
+      num.digits.push_back(cy);
+    }
     EXPECT_EQ(real::cmp_n(num, expected), 0);
   };
 
-  run_small(256u);
-  run_small(257u);
-  run_small(12832u);
-  run_small(3818123u);
+  run_small(256u, 0);
+  run_small(256u, 7);
+  run_small(257u, 4);
+  run_small(12832u, 6);
+  run_small(3818123u, 7);
 
-  run_middle(65536u);
-  run_middle(38265536u);
-  run_middle(988265536u);
-  run_middle(732938274u);
+  run_middle(65536u, 15);
+  run_middle(38265536u, 10);
+  run_middle(988265536u, 3);
+  run_middle(732938274u, 15);
+
+  run(0, 0);
+  run(1898274u, 31);
+  run(27371u, 8);
+  run(1938173u, 18);
 }
 
 TEST(n_tests, cmp_n) {
@@ -379,5 +397,19 @@ TEST(n_tests, mul_n) {
       sum = real::add(sum, num2);
     }
     EXPECT_EQ(real::cmp_n(prod, sum), 0);
+  }
+}
+
+TEST(n_tests, div_n) {
+  {
+    real::z<small> zero, one;
+    real::init(one, 1);
+    real::div_n<small>(zero, one, nullptr);
+  }
+  {
+    real::z<small> u, v;
+    real::init(u, 8347330149823u);
+    real::init(v, 182734u);
+    real::div_n<small>(u, v, nullptr);
   }
 }
