@@ -65,9 +65,16 @@ constexpr T nlz(T x) {
 }
 
 template <std::unsigned_integral T>
-constexpr T knuth_algo_d_normalize(std::span<T> digits) {
-  assert(digits.size() >= 1 && "both dividend and divisor of the algo d must be greater than 1.");
-  // constexpr auto s = nlz();
+constexpr void knuth_algo_d_norm(std::span<T> d) {
+  assert(d.size() >= 1 && "both dividend and divisor of the algo d must be greater than 1.");
+  auto s = nlz<T>(d.back());  // 0 <= s <= 31
+  T cy = 0;
+  for (auto& x : d) {
+    T t = (x << s) | cy;
+    cy = x >> (sizeof(T) * CHAR_BIT - s);
+    x = t;
+  }
+  assert(cy == 0 && "this function guarantees no new digits be introduced.");
 }
 
 }  // namespace details
@@ -299,22 +306,13 @@ constexpr z<C> mul_n(const z<C>& lhs, const z<C>& rhs) {
 }
 
 // ignores: the signs of `dividend` and `divisor`
-// returns: the quotient of (dividend / divisor), and out put its remainder
+// returns: the quotient of (dividend / divisor), and output its remainder
 template <z_digit_container C>
-constexpr z<C> div_n(const z<C>& dividend, const z<C>& divisor, z<C>& remainder) {
+constexpr z<C> div_n(z<C> dividend, z<C> divisor, z<C>& remainder) {
   _REAL_CHECK_ZERO(divisor);
-  // long division.
-  // todo: use some views over z to avoid intermediate copies.
+  details::knuth_algo_d_norm(dividend.digits);
+  details::knuth_algo_d_norm(divisor.digits);
   z<C> q;  // quotient
-  const auto k = dividend.digits.size();
-  const auto l = divisor.digits.size();
-
-  // initialize remainder
-  z<C>& r = remainder;
-  for (size_t i = 0; i <= l - 2; ++i) {
-    // todo:
-  }
-
   return q;
 }
 

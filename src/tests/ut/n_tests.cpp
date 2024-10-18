@@ -68,6 +68,40 @@ TEST(n_tests, details_nlz) {
   EXPECT_EQ(real::details::nlz<unsigned short>(0xffff), 0);
 }
 
+TEST(n_tests, details_knuth_algo_d_norm) {
+  constexpr auto run_small = [](unsigned val) {
+    assert(val > std::numeric_limits<small::value_type>::max() && "val shall be sufficiently large.");
+    real::z<small> num, times;
+    real::init(num, val);
+    auto s = real::details::nlz(num.digits.back());
+    real::init(times, 1ul << s);
+    auto expected = real::mul_n(num, times);
+    real::details::knuth_algo_d_norm<small::value_type>(num.digits);
+    EXPECT_EQ(real::cmp_n(num, expected), 0);
+  };
+
+  constexpr auto run_middle = [](unsigned val) {
+    assert(val > std::numeric_limits<middle::value_type>::max() && "val shall be sufficiently large.");
+    real::z<middle> num, times;
+    real::init(num, val);
+    auto s = real::details::nlz(num.digits.back());
+    real::init(times, 1ul << s);
+    auto expected = real::mul_n(num, times);
+    real::details::knuth_algo_d_norm<middle::value_type>(num.digits);
+    EXPECT_EQ(real::cmp_n(num, expected), 0);
+  };
+
+  run_small(256u);
+  run_small(257u);
+  run_small(12832u);
+  run_small(3818123u);
+
+  run_middle(65536u);
+  run_middle(38265536u);
+  run_middle(988265536u);
+  run_middle(732938274u);
+}
+
 TEST(n_tests, cmp_n) {
   real::z zero;
   {
