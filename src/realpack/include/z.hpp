@@ -82,7 +82,7 @@ constexpr T nlz(T x) {
 
 template <std::unsigned_integral D>
 constexpr D bit_shift(std::span<D> digits, signed offset) {
-  assert((sizeof(D) * CHAR_BIT) > offset);
+  assert((sizeof(D) * CHAR_BIT) > std::abs(offset));
   if (offset > 0) {
     // left shift
     const D mask = ((1u << offset) - 1) << (sizeof(D) * CHAR_BIT - offset);
@@ -94,6 +94,7 @@ constexpr D bit_shift(std::span<D> digits, signed offset) {
     }
     return cy;
   } else if (offset < 0) {
+    offset = std::abs(offset);
     // right shift
     const D mask = (1u << offset) - 1;
     D cy = 0;

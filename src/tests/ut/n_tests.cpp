@@ -145,6 +145,24 @@ TEST(n_tests, details_bit_shift) {
     }
     EXPECT_EQ(real::cmp(num, expected), 0);
   }
+  {
+    real::z<small> expected;
+    real::init(expected, 1234u);
+    auto num = real::mul(expected, pow_of_2<small>(7));
+    auto cy = real::details::bit_shift<typename small::value_type>(num.digits, -7);
+    real::norm_n(num);
+    EXPECT_EQ(cy, 0);
+    EXPECT_EQ(real::cmp(num, expected), 0);
+  }
+  {
+    real::z<small> expected;
+    real::init(expected, 7462981237123ull);
+    auto num = real::mul(expected, pow_of_2<small>(4));
+    auto cy = real::details::bit_shift<typename small::value_type>(num.digits, -4);
+    real::norm_n(num);
+    EXPECT_EQ(cy, 0);
+    EXPECT_EQ(real::cmp(num, expected), 0);
+  }
 }
 
 TEST(n_tests, cmp_n) {
