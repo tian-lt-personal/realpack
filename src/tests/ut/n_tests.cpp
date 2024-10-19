@@ -4,8 +4,38 @@
 // realpack headers
 #include <z.hpp>
 
+namespace {
+
 using small = std::vector<unsigned char>;
 using middle = std::vector<unsigned short>;
+
+template <class C>
+constexpr auto pow_of_2(unsigned pwr) {
+  auto res = real::identity<C>();
+  auto two = real::add(real::identity<C>(), real::identity<C>());
+  for (auto i = 0u; i < pwr; ++i) {
+    res = real::mul(res, two);
+  }
+  return res;
+}
+static_assert([] {
+  auto num = pow_of_2<small>(0);
+  auto one = real::identity<small>();
+  return real::cmp(num, one) == 0;
+}());
+static_assert([] {
+  auto num = pow_of_2<small>(1);
+  auto two = real::add(real::identity<small>(), real::identity<small>());
+  return real::cmp(num, two) == 0;
+}());
+static_assert([] {
+  auto num = pow_of_2<small>(2);
+  auto two = real::add(real::identity<small>(), real::identity<small>());
+  auto four = real::add(two, two);
+  return real::cmp(num, four) == 0;
+}());
+
+}  // namespace
 
 TEST(n_tests, details_umul) {
   {
@@ -68,56 +98,53 @@ TEST(n_tests, details_nlz) {
   EXPECT_EQ(real::details::nlz<unsigned short>(0xffff), 0);
 }
 
-TEST(n_tests, pwr2_n) {
-  constexpr auto run_small = [](unsigned val, unsigned pwr) {
-    real::z<small> num, times;
-    real::init(num, val);
-    real::init(times, 1ul << pwr);
-    auto expected = real::mul_n(num, times);
-    auto cy = real::pwr2_n(num, pwr);
+TEST(n_tests, details_bit_shift) {
+  {
+    real::z<small> zero;
+    real::details::bit_shift<typename small::value_type>(zero.digits, 0);
+    EXPECT_TRUE(real::is_zero(zero));
+  }
+  {
+    real::z<small> zero;
+    real::details::bit_shift<typename small::value_type>(zero.digits, 6);
+    EXPECT_TRUE(real::is_zero(zero));
+  }
+  {
+    auto num = real::identity<small>();
+    auto expected = real::mul(num, pow_of_2<small>(7));
+    real::details::bit_shift<typename small::value_type>(num.digits, 7);
+    EXPECT_EQ(real::cmp(num, expected), 0);
+  }
+  {
+    real::z<small> num;
+    real::init(num, 8365473u);
+    auto expected = real::mul(num, pow_of_2<small>(3));
+    auto cy = real::details::bit_shift<typename small::value_type>(num.digits, 3);
     if (cy > 0) {
       num.digits.push_back(cy);
     }
-    EXPECT_EQ(real::cmp_n(num, expected), 0);
-  };
-  constexpr auto run_middle = [](unsigned val, unsigned pwr) {
-    real::z<middle> num, times;
-    real::init(num, val);
-    real::init(times, 1ul << pwr);
-    auto expected = real::mul_n(num, times);
-    auto cy = real::pwr2_n(num, pwr);
+    EXPECT_EQ(real::cmp(num, expected), 0);
+  }
+  {
+    real::z<small> num;
+    real::init(num, 99382171723ull);
+    auto expected = real::mul(num, pow_of_2<small>(6));
+    auto cy = real::details::bit_shift<typename small::value_type>(num.digits, 6);
     if (cy > 0) {
       num.digits.push_back(cy);
     }
-    EXPECT_EQ(real::cmp_n(num, expected), 0);
-  };
-  constexpr auto run = [](unsigned val, unsigned pwr) {
-    real::z num, times;
-    real::init(num, val);
-    real::init(times, 1ul << pwr);
-    auto expected = real::mul_n(num, times);
-    auto cy = real::pwr2_n(num, pwr);
+    EXPECT_EQ(real::cmp(num, expected), 0);
+  }
+  {
+    real::z<middle> num;
+    real::init(num, 9382723635117365ull);
+    auto expected = real::mul(num, pow_of_2<middle>(6));
+    auto cy = real::details::bit_shift<typename middle::value_type>(num.digits, 6);
     if (cy > 0) {
       num.digits.push_back(cy);
     }
-    EXPECT_EQ(real::cmp_n(num, expected), 0);
-  };
-
-  run_small(256u, 0);
-  run_small(256u, 7);
-  run_small(257u, 4);
-  run_small(12832u, 6);
-  run_small(3818123u, 7);
-
-  run_middle(65536u, 15);
-  run_middle(38265536u, 10);
-  run_middle(988265536u, 3);
-  run_middle(732938274u, 15);
-
-  run(0, 0);
-  run(1898274u, 31);
-  run(27371u, 8);
-  run(1938173u, 18);
+    EXPECT_EQ(real::cmp(num, expected), 0);
+  }
 }
 
 TEST(n_tests, cmp_n) {

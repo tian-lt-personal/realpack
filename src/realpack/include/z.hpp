@@ -80,17 +80,32 @@ constexpr T nlz(T x) {
   return count;
 }
 
-template <std::unsigned_integral T>
-constexpr T knuth_algo_d_norm(std::span<T> d, unsigned pwr) {
-  assert(d.size() >= 1 && "both dividend and divisor of the algo d must be greater than 1.");
-  auto s = nlz<T>(d.back());  // 0 <= s <= 31
-  T cy = 0;
-  for (auto& x : d) {
-    T t = (x << s) | cy;
-    cy = x >> (sizeof(T) * CHAR_BIT - s);
-    x = t;
+template <std::unsigned_integral D>
+constexpr D bit_shift(std::span<D> digits, signed offset) {
+  assert((sizeof(D) * CHAR_BIT) > offset);
+  if (offset > 0) {
+    // left shift
+    const D mask = ((1u << offset) - 1) << (sizeof(D) * CHAR_BIT - offset);
+    D cy = 0;
+    for (auto& d : digits) {
+      D t = (d << offset) | cy;
+      cy = (d & mask) >> (sizeof(D) * CHAR_BIT - offset);
+      d = t;
+    }
+    return cy;
+  } else if (offset < 0) {
+    // right shift
+    const D mask = (1u << offset) - 1;
+    D cy = 0;
+    for (auto& d : digits | std::views::reverse) {
+      D t = (d >> offset) | cy;
+      cy = (d & mask) << (sizeof(D) * CHAR_BIT - offset);
+      d = t;
+    }
+    return cy;
+  } else {
+    return 0;
   }
-  return cy;
 }
 
 }  // namespace details
@@ -137,6 +152,11 @@ constexpr bool is_zero(const z<C>& num) noexcept {
   if (num.digits.size() == 0) return true;
   return std::ranges::all_of(num.digits, [](typename z<C>::digit_type x) { return x == 0; });
 }
+
+template <z_digit_container C>
+constexpr z<C> identity() {
+  return z<C>{.digits = {1u}};
+};
 
 // assumes: is_zero(num) == true && num.sign == false
 template <z_digit_container C, std::integral T>
@@ -213,19 +233,6 @@ constexpr z<C>& norm_n(z<C>& num) {
   num.digits.resize(std::ranges::distance(view));
   num.sign = num.digits.empty() == false ? num.sign : false;
   return num;
-}
-
-template <z_digit_container C, std::unsigned_integral U>
-constexpr auto pwr2_n(z<C>& num, U pwr) {
-  using D = typename z<C>::digit_type;
-  assert((sizeof(D) * CHAR_BIT) > pwr);
-  D cy = 0;
-  for (auto& d : num.digits) {
-    D t = (d << pwr) | cy;
-    cy = d >> (sizeof(D) * CHAR_BIT - pwr);
-    d = t;
-  }
-  return cy;
 }
 
 // effects: shift `num` with the `offset` digits towards msd or lsd.
@@ -351,7 +358,6 @@ constexpr z<C> div_n(z<C> dividend, z<C> divisor, z<C>* remainder = nullptr) {
   auto c = cmp_n(dividend, divisor);
   if (c > 0) {
     if (divisor.digits.size() > 1) {
-      constexpr U b = ((U)1u) << (sizeof(D) * CHAR_BIT);
       auto& u = dividend.digits;
       auto& v = divisor.digits;
       const auto m = u.size();
@@ -360,32 +366,11 @@ constexpr z<C> div_n(z<C> dividend, z<C> divisor, z<C>* remainder = nullptr) {
       // algorithm d (division of nonnegative integers) in TAOCP volume 2.
       // d1. [normalize]
       const auto s = details::nlz(v.back());
-      assert(0 <= s && s < (sizeof(D) * CHAR_BIT));
-      pwr2_n(divisor, s);
-      u.push_back(pwr2_n(dividend, s));
       //  d2. [initialize]
-      size_t j_ = m - n + 1;
-      for (; j_ > 0; --j_) {
-        // d3. [calculator q_hat]
-        const auto j = j_ - 1;
-        auto q_hat = (u[j + n] * b + u[j + n - 1]) / v[n - 1];
-        auto r_hat = (u[j + n] * b + u[j + n - 1]) % v[n - 1];
-      _LOOP_D3:
-        if (q_hat >= b || (D)q_hat * (U)v[n - 2] > b * r_hat + u[j + n - 2]) {
-          --q_hat;
-          r_hat += v[n - 1];
-          if (r_hat < b) goto _LOOP_D3;
-        }
-        // d4. multiply and subtract
-        I k = 0;
-        for (size_t i = 0; i < n; ++i) {
-          auto p = (D)q_hat * (U)v[i];
-        }
-      }
       z<C> q;  // quotient
       return q;
     } else {
-      assert(divisor.digits.size() == 0);
+      assert(divisor.digits.size() == 1);
       z<C> q;  // quotient
       return q;
     }
@@ -398,7 +383,7 @@ constexpr z<C> div_n(z<C> dividend, z<C> divisor, z<C>* remainder = nullptr) {
     if (remainder != nullptr) {
       *remainder = {};
     }
-    return z<C>{.digits = {1u}};
+    return identity<C>();
   }
 }
 
