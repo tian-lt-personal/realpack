@@ -21,6 +21,7 @@ static_assert([] {
 
 }  // namespace z_tests_is_zero
 }  // namespace
+
 TEST(z_tests, is_zero) {
   {
     real::z num;
@@ -43,6 +44,14 @@ TEST(z_tests, identity) {
     real::init(expected, 1u);
     auto one = real::identity<real::details::z_default_container>();
     EXPECT_EQ(real::cmp(one, expected), 0);
+  }
+}
+
+TEST(z_tests, z_view) {
+  {
+    real::z num;
+    real::z_view zv{num};
+    real::z_view zv2 = num;
   }
 }
 
