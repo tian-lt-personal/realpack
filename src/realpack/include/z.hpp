@@ -148,6 +148,17 @@ struct z {
   bool sign = false;  // false for non-negative. -0 is ill-formed.
 };
 
+template <class D>
+struct z_view {
+  std::span<const D> digits;
+  bool sign;
+
+  template <class Z>
+  explicit z_view(Z&& z) {
+    return {.digits = z.digits, .sign = z.sign};
+  }
+};
+
 template <z_digit_container C>
 constexpr bool is_zero(const z<C>& num) noexcept {
   if (num.digits.size() == 0) return true;

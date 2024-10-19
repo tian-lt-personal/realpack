@@ -33,6 +33,19 @@ TEST(z_tests, is_zero) {
   }
 }
 
+TEST(z_tests, identity) {
+  {
+    auto one = real::identity<real::details::z_default_container>();
+    EXPECT_FALSE(real::is_zero(one));
+  }
+  {
+    real::z expected;
+    real::init(expected, 1u);
+    auto one = real::identity<real::details::z_default_container>();
+    EXPECT_EQ(real::cmp(one, expected), 0);
+  }
+}
+
 TEST(z_tests, init_unsigned) {
   {
     real::z num;
