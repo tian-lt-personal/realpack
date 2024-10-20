@@ -30,22 +30,6 @@ constexpr std::optional<unsigned> char2decimal(char ch) {
     return std::nullopt;
 }
 
-template <class T>
-struct promoted_unsigned;  // not defined
-template <std::unsigned_integral T>
-  requires(sizeof(T) < sizeof(unsigned long) && alignof(T) < alignof(unsigned long))
-struct promoted_unsigned<T> {
-  using type = unsigned long;
-};
-template <>
-struct promoted_unsigned<unsigned long> {
-  using type = unsigned long long;
-};
-template <>
-struct promoted_unsigned<unsigned int> {
-  using type = unsigned long long;
-};
-
 template <class MaxD, std::unsigned_integral T>
 constexpr T umul(T lhs, T rhs, T& o) {
   if constexpr (sizeof(T) >= sizeof(MaxD)) {
@@ -70,7 +54,7 @@ constexpr T umul(T lhs, T rhs, T& o) {
 
 template <std::unsigned_integral T>
 constexpr T nlz(T x) {
-  assert(x != 0 && "x must be greater than zero.");
+  if (x == 0) return sizeof(T) * CHAR_BIT;
   unsigned count = 0;
   T mask = 1u << (sizeof(T) * CHAR_BIT - 1);
   while ((x & mask) == 0) {
@@ -386,9 +370,6 @@ constexpr z<C> mul_n(const z<C>& lhs, const z<C>& rhs) {
 // returns: the quotient of (dividend / divisor), and output its remainder
 template <z_digit_container C>
 constexpr z<C> div_n(z<C> dividend, z<C> divisor, z<C>* remainder = nullptr) {
-  using D = typename z<C>::digit_type;
-  using U = typename details::promoted_unsigned<D>::type;
-  using I = std::make_signed_t<U>;
   _REAL_CHECK_ZERO(divisor);
   if (is_zero(dividend)) {
     if (remainder != nullptr) {
