@@ -448,6 +448,23 @@ TEST(n_tests, mul_n) {
   }
 }
 
+TEST(n_tests, short_div_n) {
+  {
+    real::z<small> zero;
+    unsigned char r;
+    auto q = real::div_n(zero, 1, &r);
+    EXPECT_TRUE(real::is_zero(q));
+    EXPECT_EQ(r, 0);
+  }
+  {
+    auto one = real::identity<small>();
+    unsigned char r;
+    auto q = real::div_n(one, 1, &r);
+    EXPECT_EQ(real::cmp_n(q, one), 0);
+    EXPECT_EQ(r, 0);
+  }
+}
+
 TEST(n_tests, div_n) {
   {
     real::z<small> zero, one;

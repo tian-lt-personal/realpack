@@ -93,6 +93,17 @@ constexpr D bit_shift(std::span<D> digits, signed offset) {
   }
 }
 
+// returns: the quotient of `(u1*b + u0) / v`, where b == 2^32
+// notes:
+// 1. this is a short-division with the specialization of 64-bit arithmetics, and
+// 2. `u1` is the MSD, and `u0` is the LSD.
+// 3. `r` is the remainder of `(u1*b + u0) / v`, where b == 2^32
+inline unsigned long long div_2ul(unsigned long u1, unsigned long u0, unsigned long v, unsigned long& r) {
+  auto u = ((u1 * 1ull) << 32 | u0);
+  r = static_cast<unsigned long>(u % v);
+  return u / v;
+};
+
 }  // namespace details
 
 struct z_error : std::domain_error {
@@ -112,8 +123,11 @@ struct z_parse_error : z_error {
 #if defined(_DEBUG) || defined(DEBUG)
 #define _REAL_CHECK_ZERO(Z) \
   if (is_zero(Z)) throw z_divided_by_zero_error{};
+#define _REAL_CHECK_ZERO_D(D) \
+  if ((D) == 0) throw z_divided_by_zero_error{};
 #else
 #define _REAL_CHECK_ZERO(Z)
+#define _REAL_CHECK_ZERO_D(D)
 #endif
 
 template <class T>
@@ -366,6 +380,35 @@ constexpr z<C> mul_n(const z<C>& lhs, const z<C>& rhs) {
   return mul_n<C>(z_view{lhs}, z_view{rhs});
 }
 
+// short division
+// ignores: the signs of `u` and `v`
+// returns: the quotient of `u/v`, and output its remainder via `r`
+template <z_digit_container C>
+constexpr z<C> div_n(z_view<typename C::value_type> u, typename C::value_type v, typename C::value_type* r = nullptr) {
+  using D = typename C::value_type;
+  static_assert(sizeof(D) <= sizeof(details::z_max_digit_type));
+  _REAL_CHECK_ZERO_D(v);
+  auto _r = 0ul;
+  z<C> q;
+  auto& w = q.digits;
+  const auto n = u.digits.size();
+  w.resize(n);
+  for (size_t i = 0; i < n; ++i) {
+    auto j = n - i - 1;
+    w[j] = static_cast<D>(details::div_2ul(_r, u.digits[j], v, _r));
+  }
+  norm_n(q);
+  if (r != nullptr) {
+    *r = static_cast<D>(_r);
+  }
+  return q;
+}
+template <z_digit_container C>
+constexpr z<C> div_n(z<C> u, typename C::value_type v, typename C::value_type* r = nullptr) {
+  using D = typename C::value_type;
+  return div_n<C>(z_view<D>{u}, v, r);
+}
+
 // ignores: the signs of `dividend` and `divisor`
 // returns: the quotient of (dividend / divisor), and output its remainder
 template <z_digit_container C>
@@ -514,4 +557,5 @@ constexpr z<C>& init_decstr(z<C>& num, std::string_view str) {
 }  // namespace real
 
 #undef _REAL_CHECK_ZERO
+#undef _REAL_CHECK_ZERO_D
 #endif  // !REALPACK_INC_Z_HPP
