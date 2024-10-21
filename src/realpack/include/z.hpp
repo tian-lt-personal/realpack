@@ -139,7 +139,7 @@ struct z_parse_error : z_error {
   z_parse_error(const char* reason) : z_error(reason) {}
 };
 
-#if defined(_DEBUG) || defined(DEBUG)
+#if defined(_DEBUG) || defined(DEBUG) || defined(REAL_ENABLE_ZERO_CHECK)
 #define _REAL_CHECK_ZERO(Z) \
   if (is_zero(Z)) throw z_divided_by_zero_error{};
 #define _REAL_CHECK_ZERO_D(D) \
@@ -185,7 +185,7 @@ constexpr bool is_zero(const z<C>& num) noexcept {
   return std::ranges::all_of(num.digits, [](typename z<C>::digit_type x) { return x == 0; });
 }
 
-template <z_digit_container C>
+template <z_digit_container C = details::z_default_container>
 constexpr z<C> identity() {
   return z<C>{.digits = {1u}};
 };
@@ -531,7 +531,17 @@ constexpr z<C> div_n(z<C> u, z<C> v, z<C>* r = nullptr) {
   }
 }
 
-// returns: r = lhs + rhs;
+//
+template <z_digit_container C>
+constexpr z<C> abs(z_view<typename C::value_type> num) {
+  return z<C>{.digits = num.digits};
+}
+template <z_digit_container C>
+constexpr z<C> abs(const z<C>& num) {
+  return abs<C>(z_view{num});
+}
+
+// returns: lhs + rhs;
 // notes: operands may be negative integers
 template <z_digit_container C>
 constexpr z<C> add(z_view<typename C::value_type> lhs, z_view<typename C::value_type> rhs) {
@@ -557,7 +567,7 @@ constexpr z<C> add(const z<C>& lhs, const z<C>& rhs) {
   return add<C>(z_view{lhs}, z_view{rhs});
 }
 
-// returns: r = lhs * rhs;
+// returns: lhs * rhs;
 template <z_digit_container C>
 constexpr z<C> mul(z_view<typename C::value_type> lhs, z_view<typename C::value_type> rhs) {
   z<C> r;
@@ -568,6 +578,19 @@ constexpr z<C> mul(z_view<typename C::value_type> lhs, z_view<typename C::value_
 template <z_digit_container C>
 constexpr z<C> mul(const z<C>& lhs, const z<C>& rhs) {
   return mul<C>(z_view{lhs}, z_view{rhs});
+}
+
+// returns: floor(lhs / rhs), and outputs its remainder
+template <z_digit_container C>
+constexpr z<C> div(z<C> lhs, z<C> rhs, z<C>* remainder) {
+  auto lsign = lhs.sign, rsign = rhs.sign, qsign = lsign != rsign;
+  auto q = qsign == false ? div_n(std::move(lhs), std::move(rhs), remainder) : div_n(std::move(lhs), rhs, remainder);
+  if (remainder != nullptr) {
+    if (qsign) *remainder = sub_n(rhs, *remainder);
+    remainder->sign = rsign;
+  }
+  q.sign = qsign;
+  return q;
 }
 
 template <z_digit_container C>

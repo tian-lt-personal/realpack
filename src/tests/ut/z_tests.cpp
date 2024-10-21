@@ -218,3 +218,44 @@ TEST(z_tests, mul) {
     EXPECT_EQ(real::cmp(prod, expected), 0);
   }
 }
+
+TEST(z_tests, div) {
+  {
+    real::z u, v, r, expected_r;
+    real::init(u, 11);
+    real::init(v, 7);
+    real::init(expected_r, 4);
+    auto q = real::div(u, v, &r);
+    EXPECT_EQ(real::cmp(q, real::identity()), 0);
+    EXPECT_EQ(real::cmp(r, expected_r), 0);
+  }
+  {
+    real::z u, v, r, expected_r, expected_q;
+    real::init(u, 11);
+    real::init(v, -7);
+    real::init(expected_r, -3);
+    real::init(expected_q, -1);
+    auto q = real::div(u, v, &r);
+    EXPECT_EQ(real::cmp(q, expected_q), 0);
+    EXPECT_EQ(real::cmp(r, expected_r), 0);
+  }
+  {
+    real::z u, v, r, expected_r, expected_q;
+    real::init(u, -11);
+    real::init(v, 7);
+    real::init(expected_r, 3);
+    real::init(expected_q, -1);
+    auto q = real::div(u, v, &r);
+    EXPECT_EQ(real::cmp(q, expected_q), 0);
+    EXPECT_EQ(real::cmp(r, expected_r), 0);
+  }
+  {
+    real::z u, v, r, expected_r;
+    real::init(u, -11);
+    real::init(v, -7);
+    real::init(expected_r, -4);
+    auto q = real::div(u, v, &r);
+    EXPECT_EQ(real::cmp(q, real::identity()), 0);
+    EXPECT_EQ(real::cmp(r, expected_r), 0);
+  }
+}
