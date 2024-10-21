@@ -513,15 +513,19 @@ TEST(n_tests, short_div_n) {
 }
 
 TEST(n_tests, div_n) {
-  //{
-  //  real::z<small> zero, one;
-  //  real::init(one, 1);
-  //  real::div_n<small>(zero, one, nullptr);
-  //}
-  //{
-  //  real::z<small> u, v;
-  //  real::init(u, 8347330149823u);
-  //  real::init(v, 182734u);
-  //  real::div_n<small>(u, v, nullptr);
-  //}
+  {
+    real::z<small> zero, one;
+    real::init(one, 1);
+    real::div_n<small>(zero, one, nullptr);
+  }
+  {
+    real::z<small> u, v, r, expected_q, expected_r;
+    real::init(u, 8347330149823u);
+    real::init(v, 182734u);
+    real::init(expected_q, 45680224u);
+    real::init(expected_r, 97407u);
+    auto q = real::div_n<small>(u, v, &r);
+    EXPECT_EQ(real::cmp_n(q, expected_q), 0);
+    EXPECT_EQ(real::cmp_n(r, expected_r), 0);
+  }
 }

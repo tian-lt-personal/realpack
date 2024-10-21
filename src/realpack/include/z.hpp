@@ -174,6 +174,7 @@ struct z_view {
 
   template <class Z>
   constexpr z_view(Z&& z) : digits(z.digits), sign(z.sign) {}
+  explicit constexpr z_view(std::span<const D> d, bool s) : digits(d), sign(s) {}
 };
 template <z_digit_container C>
 z_view(z<C>) -> z_view<typename C::value_type>;
@@ -447,20 +448,22 @@ constexpr z<C> div_n(z<C> u, z<C> v, z<C>* r = nullptr) {
     if (v.digits.size() > 1) {
       const auto n = v.digits.size();
       const auto m = u.digits.size() - n;
+      z<C> q;
+      q.digits.resize(m + 1);
 
       // algorithm d (division of nonnegative integers) in TAOCP volume 2.
       // d1. [normalize]
       const auto s = details::nlz(v.digits.back());
       details::bit_shift<D>(v.digits, s);
       u.digits.push_back(details::bit_shift<D>(u.digits, s));
+      using Q = decltype(details::div_2ul(std::declval<D>(), std::declval<D>(), std::declval<D>(), *(D*)nullptr));
       // d2. [initialize]
-      for (size_t i = 0; i <= m; ++i)  // loop on j >= 0
+      for (size_t l = 0; l <= m; ++l)  // loop on j >= 0
       {
-        auto j = m - i;
+        auto j = m - l;
         // d3. [calculate q-hat]
         D r_hat_;
         auto q_hat = details::div_2ul(u.digits[j + n], u.digits[j + n - 1], v.digits[n - 1], r_hat_);
-        using Q = decltype(q_hat);
         const auto base = static_cast<Q>(1u) << (sizeof(D) * CHAR_BIT);
         Q r_hat = r_hat_;
       LOOP_D3_FIND_Q:
@@ -470,21 +473,50 @@ constexpr z<C> div_n(z<C> u, z<C> v, z<C>* r = nullptr) {
           if (r_hat < base) goto LOOP_D3_FIND_Q;
         }
         // d4. [multiply and substract]
-        {
-          auto sub = std::span{u.digits}.subspan(j, j + n + 1);
-          // z_view<D> uj{.digits = sub};
+        using I = std::make_signed_t<Q>;
+        I k = 0, t;
+        for (size_t i = 0; i < n; ++i) {
+          auto p = q_hat * v.digits[i];
+          t = u.digits[i + j] - k - (p & (base - 1));
+          u.digits[i + j] = static_cast<D>(t);
+          k = (p >> (sizeof(D) * CHAR_BIT)) - (t >> (sizeof(D) * CHAR_BIT));
         }
-      }
+        t = u.digits[j + n] - k;
+        u.digits[j + n] = static_cast<D>(t);
+        q.digits[j] = static_cast<D>(q_hat);
 
-      //  z<C> q;  // quotient
-      //  return q;
-      //} else {
-      //  assert(divisor.digits.size() == 1);
-      //  z<C> q;  // quotient
-      //  return q;
-      //}
+        // d5 & d6. [test remainder & add back]
+        if (t < 0) {
+          --q.digits[j];
+          k = 0;
+          for (size_t i = 0; i < n; ++i) {
+            t = static_cast<Q>(u.digits[i + j]) + v.digits[i] + k;
+            u.digits[i + j] = static_cast<D>(t);
+            k = t >> (sizeof(D) * CHAR_BIT);
+          }
+          u.digits[j + n] = static_cast<D>(u.digits[j + n] + k);
+        }
+      }  // d7. [loop on j]
+      // d8. [unnormalize]
+      if (r != nullptr) {
+        *r = {};
+        r->digits.resize(n);
+        for (size_t i = 0; i < n; ++i)
+          r->digits[i] = (u.digits[i] >> s) | (static_cast<Q>(u.digits[i + 1]) << ((sizeof(D) * CHAR_BIT) - s));
+        r->digits[n - 1] = u.digits[n - 1] >> s;
+        norm_n(*r);
+      }
+      norm_n(q);
+      return q;
     } else {
       assert(v.digits.size() == 1);
+      D r_;
+      auto q = div_n(u, v.digits.front(), &r_);
+      if (r != nullptr) {
+        *r = {};
+        init(*r, r_);
+      }
+      return q;
     }
   } else if (c < 0) {
     if (r != nullptr) {
