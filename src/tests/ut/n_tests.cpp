@@ -463,6 +463,53 @@ TEST(n_tests, short_div_n) {
     EXPECT_EQ(real::cmp_n(q, one), 0);
     EXPECT_EQ(r, 0);
   }
+  {
+    real::z<small> num;
+    real::init(num, 256);
+    unsigned char r;
+    auto q = real::div_n(num, 255u, &r);
+    EXPECT_EQ(real::cmp_n(q, real::identity<small>()), 0);
+    EXPECT_EQ(r, 1u);
+  }
+  {
+    real::z<small> num, expected;
+    real::init(num, 837261932u);
+    real::init(expected, 4839664u);
+    unsigned char r;
+    auto q = real::div_n(num, 173u, &r);
+    EXPECT_EQ(real::cmp_n(q, expected), 0);
+    EXPECT_EQ(r, 60u);
+  }
+  {
+    real::z<small> num, expected;
+    real::init(num, 123878293827291834ull);
+    real::init(expected, 485797230695262ull);
+    unsigned char r;
+    auto q = real::div_n(num, 255, &r);
+    EXPECT_EQ(real::cmp_n(q, expected), 0);
+    EXPECT_EQ(r, 24u);
+  }
+  {
+    real::z<middle> num, expected;
+    real::init(num, 892387334912834125ull);
+    real::init(expected, 14193264861673u);
+    unsigned short r;
+    auto q = real::div_n(num, 62874, &r);
+    EXPECT_EQ(real::cmp_n(q, expected), 0);
+    EXPECT_EQ(r, 5923u);
+  }
+  {
+    real::z num, expected;
+    num.digits.push_back(8237234u);
+    num.digits.push_back(2829247u);
+    num.digits.push_back(9238412u);
+    expected.digits.push_back(3346301246u);
+    expected.digits.push_back(41838672u);
+    unsigned long r;
+    auto q = real::div_n(num, 948373234u, &r);
+    EXPECT_EQ(real::cmp_n(q, expected), 0);
+    EXPECT_EQ(r, 27398166u);
+  }
 }
 
 TEST(n_tests, div_n) {

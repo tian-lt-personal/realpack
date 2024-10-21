@@ -395,7 +395,12 @@ constexpr z<C> div_n(z_view<typename C::value_type> u, typename C::value_type v,
   w.resize(n);
   for (size_t i = 0; i < n; ++i) {
     auto j = n - i - 1;
-    w[j] = static_cast<D>(details::div_2ul(_r, u.digits[j], v, _r));
+    if constexpr (sizeof(D) == sizeof(unsigned long)) {
+      w[j] = static_cast<D>(details::div_2ul(_r, u.digits[j], v, _r));
+    } else {
+      static_assert(sizeof(D) * 2 <= sizeof(unsigned long));
+      w[j] = static_cast<D>(details::div_2ul(0, _r << (sizeof(D) * CHAR_BIT) | u.digits[j], v, _r));
+    }
   }
   norm_n(q);
   if (r != nullptr) {
