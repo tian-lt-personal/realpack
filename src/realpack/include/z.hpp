@@ -197,12 +197,13 @@ constexpr z<C>& init(z<C>& num, T val) {
     num.sign = val < 0;
     val = num.sign ? -val : val;
   }
-  constexpr auto digit_size = sizeof(typename z<C>::digit_type);
-  if constexpr (sizeof(T) <= digit_size) {
+  using D = typename z<C>::digit_type;
+  if constexpr (sizeof(T) <= sizeof(D)) {
     num.digits.push_back(val);
   } else {
-    static_assert(digit_size < 4);
-    constexpr unsigned long base = 1u << (digit_size * 8);
+    static_assert(sizeof(D) < sizeof(unsigned long long));
+    using B = std::conditional_t<sizeof(D) < sizeof(unsigned long), unsigned long, unsigned long long>;
+    constexpr auto base = static_cast<B>(1u) << (sizeof(D) * CHAR_BIT);
     while (val > 0) {
       num.digits.push_back(val % base);
       val /= base;
@@ -452,12 +453,27 @@ constexpr z<C> div_n(z<C> u, z<C> v, z<C>* r = nullptr) {
       const auto s = details::nlz(v.digits.back());
       details::bit_shift<D>(v.digits, s);
       u.digits.push_back(details::bit_shift<D>(u.digits, s));
-      //  d2. [initialize]
+      // d2. [initialize]
       for (size_t i = 0; i <= m; ++i)  // loop on j >= 0
       {
         auto j = m - i;
-        // d3. [calculate q hat]
-        // auto q_hat = div_n();
+        // d3. [calculate q-hat]
+        D r_hat_;
+        auto q_hat = details::div_2ul(u.digits[j + n], u.digits[j + n - 1], v.digits[n - 1], r_hat_);
+        using Q = decltype(q_hat);
+        const auto base = static_cast<Q>(1u) << (sizeof(D) * CHAR_BIT);
+        Q r_hat = r_hat_;
+      LOOP_D3_FIND_Q:
+        if (q_hat == base || q_hat * v.digits[n - 2] > base * r_hat + u.digits[j + n - 2]) {
+          --q_hat;
+          r_hat += v.digits[n - 1];
+          if (r_hat < base) goto LOOP_D3_FIND_Q;
+        }
+        // d4. [multiply and substract]
+        {
+          auto sub = std::span{u.digits}.subspan(j, j + n + 1);
+          // z_view<D> uj{.digits = sub};
+        }
       }
 
       //  z<C> q;  // quotient

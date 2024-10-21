@@ -77,6 +77,22 @@ TEST(z_tests, init_unsigned) {
     EXPECT_EQ(num.digits[0], 1u);
     EXPECT_EQ(num.digits[1], 1u);
   }
+  {
+    real::z num;
+    real::init(num, 4294967296ull);
+    EXPECT_FALSE(num.sign);
+    EXPECT_EQ(num.digits.size(), 2);
+    EXPECT_EQ(num.digits[0], 0u);
+    EXPECT_EQ(num.digits[1], 1u);
+  }
+  {
+    real::z num;
+    real::init(num, 943988731981237123ull);
+    EXPECT_FALSE(num.sign);
+    EXPECT_EQ(num.digits.size(), 2);
+    EXPECT_EQ(num.digits[0], 297175939u);
+    EXPECT_EQ(num.digits[1], 219789504u);
+  }
 }
 
 TEST(z_tests, init_signed) {
@@ -96,6 +112,14 @@ TEST(z_tests, init_signed) {
   {
     real::z<std::vector<unsigned char>> num;
     real::init(num, -257);
+    EXPECT_TRUE(num.sign);
+    EXPECT_EQ(num.digits.size(), 2);
+    EXPECT_EQ(num.digits[0], 1u);
+    EXPECT_EQ(num.digits[1], 1u);
+  }
+  {
+    real::z num;
+    real::init(num, -4294967297ll);
     EXPECT_TRUE(num.sign);
     EXPECT_EQ(num.digits.size(), 2);
     EXPECT_EQ(num.digits[0], 1u);
