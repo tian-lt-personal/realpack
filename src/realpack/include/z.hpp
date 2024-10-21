@@ -98,10 +98,29 @@ constexpr D bit_shift(std::span<D> digits, signed offset) {
 // 1. this is a short-division with the specialization of 64-bit arithmetics, and
 // 2. `u1` is the MSD, and `u0` is the LSD.
 // 3. `r` is the remainder of `(u1*b + u0) / v`, where b == 2^32
-inline unsigned long long div_2ul(unsigned long u1, unsigned long u0, unsigned long v, unsigned long& r) {
+inline unsigned long long div_2ul_impl(unsigned long u1, unsigned long u0, unsigned long v, unsigned long& r) {
   auto u = ((u1 * 1ull) << 32 | u0);
   r = static_cast<unsigned long>(u % v);
   return u / v;
+};
+inline unsigned long div_2ul_impl(unsigned long u, unsigned short v, unsigned short& r) {
+  r = static_cast<unsigned short>(u % v);
+  return u / v;
+};
+template <std::unsigned_integral D>
+auto div_2ul(D u1, D u0, D v, D& r) {
+  if constexpr (sizeof(D) == sizeof(unsigned long)) {
+    unsigned long _r;
+    auto q = div_2ul_impl(u1, u0, v, _r);
+    r = static_cast<D>(_r);
+    return q;
+  } else {
+    static_assert(sizeof(D) * 2 <= sizeof(unsigned long));
+    unsigned short _r;
+    auto q = div_2ul_impl(u1 << (sizeof(D) * CHAR_BIT) | u0, v, _r);
+    r = static_cast<D>(_r);
+    return q;
+  }
 };
 
 }  // namespace details
@@ -388,19 +407,14 @@ constexpr z<C> div_n(z_view<typename C::value_type> u, typename C::value_type v,
   using D = typename C::value_type;
   static_assert(sizeof(D) <= sizeof(details::z_max_digit_type));
   _REAL_CHECK_ZERO_D(v);
-  auto _r = 0ul;
+  D _r = 0u;
   z<C> q;
   auto& w = q.digits;
   const auto n = u.digits.size();
   w.resize(n);
   for (size_t i = 0; i < n; ++i) {
     auto j = n - i - 1;
-    if constexpr (sizeof(D) == sizeof(unsigned long)) {
-      w[j] = static_cast<D>(details::div_2ul(_r, u.digits[j], v, _r));
-    } else {
-      static_assert(sizeof(D) * 2 <= sizeof(unsigned long));
-      w[j] = static_cast<D>(details::div_2ul(0, _r << (sizeof(D) * CHAR_BIT) | u.digits[j], v, _r));
-    }
+    w[j] = static_cast<D>(details::div_2ul(_r, u.digits[j], v, _r));
   }
   norm_n(q);
   if (r != nullptr) {
@@ -414,44 +428,56 @@ constexpr z<C> div_n(z<C> u, typename C::value_type v, typename C::value_type* r
   return div_n<C>(z_view<D>{u}, v, r);
 }
 
+// long division
 // ignores: the signs of `dividend` and `divisor`
 // returns: the quotient of (dividend / divisor), and output its remainder
 template <z_digit_container C>
-constexpr z<C> div_n(z<C> dividend, z<C> divisor, z<C>* remainder = nullptr) {
-  _REAL_CHECK_ZERO(divisor);
-  if (is_zero(dividend)) {
-    if (remainder != nullptr) {
-      *remainder = {};
+constexpr z<C> div_n(z<C> u, z<C> v, z<C>* r = nullptr) {
+  _REAL_CHECK_ZERO(v);
+  using D = typename C::value_type;
+  if (is_zero(u)) {
+    if (r != nullptr) {
+      *r = {};
     }
     return z<C>{};
   }
-  auto c = cmp_n(dividend, divisor);
+  auto c = cmp_n(u, v);
   if (c > 0) {
-    if (divisor.digits.size() > 1) {
-      auto& u = dividend.digits;
-      auto& v = divisor.digits;
-      const auto m = u.size();
-      const auto n = v.size();
-      assert(m >= n && "length(u) shall be greater than or equal to length(v)");
+    if (v.digits.size() > 1) {
+      const auto n = v.digits.size();
+      const auto m = u.digits.size() - n;
+
       // algorithm d (division of nonnegative integers) in TAOCP volume 2.
       // d1. [normalize]
-      const auto s = details::nlz(v.back());
+      const auto s = details::nlz(v.digits.back());
+      details::bit_shift<D>(v.digits, s);
+      u.digits.push_back(details::bit_shift<D>(u.digits, s));
       //  d2. [initialize]
-      z<C> q;  // quotient
-      return q;
+      for (size_t i = 0; i <= m; ++i)  // loop on j >= 0
+      {
+        auto j = m - i;
+        // d3. [calculate q hat]
+        // auto q_hat = div_n();
+      }
+
+      //  z<C> q;  // quotient
+      //  return q;
+      //} else {
+      //  assert(divisor.digits.size() == 1);
+      //  z<C> q;  // quotient
+      //  return q;
+      //}
     } else {
-      assert(divisor.digits.size() == 1);
-      z<C> q;  // quotient
-      return q;
+      assert(v.digits.size() == 1);
     }
   } else if (c < 0) {
-    if (remainder != nullptr) {
-      *remainder = dividend;
+    if (r != nullptr) {
+      *r = u;
     }
     return z<C>{};
   } else {
-    if (remainder != nullptr) {
-      *remainder = {};
+    if (r != nullptr) {
+      *r = {};
     }
     return identity<C>();
   }
