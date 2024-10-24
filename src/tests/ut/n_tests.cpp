@@ -524,7 +524,27 @@ TEST(n_tests, div_n) {
     real::init(v, 182734u);
     real::init(expected_q, 45680224u);
     real::init(expected_r, 97407u);
-    auto q = real::div_n<small>(u, v, &r);
+    auto q = real::div_n(u, v, &r);
+    EXPECT_EQ(real::cmp_n(q, expected_q), 0);
+    EXPECT_EQ(real::cmp_n(r, expected_r), 0);
+  }
+  {
+    real::z<middle> u, v, r, expected_q, expected_r;
+    real::init(u, 746294827234237124ull);
+    real::init(v, 16327347234856234ull);
+    real::init(expected_q, 45u);
+    real::init(expected_r, 11564201665706594ull);
+    auto q = real::div_n(u, v, &r);
+    EXPECT_EQ(real::cmp_n(q, expected_q), 0);
+    EXPECT_EQ(real::cmp_n(r, expected_r), 0);
+  }
+  {
+    real::z u, v, r, expected_q, expected_r;
+    real::init(u, 746294827234237124ull);
+    real::init(v, 16327347234856234ull);
+    real::init(expected_q, 45u);
+    real::init(expected_r, 11564201665706594ull);
+    auto q = real::div_n(u, v, &r);
     EXPECT_EQ(real::cmp_n(q, expected_q), 0);
     EXPECT_EQ(real::cmp_n(r, expected_r), 0);
   }
