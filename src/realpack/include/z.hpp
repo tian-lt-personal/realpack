@@ -269,6 +269,14 @@ constexpr z<C>& neg(z<C>& num) {
   return num;
 }
 
+// returns: -num.
+template <z_digit_container C>
+constexpr z<C> neg(const z<C>& num) {
+  auto result = num;
+  result.sign = !result.sign;
+  return result;
+}
+
 // effects: remove redundant zeros in digits.
 // returns: ref to `num`
 template <z_digit_container C>
@@ -582,7 +590,7 @@ constexpr z<C> mul(const z<C>& lhs, const z<C>& rhs) {
 
 // returns: floor(lhs / rhs), and outputs its remainder
 template <z_digit_container C>
-constexpr z<C> div(z<C> lhs, z<C> rhs, z<C>* remainder) {
+constexpr z<C> div(z<C> lhs, z<C> rhs, z<C>* remainder = nullptr) {
   auto lsign = lhs.sign, rsign = rhs.sign, qsign = lsign != rsign;
   auto q = qsign == false ? div_n(std::move(lhs), std::move(rhs), remainder) : div_n(std::move(lhs), rhs, remainder);
   if (remainder != nullptr) {
