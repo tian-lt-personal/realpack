@@ -15,9 +15,11 @@ set(BUILD_GMOCK OFF CACHE BOOL "" FORCE) # Disable GMock
 FetchContent_MakeAvailable(googletest)
 
 add_executable(realpack_ut
+               coro_tests.cpp
                create_tests.cpp
                n_tests.cpp
                op_tests.cpp
+               r_tests.cpp
                z_tests.cpp)
 target_link_libraries(realpack_ut PRIVATE
                       realpack
