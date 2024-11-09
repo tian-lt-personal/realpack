@@ -131,7 +131,7 @@ TEST(z_tests, init_decstr) {
   // TODO
 }
 
-TEST(z_tests, add) {
+TEST(z_tests, add_z) {
   {
     real::z zero;
     auto sum = real::add_z(zero, zero);
@@ -175,7 +175,7 @@ TEST(z_tests, add) {
   }
 }
 
-TEST(z_tests, mul) {
+TEST(z_tests, mul_z) {
   {
     real::z zero;
     auto prod = real::mul_z(zero, zero);
@@ -219,7 +219,7 @@ TEST(z_tests, mul) {
   }
 }
 
-TEST(z_tests, div) {
+TEST(z_tests, div_z) {
   {
     real::z u, v, r, expected_r;
     real::init(u, 11);
