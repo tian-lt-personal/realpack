@@ -2,6 +2,7 @@
 #define REALPACK_INC_CORO_HPP
 
 #include <coroutine>
+#include <optional>
 #include <semaphore>
 #include <stdexcept>
 
@@ -43,11 +44,15 @@ class lazy_promise {
     };
     return final_awaiter{};
   }
-  void return_value(T) {}
+  template <class U>
+  void return_value(U&& value) {
+    val_ = std::forward<U>(value);
+  }
   void unhandled_exception() { std::terminate(); }
 
  private:
   std::coroutine_handle<> cont_;
+  std::optional<T> val_;
 };
 
 template <class T>
@@ -59,6 +64,7 @@ class lazy<T>::awaiter : public std::suspend_always {
     coro_.promise().cont_ = cont;
     return coro_;
   }
+  T await_resume() { return std::move(*coro_.promise().val_); }
 
  private:
   std::coroutine_handle<lazy_promise> coro_;
