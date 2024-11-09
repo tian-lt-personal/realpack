@@ -11,6 +11,6 @@ TEST(create_tests, init_from_unsigned) {
   }
   {
     auto one = real::create_z(1);
-    EXPECT_EQ(real::cmp(one, real::identity()), 0);
+    EXPECT_EQ(real::cmp_z(one, real::identity()), 0);
   }
 }

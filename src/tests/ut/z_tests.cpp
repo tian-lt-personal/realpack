@@ -43,7 +43,7 @@ TEST(z_tests, identity) {
     real::z expected;
     real::init(expected, 1u);
     auto one = real::identity<real::details::z_default_container>();
-    EXPECT_EQ(real::cmp(one, expected), 0);
+    EXPECT_EQ(real::cmp_z(one, expected), 0);
   }
 }
 
@@ -134,15 +134,15 @@ TEST(z_tests, init_decstr) {
 TEST(z_tests, add) {
   {
     real::z zero;
-    auto sum = real::add(zero, zero);
+    auto sum = real::add_z(zero, zero);
     EXPECT_TRUE(real::is_zero(sum));
   }
   {
     real::z zero;
     real::z num;
     real::init(num, 123456);
-    auto sum = real::add(num, zero);
-    EXPECT_EQ(real::cmp(sum, num), 0);
+    auto sum = real::add_z(num, zero);
+    EXPECT_EQ(real::cmp_z(sum, num), 0);
   }
   {
     using zch = real::z<std::vector<unsigned char>>;
@@ -150,18 +150,18 @@ TEST(z_tests, add) {
     zch expected;
     real::init(num, 123456u);
     real::init(expected, 246912u);
-    auto sum = real::add(num, num);
-    EXPECT_EQ(real::cmp(sum, expected), 0);
+    auto sum = real::add_z(num, num);
+    EXPECT_EQ(real::cmp_z(sum, expected), 0);
   }
   {
     using zch = real::z<std::vector<unsigned char>>;
     zch num, num2, zero;
     real::init(num, 123456u);
     real::init(num2, -123456);
-    auto sum = real::add(num, num2);
-    EXPECT_EQ(real::cmp(sum, zero), 0);
-    sum = real::add(num2, num);
-    EXPECT_EQ(real::cmp(sum, zero), 0);
+    auto sum = real::add_z(num, num2);
+    EXPECT_EQ(real::cmp_z(sum, zero), 0);
+    sum = real::add_z(num2, num);
+    EXPECT_EQ(real::cmp_z(sum, zero), 0);
   }
   {
     using zch = real::z<std::vector<unsigned char>>;
@@ -170,52 +170,52 @@ TEST(z_tests, add) {
     real::init(num, 123456u);
     real::init(num2, -928392780);
     real::init(expected, -928269324);
-    auto sum = real::add(num, num2);
-    EXPECT_EQ(real::cmp(sum, expected), 0);
+    auto sum = real::add_z(num, num2);
+    EXPECT_EQ(real::cmp_z(sum, expected), 0);
   }
 }
 
 TEST(z_tests, mul) {
   {
     real::z zero;
-    auto prod = real::mul(zero, zero);
+    auto prod = real::mul_z(zero, zero);
     EXPECT_TRUE(real::is_zero(prod));
   }
   {
     real::z zero, num;
     real::init(num, 123456);
-    auto prod = real::mul(num, zero);
+    auto prod = real::mul_z(num, zero);
     EXPECT_TRUE(real::is_zero(prod));
-    prod = real::mul(zero, num);
+    prod = real::mul_z(zero, num);
     EXPECT_TRUE(real::is_zero(prod));
   }
   {
     real::z one, num;
     real::init(one, 1);
     real::init(num, 123456);
-    auto prod = real::mul(num, one);
-    EXPECT_EQ(real::cmp(prod, num), 0);
-    prod = real::mul(one, num);
-    EXPECT_EQ(real::cmp(prod, num), 0);
+    auto prod = real::mul_z(num, one);
+    EXPECT_EQ(real::cmp_z(prod, num), 0);
+    prod = real::mul_z(one, num);
+    EXPECT_EQ(real::cmp_z(prod, num), 0);
   }
   {
     real::z minus_one, num;
     real::init(minus_one, -1);
     real::init(num, 123456);
-    auto prod = real::mul(num, minus_one);
-    EXPECT_TRUE(real::is_zero(real::add(num, prod)));
-    prod = real::mul(minus_one, num);
-    EXPECT_TRUE(real::is_zero(real::add(num, prod)));
+    auto prod = real::mul_z(num, minus_one);
+    EXPECT_TRUE(real::is_zero(real::add_z(num, prod)));
+    prod = real::mul_z(minus_one, num);
+    EXPECT_TRUE(real::is_zero(real::add_z(num, prod)));
   }
   {
     real::z num, num2, expected;
     real::init(num, 123456);
     real::init(num2, -4321);
     real::init(expected, -533453376);
-    auto prod = real::mul(num, num2);
-    EXPECT_EQ(real::cmp(prod, expected), 0);
-    prod = real::mul(num2, num);
-    EXPECT_EQ(real::cmp(prod, expected), 0);
+    auto prod = real::mul_z(num, num2);
+    EXPECT_EQ(real::cmp_z(prod, expected), 0);
+    prod = real::mul_z(num2, num);
+    EXPECT_EQ(real::cmp_z(prod, expected), 0);
   }
 }
 
@@ -225,9 +225,9 @@ TEST(z_tests, div) {
     real::init(u, 11);
     real::init(v, 7);
     real::init(expected_r, 4);
-    auto q = real::div(u, v, &r);
-    EXPECT_EQ(real::cmp(q, real::identity()), 0);
-    EXPECT_EQ(real::cmp(r, expected_r), 0);
+    auto q = real::div_z(u, v, &r);
+    EXPECT_EQ(real::cmp_z(q, real::identity()), 0);
+    EXPECT_EQ(real::cmp_z(r, expected_r), 0);
   }
   {
     real::z u, v, r, expected_r, expected_q;
@@ -235,9 +235,9 @@ TEST(z_tests, div) {
     real::init(v, -7);
     real::init(expected_r, -3);
     real::init(expected_q, -1);
-    auto q = real::div(u, v, &r);
-    EXPECT_EQ(real::cmp(q, expected_q), 0);
-    EXPECT_EQ(real::cmp(r, expected_r), 0);
+    auto q = real::div_z(u, v, &r);
+    EXPECT_EQ(real::cmp_z(q, expected_q), 0);
+    EXPECT_EQ(real::cmp_z(r, expected_r), 0);
   }
   {
     real::z u, v, r, expected_r, expected_q;
@@ -245,17 +245,17 @@ TEST(z_tests, div) {
     real::init(v, 7);
     real::init(expected_r, 3);
     real::init(expected_q, -1);
-    auto q = real::div(u, v, &r);
-    EXPECT_EQ(real::cmp(q, expected_q), 0);
-    EXPECT_EQ(real::cmp(r, expected_r), 0);
+    auto q = real::div_z(u, v, &r);
+    EXPECT_EQ(real::cmp_z(q, expected_q), 0);
+    EXPECT_EQ(real::cmp_z(r, expected_r), 0);
   }
   {
     real::z u, v, r, expected_r;
     real::init(u, -11);
     real::init(v, -7);
     real::init(expected_r, -4);
-    auto q = real::div(u, v, &r);
-    EXPECT_EQ(real::cmp(q, real::identity()), 0);
-    EXPECT_EQ(real::cmp(r, expected_r), 0);
+    auto q = real::div_z(u, v, &r);
+    EXPECT_EQ(real::cmp_z(q, real::identity()), 0);
+    EXPECT_EQ(real::cmp_z(r, expected_r), 0);
   }
 }

@@ -12,27 +12,27 @@ using middle = std::vector<unsigned short>;
 template <class C>
 constexpr auto pow_of_2(unsigned pwr) {
   auto res = real::identity<C>();
-  auto two = real::add(real::identity<C>(), real::identity<C>());
+  auto two = real::add_z(real::identity<C>(), real::identity<C>());
   for (auto i = 0u; i < pwr; ++i) {
-    res = real::mul(res, two);
+    res = real::mul_z(res, two);
   }
   return res;
 }
 static_assert([] {
   auto num = pow_of_2<small>(0);
   auto one = real::identity<small>();
-  return real::cmp(num, one) == 0;
+  return real::cmp_z(num, one) == 0;
 }());
 static_assert([] {
   auto num = pow_of_2<small>(1);
-  auto two = real::add(real::identity<small>(), real::identity<small>());
-  return real::cmp(num, two) == 0;
+  auto two = real::add_z(real::identity<small>(), real::identity<small>());
+  return real::cmp_z(num, two) == 0;
 }());
 static_assert([] {
   auto num = pow_of_2<small>(2);
-  auto two = real::add(real::identity<small>(), real::identity<small>());
-  auto four = real::add(two, two);
-  return real::cmp(num, four) == 0;
+  auto two = real::add_z(real::identity<small>(), real::identity<small>());
+  auto four = real::add_z(two, two);
+  return real::cmp_z(num, four) == 0;
 }());
 
 }  // namespace
@@ -114,57 +114,57 @@ TEST(n_tests, details_bit_shift) {
   }
   {
     auto num = real::identity<small>();
-    auto expected = real::mul(num, pow_of_2<small>(7));
+    auto expected = real::mul_z(num, pow_of_2<small>(7));
     real::details::bit_shift<typename small::value_type>(num.digits, 7);
-    EXPECT_EQ(real::cmp(num, expected), 0);
+    EXPECT_EQ(real::cmp_z(num, expected), 0);
   }
   {
     real::z<small> num;
     real::init(num, 8365473u);
-    auto expected = real::mul(num, pow_of_2<small>(3));
+    auto expected = real::mul_z(num, pow_of_2<small>(3));
     auto cy = real::details::bit_shift<typename small::value_type>(num.digits, 3);
     if (cy > 0) {
       num.digits.push_back(cy);
     }
-    EXPECT_EQ(real::cmp(num, expected), 0);
+    EXPECT_EQ(real::cmp_z(num, expected), 0);
   }
   {
     real::z<small> num;
     real::init(num, 99382171723ull);
-    auto expected = real::mul(num, pow_of_2<small>(6));
+    auto expected = real::mul_z(num, pow_of_2<small>(6));
     auto cy = real::details::bit_shift<typename small::value_type>(num.digits, 6);
     if (cy > 0) {
       num.digits.push_back(cy);
     }
-    EXPECT_EQ(real::cmp(num, expected), 0);
+    EXPECT_EQ(real::cmp_z(num, expected), 0);
   }
   {
     real::z<middle> num;
     real::init(num, 9382723635117365ull);
-    auto expected = real::mul(num, pow_of_2<middle>(6));
+    auto expected = real::mul_z(num, pow_of_2<middle>(6));
     auto cy = real::details::bit_shift<typename middle::value_type>(num.digits, 6);
     if (cy > 0) {
       num.digits.push_back(cy);
     }
-    EXPECT_EQ(real::cmp(num, expected), 0);
+    EXPECT_EQ(real::cmp_z(num, expected), 0);
   }
   {
     real::z<small> expected;
     real::init(expected, 1234u);
-    auto num = real::mul(expected, pow_of_2<small>(7));
+    auto num = real::mul_z(expected, pow_of_2<small>(7));
     auto cy = real::details::bit_shift<typename small::value_type>(num.digits, -7);
     real::norm_n(num);
     EXPECT_EQ(cy, 0);
-    EXPECT_EQ(real::cmp(num, expected), 0);
+    EXPECT_EQ(real::cmp_z(num, expected), 0);
   }
   {
     real::z<small> expected;
     real::init(expected, 7462981237123ull);
-    auto num = real::mul(expected, pow_of_2<small>(4));
+    auto num = real::mul_z(expected, pow_of_2<small>(4));
     auto cy = real::details::bit_shift<typename small::value_type>(num.digits, -4);
     real::norm_n(num);
     EXPECT_EQ(cy, 0);
-    EXPECT_EQ(real::cmp(num, expected), 0);
+    EXPECT_EQ(real::cmp_z(num, expected), 0);
   }
 }
 
@@ -442,7 +442,7 @@ TEST(n_tests, mul_n) {
     auto prod = real::mul_n(num, num2);
     EXPECT_EQ(real::cmp_n(prod, expected), 0);
     for (auto _ : std::views::iota(0, 9384)) {
-      sum = real::add(sum, num2);
+      sum = real::add_z(sum, num2);
     }
     EXPECT_EQ(real::cmp_n(prod, sum), 0);
   }

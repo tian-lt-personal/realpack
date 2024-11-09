@@ -215,11 +215,11 @@ constexpr z<C>& init(z<C>& num, T val) {
 
 // returns: the sign of `num`.
 template <z_digit_container C>
-constexpr bool sign(const z<C>& num) {
+constexpr bool sign_z(const z<C>& num) {
   return num.sign;
 }
 template <class D>
-constexpr bool sign(const z_view<D>& num) {
+constexpr bool sign_z(const z_view<D>& num) {
   return num.sign;
 }
 
@@ -248,30 +248,30 @@ constexpr int cmp_n(const z<C>& lhs, const z<C>& rhs) {
 //          + if lhs is greater than rhs
 //          - if lhs is less than rhs
 template <class D>
-constexpr int cmp(z_view<D> lhs, z_view<D> rhs) {
-  if (sign(lhs) == sign(rhs)) {
+constexpr int cmp_z(z_view<D> lhs, z_view<D> rhs) {
+  if (sign_z(lhs) == sign_z(rhs)) {
     auto abs_cmp = cmp_n(lhs, rhs);
-    return sign(lhs) == false ? abs_cmp : -abs_cmp;
+    return sign_z(lhs) == false ? abs_cmp : -abs_cmp;
   } else {
-    return sign(lhs) == false ? 1 : -1;
+    return sign_z(lhs) == false ? 1 : -1;
   }
 }
 template <z_digit_container C>
-constexpr int cmp(const z<C>& lhs, const z<C>& rhs) {
-  return cmp(z_view{lhs}, z_view{rhs});
+constexpr int cmp_z(const z<C>& lhs, const z<C>& rhs) {
+  return cmp_z(z_view{lhs}, z_view{rhs});
 }
 
 // effects: num = -num.
 // returns: ref to `num`.
 template <z_digit_container C>
-constexpr z<C>& neg(z<C>& num) {
+constexpr z<C>& neg_z(z<C>& num) {
   num.sign = !num.sign;
   return num;
 }
 
 // returns: -num.
 template <z_digit_container C>
-constexpr z<C> neg(const z<C>& num) {
+constexpr z<C> neg_z(const z<C>& num) {
   auto result = num;
   result.sign = !result.sign;
   return result;
@@ -541,21 +541,21 @@ constexpr z<C> div_n(z<C> u, z<C> v, z<C>* r = nullptr) {
 
 //
 template <z_digit_container C>
-constexpr z<C> abs(z_view<typename C::value_type> num) {
+constexpr z<C> abs_z(z_view<typename C::value_type> num) {
   return z<C>{.digits = num.digits};
 }
 template <z_digit_container C>
-constexpr z<C> abs(const z<C>& num) {
+constexpr z<C> abs_z(const z<C>& num) {
   return abs<C>(z_view{num});
 }
 
 // returns: lhs + rhs;
 // notes: operands may be negative integers
 template <z_digit_container C>
-constexpr z<C> add(z_view<typename C::value_type> lhs, z_view<typename C::value_type> rhs) {
+constexpr z<C> add_z(z_view<typename C::value_type> lhs, z_view<typename C::value_type> rhs) {
   z<C> r;
-  if (sign(lhs) == sign(rhs)) {
-    auto tmp_sign = sign(lhs);
+  if (sign_z(lhs) == sign_z(rhs)) {
+    auto tmp_sign = sign_z(lhs);
     r = add_n<C>(lhs, rhs);
     r.sign = tmp_sign;
   } else {
@@ -566,31 +566,31 @@ constexpr z<C> add(z_view<typename C::value_type> lhs, z_view<typename C::value_
       substrahend = &lhs;
     }
     r = sub_n<C>(*minuend, *substrahend);
-    r.sign = r.digits.empty() == false ? sign(*minuend) : false;
+    r.sign = r.digits.empty() == false ? sign_z(*minuend) : false;
   }
   return r;
 }
 template <z_digit_container C>
-constexpr z<C> add(const z<C>& lhs, const z<C>& rhs) {
-  return add<C>(z_view{lhs}, z_view{rhs});
+constexpr z<C> add_z(const z<C>& lhs, const z<C>& rhs) {
+  return add_z<C>(z_view{lhs}, z_view{rhs});
 }
 
 // returns: lhs * rhs;
 template <z_digit_container C>
-constexpr z<C> mul(z_view<typename C::value_type> lhs, z_view<typename C::value_type> rhs) {
+constexpr z<C> mul_z(z_view<typename C::value_type> lhs, z_view<typename C::value_type> rhs) {
   z<C> r;
   r = mul_n<C>(lhs, rhs);
   r.sign = lhs.sign != rhs.sign;
   return r;
 }
 template <z_digit_container C>
-constexpr z<C> mul(const z<C>& lhs, const z<C>& rhs) {
-  return mul<C>(z_view{lhs}, z_view{rhs});
+constexpr z<C> mul_z(const z<C>& lhs, const z<C>& rhs) {
+  return mul_z<C>(z_view{lhs}, z_view{rhs});
 }
 
 // returns: floor(lhs / rhs), and outputs its remainder
 template <z_digit_container C>
-constexpr z<C> div(z<C> lhs, z<C> rhs, z<C>* remainder = nullptr) {
+constexpr z<C> div_z(z<C> lhs, z<C> rhs, z<C>* remainder = nullptr) {
   auto lsign = lhs.sign, rsign = rhs.sign, qsign = lsign != rsign;
   auto q = qsign == false ? div_n(std::move(lhs), std::move(rhs), remainder) : div_n(std::move(lhs), rhs, remainder);
   if (remainder != nullptr) {
