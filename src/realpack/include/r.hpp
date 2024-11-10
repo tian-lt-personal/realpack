@@ -10,6 +10,7 @@
 
 // util headers
 #include "_coro.hpp"
+#include "_op.hpp"
 
 namespace real {
 
@@ -34,7 +35,7 @@ evaluator<C> expr_add(evaluator<C> lhs, evaluator<C> rhs) {
   return [lhs = std::move(lhs), rhs = std::move(rhs)](size_t n) -> coro::lazy<z<C>> {
     auto x = co_await lhs(n + 2);
     auto y = co_await rhs(n + 2);
-    co_return z<C>{};  // TODO:
+    co_return ndiv_2exp_z(x + y, 2);
   };
 }
 
