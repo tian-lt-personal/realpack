@@ -52,10 +52,7 @@ class lazy_promise {
 
  private:
   std::coroutine_handle<> cont_;
-  union {
-    char _;
-    T val_;
-  };
+  std::optional<T> val_;
 };
 
 template <class T>
@@ -67,7 +64,7 @@ class lazy<T>::awaiter : public std::suspend_always {
     coro_.promise().cont_ = cont;
     return coro_;
   }
-  T await_resume() noexcept(std::is_nothrow_move_constructible_v<T>) { return std::move(coro_.promise().val_); }
+  T await_resume() noexcept(std::is_nothrow_move_constructible_v<T>) { return std::move(*coro_.promise().val_); }
 
  private:
   std::coroutine_handle<lazy_promise> coro_;
