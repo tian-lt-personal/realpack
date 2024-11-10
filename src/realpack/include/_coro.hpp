@@ -84,18 +84,6 @@ struct forget {
   };
 };
 
-template <class T>
-  requires requires(T awaitable) { awaitable.operator co_await; }
-void sync_wait(T task) {
-  std::binary_semaphore signal{0};
-  auto run = [&]() -> forget {
-    co_await task;
-    signal.release();
-  };
-  run();
-  signal.acquire();
-}
-
 }  // namespace real::coro
 
 #endif  // !REALPACK_INC_CORO_HPP

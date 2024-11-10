@@ -588,6 +588,13 @@ constexpr z<C> mul_z(const z<C>& lhs, const z<C>& rhs) {
   return mul_z<C>(z_view{lhs}, z_view{rhs});
 }
 
+// requires: exp >= 0.
+// returns num * 2 ^ exp.
+template <z_digit_container C>
+constexpr z<C> mul_2exp_z(const z<C>& num, const z<C>& exp) {
+  return z<C>{};  // TODO:
+}
+
 // returns: floor(lhs / rhs), and outputs its remainder
 template <z_digit_container C>
 constexpr z<C> div_z(z<C> lhs, z<C> rhs, z<C>* remainder = nullptr) {
