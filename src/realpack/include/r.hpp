@@ -2,6 +2,7 @@
 #define REALPACK_INC_R_HPP
 
 // std headers
+#include <optional>
 #include <stdexcept>
 
 // real headers
@@ -18,9 +19,13 @@ template <z_digit_container C>
 using evaluator = std::function<coro::lazy<z<C>>(size_t)>;
 
 template <z_digit_container C>
-evaluator<C> expr_q(z<C> n, z<C> d) {
-  return [n = std::move(n), d = std::move(d)](size_t n) -> coro::lazy<z<C>> {
-    co_return z<C>{};  // TODO: qn = floor(q * B^n)
+evaluator<C> expr_q(z<C> p, std::optional<z<C>> q = std::nullopt) {
+  return [p = std::move(p), q = std::move(q)](size_t n) -> coro::lazy<z<C>> {
+    auto res = mul_2exp_z(p, n);
+    if (q.has_value()) {
+      co_return div_z(res, *q);
+    }
+    co_return res;
   };
 }
 
