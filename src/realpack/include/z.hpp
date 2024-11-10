@@ -599,7 +599,6 @@ constexpr void mul_2exp_z(z<C>& num, size_t exp) {
       num.digits.push_back(cy);
     }
   } else {
-    // TODO:
     throw std::logic_error{"not implemented."};
   }
 }
@@ -608,18 +607,9 @@ constexpr void mul_2exp_z(z<C>& num, size_t exp) {
 // returns: num * 2 ^ exp.
 template <z_digit_container C>
 constexpr z<C> mul_2exp_z(const z<C>& num, size_t exp) {
-  using D = typename z<C>::digit_type;
-  if (exp < sizeof(D) * CHAR_BIT) {
-    auto res = num;
-    auto cy = details::bit_shift<D>(res.digits, static_cast<signed>(exp));
-    if (cy > 0) {
-      res.digits.push_back(cy);
-    }
-    return res;
-  } else {
-    // TODO:
-    throw std::logic_error{"not implemented."};
-  }
+  auto res = num;
+  mul_2exp_z(res, exp);
+  return res;
 }
 
 // returns: floor(lhs / rhs), and outputs its remainder
@@ -633,6 +623,37 @@ constexpr z<C> div_z(z<C> lhs, z<C> rhs, z<C>* remainder = nullptr) {
   }
   q.sign = qsign;
   return q;
+}
+
+// requires: exp >= 0
+// effects: num = num / (2^exp), rounded to nearest
+template <z_digit_container C>
+constexpr void ndiv_2exp_z(z<C>& num, size_t exp) {
+  using D = typename z<C>::digit_type;
+  if (exp < sizeof(D) * CHAR_BIT) {
+    auto rnd = num.digits.empty() ? false : ((1u << (exp - 1)) & num.digits.front()) > 0;
+    details::bit_shift<D>(num.digits, -static_cast<signed>(exp));
+    if (rnd) {
+      auto one = identity<C>();
+      one.sign = num.sign;
+      num = add_z(num, one);
+    }
+  } else {
+    throw std::logic_error{"not implemented."};
+  }
+}
+
+// requires: exp >= 0
+// returns: num / (2^exp), rounded to nearest
+template <z_digit_container C>
+constexpr z<C> ndiv_2exp_z(const z<C>& num, size_t exp) {
+  if (exp != 0) {
+    auto res = num;
+    ndiv_2exp_z(res, exp);
+    return res;
+  } else {
+    return num;
+  }
 }
 
 template <z_digit_container C>

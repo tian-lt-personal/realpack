@@ -269,3 +269,41 @@ TEST(z_tests, div_z) {
     EXPECT_EQ(real::cmp_z(r, expected_r), 0);
   }
 }
+
+TEST(z_tests, ndiv_2exp_z) {
+  {
+    real::z num, expected;
+    real::init(num, 72);
+    real::init(expected, 18);
+    real::ndiv_2exp_z(num, 2);
+    EXPECT_EQ(real::cmp_z(num, expected), 0);
+  }
+  {
+    real::z num, expected;
+    real::init(num, 73);
+    real::init(expected, 18);
+    real::ndiv_2exp_z(num, 2);
+    EXPECT_EQ(real::cmp_z(num, expected), 0);
+  }
+  {
+    real::z num, expected;
+    real::init(num, -73);
+    real::init(expected, -18);
+    real::ndiv_2exp_z(num, 2);
+    EXPECT_EQ(real::cmp_z(num, expected), 0);
+  }
+  {
+    real::z num, expected;
+    real::init(num, 74);
+    real::init(expected, 19);
+    real::ndiv_2exp_z(num, 2);
+    EXPECT_EQ(real::cmp_z(num, expected), 0);
+  }
+  {
+    real::z num, expected;
+    real::init(num, -74);
+    real::init(expected, -19);
+    real::ndiv_2exp_z(num, 2);
+    EXPECT_EQ(real::cmp_z(num, expected), 0);
+  }
+}
