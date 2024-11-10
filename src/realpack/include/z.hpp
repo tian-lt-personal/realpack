@@ -589,10 +589,19 @@ constexpr z<C> mul_z(const z<C>& lhs, const z<C>& rhs) {
 }
 
 // requires: exp >= 0.
-// returns num * 2 ^ exp.
+// effects: num = num * 2 ^ exp.
 template <z_digit_container C>
-constexpr z<C> mul_2exp_z(const z<C>& num, const z<C>& exp) {
-  return z<C>{};  // TODO:
+constexpr void mul_2exp_z(z<C>& num, size_t exp) {
+  using D = typename z<C>::digit_type;
+  if (exp < sizeof(D) * CHAR_BIT) {
+    auto cy = details::bit_shift<D>(num.digits, static_cast<signed>(exp));
+    if (cy > 0) {
+      num.digits.push_back(cy);
+    }
+  } else {
+    // TODO:
+    throw std::logic_error{"not implemented."};
+  }
 }
 
 // returns: floor(lhs / rhs), and outputs its remainder

@@ -219,6 +219,16 @@ TEST(z_tests, mul_z) {
   }
 }
 
+TEST(z_tests, mul_2exp_z) {
+  {
+    real::z num, expected;
+    real::init(num, 2);
+    real::init(expected, 8);
+    real::mul_2exp_z(num, 2);
+    EXPECT_EQ(real::cmp_z(num, expected), 0);
+  }
+}
+
 TEST(z_tests, div_z) {
   {
     real::z u, v, r, expected_r;
