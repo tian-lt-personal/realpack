@@ -39,6 +39,11 @@ evaluator<C> expr_add(evaluator<C> lhs, evaluator<C> rhs) {
   };
 }
 
+template <z_digit_container C>
+evaluator<C> expr_neg(evaluator<C> num) {
+  return [num = std::move(num)](size_t n) -> coro::lazy<z<C>> { co_return -num(n); };
+}
+
 }  // namespace real
 
 #endif  // !REALPACK_INC_R_HPP

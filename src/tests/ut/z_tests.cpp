@@ -131,6 +131,22 @@ TEST(z_tests, init_decstr) {
   // TODO
 }
 
+TEST(z_tests, neg_z) {
+  {
+    real::z zero;
+    auto res = real::neg_z(zero);
+    EXPECT_FALSE(res.sign);
+    EXPECT_TRUE(real::is_zero(res));
+  }
+  {
+    real::z expected;
+    real::init(expected, -1);
+    auto minus_one = real::neg_z(real::identity());
+    EXPECT_TRUE(minus_one.sign);
+    EXPECT_EQ(real::cmp_z(minus_one, expected), 0);
+  }
+}
+
 TEST(z_tests, add_z) {
   {
     real::z zero;

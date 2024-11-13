@@ -265,7 +265,9 @@ constexpr int cmp_z(const z<C>& lhs, const z<C>& rhs) {
 // returns: ref to `num`.
 template <z_digit_container C>
 constexpr z<C>& neg_z(z<C>& num) {
-  num.sign = !num.sign;
+  if (!num.digits.empty()) {
+    num.sign = !num.sign;
+  }
   return num;
 }
 
@@ -273,7 +275,9 @@ constexpr z<C>& neg_z(z<C>& num) {
 template <z_digit_container C>
 constexpr z<C> neg_z(const z<C>& num) {
   auto result = num;
-  result.sign = !result.sign;
+  if (!num.digits.empty()) {
+    result.sign = !result.sign;
+  }
   return result;
 }
 
