@@ -20,6 +20,7 @@ add_executable(realpack_ut
                n_tests.cpp
                op_tests.cpp
                r_tests.cpp
+               to_tests.cpp
                z_tests.cpp)
 target_link_libraries(realpack_ut PRIVATE
                       realpack

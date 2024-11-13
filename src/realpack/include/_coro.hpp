@@ -84,6 +84,13 @@ struct forget {
   };
 };
 
+template <class T>
+T sync_get(lazy<T> awaitable) {
+  std::optional<T> slot;
+  [&]() -> forget { slot = co_await awaitable; }();
+  return std::move(*slot);
+}
+
 }  // namespace real::coro
 
 #endif  // !REALPACK_INC_CORO_HPP

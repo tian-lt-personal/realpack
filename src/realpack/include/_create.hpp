@@ -6,7 +6,7 @@
 namespace real {
 
 template <z_digit_container C = details::z_default_container>
-z<C> create_z(std::integral auto i) {
+constexpr z<C> create_z(std::integral auto i) {
   z<C> num;
   init(num, i);
   return num;
