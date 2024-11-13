@@ -17,3 +17,11 @@ TEST(to_tests, r_to_int) {
     // TODO
   }
 }
+
+TEST(to_tests, r_to_double) {
+  {
+    auto eval = real::to_double(real::expr_q(real::identity()), 10);
+    auto res = real::coro::sync_get(std::move(eval));
+    // TODO
+  }
+}
