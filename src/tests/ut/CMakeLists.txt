@@ -25,3 +25,5 @@ add_executable(realpack_ut
 target_link_libraries(realpack_ut PRIVATE
                       realpack
                       gtest_main)
+include(GoogleTest)
+gtest_discover_tests(realpack_ut)
