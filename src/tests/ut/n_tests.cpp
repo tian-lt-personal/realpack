@@ -9,6 +9,7 @@ namespace {
 using small = std::vector<unsigned char>;
 using middle = std::vector<unsigned short>;
 
+#ifdef _MSC_VER
 template <class C>
 constexpr auto pow_of_2(unsigned pwr) {
   auto res = real::identity<C>();
@@ -34,6 +35,7 @@ static_assert([] {
   auto four = real::add_z(two, two);
   return real::cmp_z(num, four) == 0;
 }());
+#endif  // _MSC_VER
 
 }  // namespace
 

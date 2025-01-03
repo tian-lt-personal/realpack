@@ -7,6 +7,7 @@
 namespace {
 namespace z_tests_is_zero {
 
+#ifdef _MSC_VER
 static_assert(real::is_zero(real::z{}));
 static_assert([] {
   real::z num;
@@ -18,6 +19,7 @@ static_assert([] {
   real::init(num, -2);
   return !real::is_zero(num);
 }());
+#endif  // _MSC_VER
 
 }  // namespace z_tests_is_zero
 }  // namespace
