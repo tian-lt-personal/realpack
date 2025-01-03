@@ -476,7 +476,7 @@ constexpr z<C> div_n(z<C> u, z<C> v, z<C>* r = nullptr) {
         // d3. [calculate q-hat]
         D r_hat_;
         auto q_hat = details::div_2ul(u.digits[j + n], u.digits[j + n - 1], v.digits[n - 1], r_hat_);
-        const auto base = static_cast<Q>(1u) << (sizeof(D) * CHAR_BIT);
+        const auto base = Q{1u} << (sizeof(D) * CHAR_BIT);
         Q r_hat = r_hat_;
         for (;;) {
           if (q_hat == base || q_hat * v.digits[n - 2] > base * r_hat + u.digits[j + n - 2]) {
