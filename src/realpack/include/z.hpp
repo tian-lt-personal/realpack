@@ -56,7 +56,7 @@ template <std::unsigned_integral T>
 constexpr T nlz(T x) {
   if (x == 0) return sizeof(T) * CHAR_BIT;
   unsigned count = 0;
-  T mask = 1u << (sizeof(T) * CHAR_BIT - 1);
+  T mask = T{1u} << (sizeof(T) * CHAR_BIT - 1);
   while ((x & mask) == 0) {
     ++count;
     mask >>= 1;
