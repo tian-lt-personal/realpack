@@ -9,7 +9,6 @@ namespace {
 using small = std::vector<unsigned char>;
 using middle = std::vector<unsigned short>;
 
-#ifdef _MSC_VER
 template <class C>
 constexpr auto pow_of_2(unsigned pwr) {
   auto res = real::identity<C>();
@@ -19,6 +18,8 @@ constexpr auto pow_of_2(unsigned pwr) {
   }
   return res;
 }
+
+#ifdef _MSC_VER
 static_assert([] {
   auto num = pow_of_2<small>(0);
   auto one = real::identity<small>();
