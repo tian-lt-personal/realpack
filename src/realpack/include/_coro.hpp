@@ -16,7 +16,6 @@ class lazy {
   friend class lazy_promise<T>;
 
  public:
-  using promise_type = lazy_promise<T>;
   lazy(const lazy&) = delete;
   lazy(lazy&& rhs) noexcept : coro_(std::exchange(rhs.coro_, {})) {}
   ~lazy() {
@@ -27,8 +26,8 @@ class lazy {
   awaiter operator co_await() noexcept;
 
  private:
-  explicit lazy(std::coroutine_handle<promise_type> coro) : coro_(coro) {}
-  std::coroutine_handle<promise_type> coro_;
+  explicit lazy(std::coroutine_handle<lazy_promise<T>> coro) : coro_(coro) {}
+  std::coroutine_handle<lazy_promise<T>> coro_;
 };
 
 template <class T>
@@ -58,8 +57,7 @@ class lazy_promise {
 template <class T>
 class lazy<T>::awaiter : public std::suspend_always {
  public:
-  using lazy_promise = typename lazy<T>::promise_type;
-  explicit awaiter(std::coroutine_handle<lazy_promise> handle) : coro_(handle) {}
+  explicit awaiter(std::coroutine_handle<lazy_promise<T>> handle) : coro_(handle) {}
   auto await_suspend(std::coroutine_handle<> cont) noexcept {
     coro_.promise().cont_ = cont;
     return coro_;
@@ -67,10 +65,10 @@ class lazy<T>::awaiter : public std::suspend_always {
   T await_resume() noexcept(std::is_nothrow_move_constructible_v<T>) { return std::move(*coro_.promise().val_); }
 
  private:
-  std::coroutine_handle<lazy_promise> coro_;
+  std::coroutine_handle<lazy_promise<T>> coro_;
 };
 template <class T>
-lazy<T>::awaiter lazy<T>::operator co_await() noexcept {
+typename lazy<T>::awaiter lazy<T>::operator co_await() noexcept {
   return lazy<T>::awaiter{coro_};
 }
 
@@ -92,5 +90,14 @@ T sync_get(lazy<T> awaitable) {
 }
 
 }  // namespace real::coro
+
+namespace std {
+
+template <class T, class... Args>
+struct coroutine_traits<real::coro::lazy<T>, Args...> {
+  using promise_type = real::coro::lazy_promise<T>;
+};
+
+}  // namespace std
 
 #endif  // !REALPACK_INC_CORO_HPP
