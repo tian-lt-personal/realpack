@@ -478,13 +478,15 @@ constexpr z<C> div_n(z<C> u, z<C> v, z<C>* r = nullptr) {
         auto q_hat = details::div_2ul(u.digits[j + n], u.digits[j + n - 1], v.digits[n - 1], r_hat_);
         const auto base = static_cast<Q>(1u) << (sizeof(D) * CHAR_BIT);
         Q r_hat = r_hat_;
-      LOOP_D3_FIND_Q:
-        if (q_hat == base || q_hat * v.digits[n - 2] > base * r_hat + u.digits[j + n - 2]) {
-          --q_hat;
-          r_hat += v.digits[n - 1];
-          if (r_hat < base) goto LOOP_D3_FIND_Q;
+        for (;;) {
+          if (q_hat == base || q_hat * v.digits[n - 2] > base * r_hat + u.digits[j + n - 2]) {
+            --q_hat;
+            r_hat += v.digits[n - 1];
+            if (r_hat < base) continue;  // loop: find q
+          }
+          break;
         }
-        // d4. [multiply and substract]
+        //  d4. [multiply and substract]
         using I = std::make_signed_t<Q>;
         I k = 0, t;
         for (size_t i = 0; i < n; ++i) {
