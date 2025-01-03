@@ -391,7 +391,7 @@ TEST(n_tests, mul_n) {
     real::z<small> num, num2, expected;
     real::init(num, 65536u);
     real::init(num2, 65536u);
-    real::init(expected, 4294967296ui64);
+    real::init(expected, 4294967296ull);
     auto prod = real::mul_n(num, num2);
     EXPECT_EQ(real::cmp_n(prod, expected), 0);
     prod = real::mul_n(num2, num);
@@ -401,7 +401,7 @@ TEST(n_tests, mul_n) {
     real::z<small> num, num2, expected;
     real::init(num, 63847u);
     real::init(num2, 19383u);
-    real::init(expected, 1237546401ui64);
+    real::init(expected, 1237546401ull);
     auto prod = real::mul_n(num, num2);
     EXPECT_EQ(real::cmp_n(prod, expected), 0);
     prod = real::mul_n(num2, num);
@@ -411,7 +411,7 @@ TEST(n_tests, mul_n) {
     real::z<small> num, num2, expected;
     real::init(num, 8463732u);
     real::init(num2, 2847463u);
-    real::init(expected, 24100163711916ui64);
+    real::init(expected, 24100163711916ull);
     auto prod = real::mul_n(num, num2);
     EXPECT_EQ(real::cmp_n(prod, expected), 0);
     prod = real::mul_n(num2, num);
@@ -421,7 +421,7 @@ TEST(n_tests, mul_n) {
     real::z<middle> num, num2, expected;
     real::init(num, 8463732u);
     real::init(num2, 2847463u);
-    real::init(expected, 24100163711916ui64);
+    real::init(expected, 24100163711916ull);
     auto prod = real::mul_n(num, num2);
     EXPECT_EQ(real::cmp_n(prod, expected), 0);
     prod = real::mul_n(num2, num);
