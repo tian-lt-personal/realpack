@@ -230,9 +230,9 @@ constexpr bool sign_z(const z_view<D>& num) {
 template <class D>
 constexpr int cmp_n(z_view<D> lhs, z_view<D> rhs) {
   if (lhs.digits.size() != rhs.digits.size()) return lhs.digits.size() < rhs.digits.size() ? -1 : 1;
-  auto l = lhs.digits.crbegin();
-  auto r = rhs.digits.crbegin();
-  for (; l != lhs.digits.crend(); ++l, ++r) {
+  auto l = lhs.digits.rbegin();
+  auto r = rhs.digits.rbegin();
+  for (; l != lhs.digits.rend(); ++l, ++r) {
     if (*l != *r) {
       return *l < *r ? -1 : 1;
     }
