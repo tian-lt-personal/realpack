@@ -1,6 +1,3 @@
-// std headers
-#include <ranges>
-
 // gtest headers
 #include <gtest/gtest.h>
 
@@ -205,8 +202,8 @@ TEST(n_tests, norm_n) {
     EXPECT_TRUE(zero.digits.empty());
   }
   {
-    real::z zero{.sign = true};
-    for (auto _ : std::views::iota(1, 10)) {
+    real::z<std::vector<unsigned>> zero{.sign = true};
+    for (int i = 1; i < 10; ++i) {
       zero.digits.push_back(0);
     }
     real::norm_n(zero);
@@ -218,7 +215,7 @@ TEST(n_tests, norm_n) {
     real::z num, expected;
     real::init(num, -12345);
     expected = num;
-    for (auto _ : std::views::iota(1, 20)) {
+    for (int i = 1; i < 20; ++i) {
       num.digits.push_back(0);
     }
     real::norm_n(num);
@@ -358,10 +355,10 @@ TEST(n_tests, sub_n) {
   {
     real::z<small> sum, num;
     real::init(num, 9382239483u);
-    for (auto _ : std::views::iota(0, 1000)) {
+    for (int i = 0; i < 1000; ++i) {
       sum = real::add_n(sum, num);
     }
-    for (auto _ : std::views::iota(0, 1000)) {
+    for (int i = 0; i < 1000; ++i) {
       sum = real::sub_n(sum, num);
     }
     EXPECT_TRUE(real::is_zero(sum));
@@ -447,7 +444,7 @@ TEST(n_tests, mul_n) {
     real::init(expected, 2645743728u);
     auto prod = real::mul_n(num, num2);
     EXPECT_EQ(real::cmp_n(prod, expected), 0);
-    for (auto _ : std::views::iota(0, 9384)) {
+    for (unsigned i = 0; i < 9384; ++i) {
       sum = real::add_z(sum, num2);
     }
     EXPECT_EQ(real::cmp_n(prod, sum), 0);
