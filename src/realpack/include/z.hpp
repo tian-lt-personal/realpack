@@ -98,27 +98,27 @@ constexpr D bit_shift(std::span<D> digits, signed offset) {
 // 1. this is a short-division with the specialization of 64-bit arithmetics, and
 // 2. `u1` is the MSD, and `u0` is the LSD.
 // 3. `r` is the remainder of `(u1*b + u0) / v`, where b == 2^32
-inline unsigned long long div_2ul_impl(unsigned long u1, unsigned long u0, unsigned long v, unsigned long& r) {
+inline unsigned long long div_2ul_impl(unsigned long u1, unsigned long u0, unsigned long v, unsigned long* r) {
   auto u = ((u1 * 1ull) << 32 | u0);
-  r = static_cast<unsigned long>(u % v);
+  *r = static_cast<unsigned long>(u % v);
   return u / v;
 };
-inline unsigned long div_2ul_impl(unsigned long u, unsigned short v, unsigned short& r) {
-  r = static_cast<unsigned short>(u % v);
+inline unsigned long div_2ul_impl(unsigned long u, unsigned short v, unsigned short* r) {
+  *r = static_cast<unsigned short>(u % v);
   return u / v;
 };
 template <std::unsigned_integral D>
-auto div_2ul(D u1, D u0, D v, D& r) {
+auto div_2ul(D u1, D u0, D v, D* r) {
   if constexpr (sizeof(D) == sizeof(unsigned long)) {
     unsigned long _r;
-    auto q = div_2ul_impl(u1, u0, v, _r);
-    r = static_cast<D>(_r);
+    auto q = div_2ul_impl(u1, u0, v, &_r);
+    *r = static_cast<D>(_r);
     return q;
   } else {
     static_assert(sizeof(D) * 2 <= sizeof(unsigned long));
     unsigned short _r;
-    auto q = div_2ul_impl(u1 << (sizeof(D) * CHAR_BIT) | u0, v, _r);
-    r = static_cast<D>(_r);
+    auto q = div_2ul_impl(u1 << (sizeof(D) * CHAR_BIT) | u0, v, &_r);
+    *r = static_cast<D>(_r);
     return q;
   }
 };
@@ -428,7 +428,7 @@ constexpr z<C> div_n(z_view<typename C::value_type> u, typename C::value_type v,
   w.resize(n);
   for (size_t i = 0; i < n; ++i) {
     auto j = n - i - 1;
-    w[j] = static_cast<D>(details::div_2ul(_r, u.digits[j], v, _r));
+    w[j] = static_cast<D>(details::div_2ul(_r, u.digits[j], v, &_r));
   }
   norm_n(q);
   if (r != nullptr) {
@@ -468,15 +468,15 @@ constexpr z<C> div_n(z<C> u, z<C> v, z<C>* r = nullptr) {
       const auto s = details::nlz(v.digits.back());
       details::bit_shift<D>(v.digits, s);
       u.digits.push_back(details::bit_shift<D>(u.digits, s));
-      using Q = decltype(details::div_2ul(std::declval<D>(), std::declval<D>(), std::declval<D>(), *(D*)nullptr));
+      using Q = decltype(details::div_2ul<D>(0, 0, 0, nullptr));
+      static_assert((sizeof(Q) > sizeof(D)) && (alignof(Q) > alignof(D)));
       // d2. [initialize]
       for (size_t l = 0; l <= m; ++l)  // loop on j >= 0
       {
         auto j = m - l;
         // d3. [calculate q-hat]
         D r_hat_;
-        auto q_hat = details::div_2ul(u.digits[j + n], u.digits[j + n - 1], v.digits[n - 1], r_hat_);
-        static_assert((sizeof(Q) > sizeof(D)) && (alignof(Q) > alignof(D)));
+        auto q_hat = details::div_2ul(u.digits[j + n], u.digits[j + n - 1], v.digits[n - 1], &r_hat_);
         const auto base = Q{1u} << (sizeof(D) * CHAR_BIT);
         Q r_hat = r_hat_;
         for (;;) {
