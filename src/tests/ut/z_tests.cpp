@@ -49,14 +49,6 @@ TEST(z_tests, identity) {
   }
 }
 
-TEST(z_tests, z_view) {
-  {
-    real::z num;
-    real::z_view zv{num};
-    real::z_view zv2 = num;
-  }
-}
-
 TEST(z_tests, init_unsigned) {
   {
     real::z num;

@@ -124,6 +124,9 @@ auto div_2ul(D u1, D u0, D v, D* r) {
   }
 };
 
+template <class C>
+using digit_t = typename C::value_type;
+
 }  // namespace details
 
 struct z_error : std::domain_error {
@@ -166,20 +169,6 @@ struct z {
   bool sign = false;  // false for non-negative. -0 is ill-formed.
 };
 
-template <class D>
-struct z_view {
-  using digit_type = D;
-
-  std::span<const D> digits;
-  bool sign;
-
-  template <class Z>
-  constexpr z_view(Z&& z) : digits(z.digits), sign(z.sign) {}
-  explicit constexpr z_view(std::span<const D> d, bool s) : digits(d), sign(s) {}
-};
-template <z_digit_container C>
-z_view(z<C>) -> z_view<typename C::value_type>;
-
 template <z_digit_container C>
 constexpr bool is_zero(const z<C>& num) noexcept {
   if (num.digits.size() == 0) return true;
@@ -199,7 +188,7 @@ constexpr z<C>& init(z<C>& num, T val) {
     num.sign = val < 0;
     val = num.sign ? -val : val;
   }
-  using D = typename z<C>::digit_type;
+  using D = details::digit_t<C>;
   if constexpr (sizeof(T) <= sizeof(D)) {
     num.digits.push_back(val);
   } else {
@@ -219,17 +208,13 @@ template <z_digit_container C>
 constexpr bool sign_z(const z<C>& num) {
   return num.sign;
 }
-template <class D>
-constexpr bool sign_z(const z_view<D>& num) {
-  return num.sign;
-}
 
 // ignores: the signs of `lhs` and `rhs`
 // returns: 0 if lhs is exactly equal to rhs
 //          + if lhs is greater than rhs
 //          - if lhs is less than rhs
-template <class D>
-constexpr int cmp_n(z_view<D> lhs, z_view<D> rhs) {
+template <z_digit_container C>
+constexpr int cmp_n(const z<C>& lhs, const z<C>& rhs) {
   if (lhs.digits.size() != rhs.digits.size()) return lhs.digits.size() < rhs.digits.size() ? -1 : 1;
   auto l = lhs.digits.rbegin();
   auto r = rhs.digits.rbegin();
@@ -240,26 +225,18 @@ constexpr int cmp_n(z_view<D> lhs, z_view<D> rhs) {
   }
   return 0;
 }
-template <z_digit_container C>
-constexpr int cmp_n(const z<C>& lhs, const z<C>& rhs) {
-  return cmp_n(z_view{lhs}, z_view{rhs});
-}
 
 // returns: 0 if lhs is exactly equal to rhs
 //          + if lhs is greater than rhs
 //          - if lhs is less than rhs
-template <class D>
-constexpr int cmp_z(z_view<D> lhs, z_view<D> rhs) {
+template <z_digit_container C>
+constexpr int cmp_z(const z<C>& lhs, const z<C>& rhs) {
   if (sign_z(lhs) == sign_z(rhs)) {
     auto abs_cmp = cmp_n(lhs, rhs);
     return sign_z(lhs) == false ? abs_cmp : -abs_cmp;
   } else {
     return sign_z(lhs) == false ? 1 : -1;
   }
-}
-template <z_digit_container C>
-constexpr int cmp_z(const z<C>& lhs, const z<C>& rhs) {
-  return cmp_z(z_view{lhs}, z_view{rhs});
 }
 
 // effects: num = -num.
@@ -286,7 +263,7 @@ constexpr z<C> neg_z(const z<C>& num) {
 // returns: ref to `num`
 template <z_digit_container C>
 constexpr z<C>& norm_n(z<C>& num) {
-  using D = typename z<C>::digit_type;
+  using D = details::digit_t<C>;
   auto view = num.digits | std::views::reverse | std::views::drop_while([](D x) { return x == 0; });
   num.digits.resize(std::ranges::distance(view));
   num.sign = num.digits.empty() == false ? num.sign : false;
@@ -297,7 +274,7 @@ constexpr z<C>& norm_n(z<C>& num) {
 // returns: ref to `num`.
 template <z_digit_container C>
 constexpr z<C>& shift_n(z<C>& num, size_t offset, bool lsd = false) {
-  using D = typename z<C>::digit_type;
+  using D = details::digit_t<C>;
   // constexpr bool has_pop_front = ;
   if (lsd) {
     if (offset < num.digits.size()) {
@@ -314,20 +291,16 @@ constexpr z<C>& shift_n(z<C>& num, size_t offset, bool lsd = false) {
 
 // returns: the n-th digit of `num`.
 // notes: `n` is an index that starts counting from 0.
-template <class D>
-constexpr auto digit_n(z_view<D> num, size_t n) {
-  return n < num.digits.size() ? num.digits[n] : (D)0;
-}
 template <z_digit_container C>
 constexpr auto digit_n(const z<C>& num, size_t n) {
-  return digit_n(z_view{num}, n);
+  return n < num.digits.size() ? num.digits[n] : details::digit_t<C>{0};
 }
 
 // ignores: the signs of `lhs` and `rhs`.
 // returns: r = lhs + rhs.
 template <z_digit_container C>
-constexpr z<C> add_n(z_view<typename C::value_type> lhs, z_view<typename C::value_type> rhs) {
-  using D = typename z<C>::digit_type;
+constexpr z<C> add_n(const z<C>& lhs, const z<C>& rhs) {
+  using D = details::digit_t<C>;
   z<C> r;
   // ensure size(a.digits) <= size(b.digits).
   auto& a = lhs.digits.size() <= rhs.digits.size() ? lhs : rhs;
@@ -349,17 +322,13 @@ constexpr z<C> add_n(z_view<typename C::value_type> lhs, z_view<typename C::valu
   }
   return r;
 }
-template <z_digit_container C>
-constexpr z<C> add_n(const z<C>& lhs, const z<C>& rhs) {
-  return add_n<C>(z_view{lhs}, z_view{rhs});
-}
 
 // requires: lhs >= rhs
 // ignores: the signs of `lhs` and `rhs`
 // returns: r = lhs - rhs;
 template <z_digit_container C>
-constexpr z<C> sub_n(z_view<typename C::value_type> lhs, z_view<typename C::value_type> rhs) {
-  using D = typename z<C>::digit_type;
+constexpr z<C> sub_n(const z<C>& lhs, const z<C>& rhs) {
+  using D = details::digit_t<C>;
   z<C> r;
   auto& a = lhs;
   auto& b = rhs;
@@ -379,19 +348,15 @@ constexpr z<C> sub_n(z_view<typename C::value_type> lhs, z_view<typename C::valu
   norm_n(r);
   return r;
 };
-template <z_digit_container C>
-constexpr z<C> sub_n(const z<C>& lhs, const z<C>& rhs) {
-  return sub_n<C>(z_view{lhs}, z_view{rhs});
-};
 
 // ignores: the signs of `lhs` and `rhs`
 // returns: r = lhs * rhs;
 template <z_digit_container C>
-constexpr z<C> mul_n(z_view<typename C::value_type> lhs, z_view<typename C::value_type> rhs) {
+constexpr z<C> mul_n(const z<C>& lhs, const z<C>& rhs) {
   // using the long multiplication method, which is
   // the same one you learnt in grade school.
   // todo: use other fast muliplication algorithms.
-  using D = typename z<C>::digit_type;
+  using D = details::digit_t<C>;
   z<C> r;
   r.digits.resize(lhs.digits.size() + rhs.digits.size());
   for (size_t j = 0; j < rhs.digits.size(); ++j) {
@@ -409,17 +374,13 @@ constexpr z<C> mul_n(z_view<typename C::value_type> lhs, z_view<typename C::valu
   norm_n(r);
   return r;
 }
-template <z_digit_container C>
-constexpr z<C> mul_n(const z<C>& lhs, const z<C>& rhs) {
-  return mul_n<C>(z_view{lhs}, z_view{rhs});
-}
 
 // short division
 // ignores: the signs of `u` and `v`
 // returns: the quotient of `u/v`, and output its remainder via `r`
 template <z_digit_container C>
-constexpr z<C> div_n(z_view<typename C::value_type> u, typename C::value_type v, typename C::value_type* r = nullptr) {
-  using D = typename C::value_type;
+constexpr z<C> div_n(z<C> u, typename C::value_type v, typename C::value_type* r = nullptr) {
+  using D = details::digit_t<C>;
   static_assert(sizeof(D) <= sizeof(details::z_max_digit_type));
   _REAL_CHECK_ZERO_D(v);
   D _r = 0u;
@@ -437,11 +398,6 @@ constexpr z<C> div_n(z_view<typename C::value_type> u, typename C::value_type v,
   }
   return q;
 }
-template <z_digit_container C>
-constexpr z<C> div_n(z<C> u, typename C::value_type v, typename C::value_type* r = nullptr) {
-  using D = typename C::value_type;
-  return div_n<C>(z_view<D>{u}, v, r);
-}
 
 // long division
 // ignores: the signs of `dividend` and `divisor`
@@ -449,7 +405,7 @@ constexpr z<C> div_n(z<C> u, typename C::value_type v, typename C::value_type* r
 template <z_digit_container C>
 constexpr z<C> div_n(z<C> u, z<C> v, z<C>* r = nullptr) {
   _REAL_CHECK_ZERO(v);
-  using D = typename C::value_type;
+  using D = details::digit_t<C>;
   if (is_zero(u)) {
     if (r != nullptr) {
       *r = {};
@@ -547,20 +503,16 @@ constexpr z<C> div_n(z<C> u, z<C> v, z<C>* r = nullptr) {
   }
 }
 
-//
-template <z_digit_container C>
-constexpr z<C> abs_z(z_view<typename C::value_type> num) {
-  return z<C>{.digits = num.digits};
-}
+// returns: abs(num)
 template <z_digit_container C>
 constexpr z<C> abs_z(const z<C>& num) {
-  return abs<C>(z_view{num});
+  return z<C>{.digits = num.digits};
 }
 
 // returns: lhs + rhs;
 // notes: operands may be negative integers
 template <z_digit_container C>
-constexpr z<C> add_z(z_view<typename C::value_type> lhs, z_view<typename C::value_type> rhs) {
+constexpr z<C> add_z(const z<C>& lhs, const z<C>& rhs) {
   z<C> r;
   if (sign_z(lhs) == sign_z(rhs)) {
     auto tmp_sign = sign_z(lhs);
@@ -578,29 +530,21 @@ constexpr z<C> add_z(z_view<typename C::value_type> lhs, z_view<typename C::valu
   }
   return r;
 }
-template <z_digit_container C>
-constexpr z<C> add_z(const z<C>& lhs, const z<C>& rhs) {
-  return add_z<C>(z_view{lhs}, z_view{rhs});
-}
 
 // returns: lhs * rhs;
 template <z_digit_container C>
-constexpr z<C> mul_z(z_view<typename C::value_type> lhs, z_view<typename C::value_type> rhs) {
+constexpr z<C> mul_z(const z<C>& lhs, const z<C>& rhs) {
   z<C> r;
   r = mul_n<C>(lhs, rhs);
   r.sign = lhs.sign != rhs.sign;
   return r;
-}
-template <z_digit_container C>
-constexpr z<C> mul_z(const z<C>& lhs, const z<C>& rhs) {
-  return mul_z<C>(z_view{lhs}, z_view{rhs});
 }
 
 // requires: exp >= 0.
 // effects: num = num * 2 ^ exp.
 template <z_digit_container C>
 constexpr void mul_2exp_z(z<C>& num, size_t exp) {
-  using D = typename z<C>::digit_type;
+  using D = details::digit_t<C>;
   if (exp < sizeof(D) * CHAR_BIT) {
     auto cy = details::bit_shift<D>(num.digits, static_cast<signed>(exp));
     if (cy > 0) {
@@ -637,7 +581,7 @@ constexpr z<C> div_z(z<C> lhs, z<C> rhs, z<C>* remainder = nullptr) {
 // effects: num = num / (2^exp), rounded to nearest
 template <z_digit_container C>
 constexpr void ndiv_2exp_z(z<C>& num, size_t exp) {
-  using D = typename z<C>::digit_type;
+  using D = details::digit_t<C>;
   if (exp < sizeof(D) * CHAR_BIT) {
     auto rnd = num.digits.empty() ? false : ((1u << (exp - 1)) & num.digits.front()) > 0;
     details::bit_shift<D>(num.digits, -static_cast<signed>(exp));
