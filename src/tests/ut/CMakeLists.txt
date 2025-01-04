@@ -32,5 +32,11 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang
   target_link_options(realpack_ut PRIVATE --coverage)
 endif()
 
+if(MSVC)
+  target_compile_options(realpack_ut PRIVATE /W4 /WX)
+else()
+  target_compile_options(realpack_ut PRIVATE -Wall -Wextra -Wpedantic -Werror)
+endif()
+
 include(GoogleTest)
 gtest_discover_tests(realpack_ut)

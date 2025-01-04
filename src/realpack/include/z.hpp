@@ -54,8 +54,8 @@ constexpr T umul(T lhs, T rhs, T& o) {
 }
 
 template <std::unsigned_integral T>
-constexpr T nlz(T x) {
-  if (x == 0) return sizeof(T) * CHAR_BIT;
+constexpr int nlz(T x) {
+  if (x == 0) return (int)(sizeof(T) * CHAR_BIT);
   unsigned count = 0;
   T mask = T{1u} << (sizeof(T) * CHAR_BIT - 1);
   while ((x & mask) == 0) {

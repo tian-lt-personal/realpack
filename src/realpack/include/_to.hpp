@@ -21,7 +21,7 @@ constexpr std::optional<int> to_int(const z<C>&) {
 }
 
 template <z_digit_container C>
-constexpr std::optional<double> to_double(const z<C>& p, const z<C>& q) {
+constexpr std::optional<double> to_double(const z<C>&, const z<C>&) {
   return 0;  // TODO
 }
 
