@@ -70,3 +70,7 @@ jobs:
           ${{ steps.strings.outputs.build-output-dir }}/**/*.gcno 
           ${{ steps.strings.outputs.build-output-dir }}/**/*.gcda
           ${{ steps.strings.outputs.build-output-dir }}/**/*.gcov
+          ${{ steps.strings.outputs.build-output-dir }}/**/*.xml
+          ${{ steps.strings.outputs.build-output-dir }}/**/*.html
+          ${{ steps.strings.outputs.build-output-dir }}/**/*.txt
+          ${{ steps.strings.outputs.build-output-dir }}/**/*.log
