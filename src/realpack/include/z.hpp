@@ -9,7 +9,6 @@
 #include <cstdint>
 #include <limits>
 #include <optional>
-#include <ranges>
 #include <string_view>
 #include <vector>
 
@@ -263,8 +262,8 @@ constexpr z<C> neg_z(const z<C>& num) {
 template <z_digit_container C>
 constexpr z<C>& norm_n(z<C>& num) {
   using D = details::digit_t<C>;
-  auto view = num.digits | std::views::reverse | std::views::drop_while([](D x) { return x == 0; });
-  num.digits.resize(std::ranges::distance(view));
+  auto pos = std::find_if(num.digits.rbegin(), num.digits.rend(), [](D x) { return x != 0; });
+  num.digits.resize(std::size(num.digits) - std::distance(num.digits.rbegin(), pos));
   num.sign = num.digits.empty() == false ? num.sign : false;
   return num;
 }

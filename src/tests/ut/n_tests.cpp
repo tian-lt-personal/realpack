@@ -1,3 +1,6 @@
+// std headers
+#include <ranges>
+
 // gtest headers
 #include <gtest/gtest.h>
 
