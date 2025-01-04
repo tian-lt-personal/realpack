@@ -86,12 +86,12 @@ TEST(n_tests, details_umul) {
 }
 
 TEST(n_tests, details_nlz) {
-  EXPECT_EQ(real::details::nlz(0ul), 32);
-  EXPECT_EQ(real::details::nlz(1ul), 31);
-  EXPECT_EQ(real::details::nlz(356ul), 23);
-  EXPECT_EQ(real::details::nlz(213123ul), 14);
-  EXPECT_EQ(real::details::nlz(84627813ul), 5);
-  EXPECT_EQ(real::details::nlz(0xffffffffu), 0);
+  EXPECT_EQ(real::details::nlz<uint32_t>(0ul), 32);
+  EXPECT_EQ(real::details::nlz<uint32_t>(1ul), 31);
+  EXPECT_EQ(real::details::nlz<uint32_t>(356ul), 23);
+  EXPECT_EQ(real::details::nlz<uint32_t>(213123ul), 14);
+  EXPECT_EQ(real::details::nlz<uint32_t>(84627813ul), 5);
+  EXPECT_EQ(real::details::nlz<uint32_t>(0xffffffffu), 0);
 
   EXPECT_EQ(real::details::nlz<uint8_t>(0), 8);
   EXPECT_EQ(real::details::nlz<uint8_t>(1), 7);
