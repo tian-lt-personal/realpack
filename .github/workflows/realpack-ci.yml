@@ -61,11 +61,8 @@ jobs:
       working-directory: ${{ steps.strings.outputs.build-output-dir }}
       run: ctest --build-config ${{ matrix.build_type }} -T Test -T Coverage
 
-    - name: Upload coverage
+    - name: Upload test results
       uses: actions/upload-artifact@v4
       with:
         name: coverage-${{ matrix.cpp_compiler }}
         path: ${{ steps.strings.outputs.build-output-dir }}/Testing
-
-    - name: Dump folder
-      run: find . | sed -e "s/[^-][^\/]*\// |/g" -e "s/|\([^ ]\)/|-\1/"
