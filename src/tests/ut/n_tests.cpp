@@ -202,7 +202,8 @@ TEST(n_tests, norm_n) {
     EXPECT_TRUE(zero.digits.empty());
   }
   {
-    real::z<std::vector<unsigned>> zero{.sign = true};
+    real::z zero;
+    zero.sign = true;
     for (int i = 1; i < 10; ++i) {
       zero.digits.push_back(0);
     }
