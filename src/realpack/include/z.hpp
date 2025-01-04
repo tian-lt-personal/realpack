@@ -85,10 +85,10 @@ constexpr digit_t<C> bit_shift(C& digits, signed offset) {
     // right shift
     const D mask = (1u << offset) - 1;
     D cy = 0;
-    for (auto& d : digits | std::views::reverse) {
-      D t = (d >> offset) | cy;
-      cy = (d & mask) << (sizeof(D) * CHAR_BIT - offset);
-      d = t;
+    for (auto d = digits.rbegin(); d != digits.rend(); ++d) {
+      D t = (*d >> offset) | cy;
+      cy = (*d & mask) << (sizeof(D) * CHAR_BIT - offset);
+      *d = t;
     }
     return cy;
   } else {
