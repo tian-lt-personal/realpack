@@ -6,8 +6,8 @@
 
 namespace {
 
-using small = std::vector<unsigned char>;
-using middle = std::vector<unsigned short>;
+using small = std::vector<uint8_t>;
+using middle = std::vector<uint16_t>;
 
 template <class C>
 constexpr auto pow_of_2(unsigned pwr) {
@@ -42,44 +42,44 @@ static_assert([] {
 
 TEST(n_tests, details_umul) {
   {
-    unsigned char o;
-    auto prod = real::details::umul<unsigned long, unsigned char>(0, 0, o);
+    uint8_t o;
+    auto prod = real::details::umul<uint32_t, uint8_t>(0, 0, o);
     EXPECT_EQ(o, 0);
     EXPECT_EQ(prod, 0);
   }
   {
-    unsigned char o;
-    auto prod = real::details::umul<unsigned long, unsigned char>(1, 0, o);
+    uint8_t o;
+    auto prod = real::details::umul<uint32_t, uint8_t>(1, 0, o);
     EXPECT_EQ(o, 0);
     EXPECT_EQ(prod, 0);
-    prod = real::details::umul<unsigned long, unsigned char>(0, 1, o);
+    prod = real::details::umul<uint32_t, uint8_t>(0, 1, o);
     EXPECT_EQ(o, 0);
     EXPECT_EQ(prod, 0);
   }
   {
-    unsigned char o;
-    auto prod = real::details::umul<unsigned long, unsigned char>(1, 1, o);
+    uint8_t o;
+    auto prod = real::details::umul<uint32_t, uint8_t>(1, 1, o);
     EXPECT_EQ(o, 0);
     EXPECT_EQ(prod, 1);
-    prod = real::details::umul<unsigned long, unsigned char>(1, 1, o);
+    prod = real::details::umul<uint32_t, uint8_t>(1, 1, o);
     EXPECT_EQ(o, 0);
     EXPECT_EQ(prod, 1);
   }
   {
-    unsigned char o;
-    auto prod = real::details::umul<unsigned long, unsigned char>(255, 254, o);
+    uint8_t o;
+    auto prod = real::details::umul<uint32_t, uint8_t>(255, 254, o);
     EXPECT_EQ(o, 253);
     EXPECT_EQ(prod, 2);
-    prod = real::details::umul<unsigned long, unsigned char>(254, 255, o);
+    prod = real::details::umul<uint32_t, uint8_t>(254, 255, o);
     EXPECT_EQ(o, 253);
     EXPECT_EQ(prod, 2);
   }
   {
-    unsigned char o;
-    auto prod = real::details::umul<unsigned char, unsigned char>(255, 254, o);
+    uint8_t o;
+    auto prod = real::details::umul<uint8_t, uint8_t>(255, 254, o);
     EXPECT_EQ(o, 253);
     EXPECT_EQ(prod, 2);
-    prod = real::details::umul<unsigned char, unsigned char>(254, 255, o);
+    prod = real::details::umul<uint8_t, uint8_t>(254, 255, o);
     EXPECT_EQ(o, 253);
     EXPECT_EQ(prod, 2);
   }
@@ -93,15 +93,15 @@ TEST(n_tests, details_nlz) {
   EXPECT_EQ(real::details::nlz(84627813ul), 5);
   EXPECT_EQ(real::details::nlz(0xffffffffu), 0);
 
-  EXPECT_EQ(real::details::nlz<unsigned char>(0), 8);
-  EXPECT_EQ(real::details::nlz<unsigned char>(1), 7);
-  EXPECT_EQ(real::details::nlz<unsigned char>(123), 1);
-  EXPECT_EQ(real::details::nlz<unsigned char>(0xff), 0);
+  EXPECT_EQ(real::details::nlz<uint8_t>(0), 8);
+  EXPECT_EQ(real::details::nlz<uint8_t>(1), 7);
+  EXPECT_EQ(real::details::nlz<uint8_t>(123), 1);
+  EXPECT_EQ(real::details::nlz<uint8_t>(0xff), 0);
 
-  EXPECT_EQ(real::details::nlz<unsigned short>(0), 16);
-  EXPECT_EQ(real::details::nlz<unsigned short>(1), 15);
-  EXPECT_EQ(real::details::nlz<unsigned short>(1234), 5);
-  EXPECT_EQ(real::details::nlz<unsigned short>(0xffff), 0);
+  EXPECT_EQ(real::details::nlz<uint16_t>(0), 16);
+  EXPECT_EQ(real::details::nlz<uint16_t>(1), 15);
+  EXPECT_EQ(real::details::nlz<uint16_t>(1234), 5);
+  EXPECT_EQ(real::details::nlz<uint16_t>(0xffff), 0);
 }
 
 TEST(n_tests, details_bit_shift) {
@@ -454,14 +454,14 @@ TEST(n_tests, mul_n) {
 TEST(n_tests, short_div_n) {
   {
     real::z<small> zero;
-    unsigned char r;
+    uint8_t r;
     auto q = real::div_n(zero, 1, &r);
     EXPECT_TRUE(real::is_zero(q));
     EXPECT_EQ(r, 0);
   }
   {
     auto one = real::identity<small>();
-    unsigned char r;
+    uint8_t r;
     auto q = real::div_n(one, 1, &r);
     EXPECT_EQ(real::cmp_n(q, one), 0);
     EXPECT_EQ(r, 0);
@@ -469,7 +469,7 @@ TEST(n_tests, short_div_n) {
   {
     real::z<small> num;
     real::init(num, 256);
-    unsigned char r;
+    uint8_t r;
     auto q = real::div_n(num, 255u, &r);
     EXPECT_EQ(real::cmp_n(q, real::identity<small>()), 0);
     EXPECT_EQ(r, 1u);
@@ -478,7 +478,7 @@ TEST(n_tests, short_div_n) {
     real::z<small> num, expected;
     real::init(num, 837261932u);
     real::init(expected, 4839664u);
-    unsigned char r;
+    uint8_t r;
     auto q = real::div_n(num, 173u, &r);
     EXPECT_EQ(real::cmp_n(q, expected), 0);
     EXPECT_EQ(r, 60u);
@@ -487,7 +487,7 @@ TEST(n_tests, short_div_n) {
     real::z<small> num, expected;
     real::init(num, 123878293827291834ull);
     real::init(expected, 485797230695262ull);
-    unsigned char r;
+    uint8_t r;
     auto q = real::div_n(num, 255, &r);
     EXPECT_EQ(real::cmp_n(q, expected), 0);
     EXPECT_EQ(r, 24u);
@@ -496,7 +496,7 @@ TEST(n_tests, short_div_n) {
     real::z<middle> num, expected;
     real::init(num, 892387334912834125ull);
     real::init(expected, 14193264861673u);
-    unsigned short r;
+    uint16_t r;
     auto q = real::div_n(num, 62874, &r);
     EXPECT_EQ(real::cmp_n(q, expected), 0);
     EXPECT_EQ(r, 5923u);
@@ -508,7 +508,7 @@ TEST(n_tests, short_div_n) {
     num.digits.push_back(9238412u);
     expected.digits.push_back(3346301246u);
     expected.digits.push_back(41838672u);
-    unsigned long r;
+    uint32_t r;
     auto q = real::div_n(num, 948373234u, &r);
     EXPECT_EQ(real::cmp_n(q, expected), 0);
     EXPECT_EQ(r, 27398166u);

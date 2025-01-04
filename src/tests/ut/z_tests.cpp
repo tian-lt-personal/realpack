@@ -72,7 +72,7 @@ TEST(z_tests, init_unsigned) {
     EXPECT_EQ(num.digits[0], 1);
   }
   {
-    real::z<std::vector<unsigned char>> num;
+    real::z<std::vector<uint8_t>> num;
     real::init(num, 257u);
     EXPECT_FALSE(num.sign);
     EXPECT_EQ(num.digits.size(), 2);
@@ -112,7 +112,7 @@ TEST(z_tests, init_signed) {
     EXPECT_EQ(num.digits[0], 1);
   }
   {
-    real::z<std::vector<unsigned char>> num;
+    real::z<std::vector<uint8_t>> num;
     real::init(num, -257);
     EXPECT_TRUE(num.sign);
     EXPECT_EQ(num.digits.size(), 2);
@@ -163,7 +163,7 @@ TEST(z_tests, add_z) {
     EXPECT_EQ(real::cmp_z(sum, num), 0);
   }
   {
-    using zch = real::z<std::vector<unsigned char>>;
+    using zch = real::z<std::vector<uint8_t>>;
     zch num;
     zch expected;
     real::init(num, 123456u);
@@ -172,7 +172,7 @@ TEST(z_tests, add_z) {
     EXPECT_EQ(real::cmp_z(sum, expected), 0);
   }
   {
-    using zch = real::z<std::vector<unsigned char>>;
+    using zch = real::z<std::vector<uint8_t>>;
     zch num, num2, zero;
     real::init(num, 123456u);
     real::init(num2, -123456);
@@ -182,7 +182,7 @@ TEST(z_tests, add_z) {
     EXPECT_EQ(real::cmp_z(sum, zero), 0);
   }
   {
-    using zch = real::z<std::vector<unsigned char>>;
+    using zch = real::z<std::vector<uint8_t>>;
     zch num, num2;
     zch expected;
     real::init(num, 123456u);

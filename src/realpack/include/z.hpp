@@ -6,6 +6,7 @@
 #include <cassert>
 #include <climits>
 #include <concepts>
+#include <cstdint>
 #include <limits>
 #include <optional>
 #include <ranges>
@@ -18,7 +19,7 @@ namespace real {
 
 namespace details {
 
-using z_max_digit_type = unsigned long;
+using z_max_digit_type = uint32_t;
 using z_default_container = std::vector<z_max_digit_type>;
 
 constexpr bool is_ws(char ch) { return ch == ' ' || ch == '\t' || ch == '\v' || ch == '\f'; }
@@ -98,25 +99,25 @@ constexpr D bit_shift(std::span<D> digits, signed offset) {
 // 1. this is a short-division with the specialization of 64-bit arithmetics, and
 // 2. `u1` is the MSD, and `u0` is the LSD.
 // 3. `r` is the remainder of `(u1*b + u0) / v`, where b == 2^32
-inline unsigned long long div_2ul_impl(unsigned long u1, unsigned long u0, unsigned long v, unsigned long* r) {
-  auto u = ((u1 * 1ull) << 32 | u0);
-  *r = static_cast<unsigned long>(u % v);
+inline uint64_t div_2ul_impl(uint32_t u1, uint32_t u0, uint32_t v, uint32_t* r) {
+  auto u = ((u1 * uint64_t{1}) << 32 | u0);
+  *r = static_cast<uint32_t>(u % v);
   return u / v;
 };
-inline unsigned long div_2ul_impl(unsigned long u, unsigned short v, unsigned short* r) {
-  *r = static_cast<unsigned short>(u % v);
+inline uint32_t div_2ul_impl(uint32_t u, uint16_t v, uint16_t* r) {
+  *r = static_cast<uint16_t>(u % v);
   return u / v;
 };
 template <std::unsigned_integral D>
 auto div_2ul(D u1, D u0, D v, D* r) {
-  if constexpr (sizeof(D) == sizeof(unsigned long)) {
-    unsigned long _r;
+  if constexpr (sizeof(D) == sizeof(uint32_t)) {
+    uint32_t _r;
     auto q = div_2ul_impl(u1, u0, v, &_r);
     *r = static_cast<D>(_r);
     return q;
   } else {
-    static_assert(sizeof(D) * 2 <= sizeof(unsigned long));
-    unsigned short _r;
+    static_assert(sizeof(D) * 2 <= sizeof(uint32_t));
+    uint16_t _r;
     auto q = div_2ul_impl(u1 << (sizeof(D) * CHAR_BIT) | u0, v, &_r);
     *r = static_cast<D>(_r);
     return q;
@@ -152,7 +153,7 @@ struct z_parse_error : z_error {
 template <class T>
 concept z_digit_container = std::ranges::contiguous_range<T> && std::ranges::sized_range<T> && requires {
   typename T::value_type;
-  sizeof(typename T::value_type) <= sizeof(details::z_max_digit_type);  // the max digit type is `unsigned long`
+  sizeof(typename T::value_type) <= sizeof(details::z_max_digit_type);  // the max digit type is `uint32_t`
   std::is_unsigned_v<typename T::value_type>;
 };
 
@@ -202,8 +203,8 @@ constexpr z<C>& init(z<C>& num, T val) {
   if constexpr (sizeof(T) <= sizeof(D)) {
     num.digits.push_back(val);
   } else {
-    static_assert(sizeof(D) < sizeof(unsigned long long));
-    using B = std::conditional_t<sizeof(D) < sizeof(unsigned long), unsigned long, unsigned long long>;
+    static_assert(sizeof(D) < sizeof(uint64_t));
+    using B = std::conditional_t<sizeof(D) < sizeof(uint32_t), uint32_t, uint64_t>;
     constexpr auto base = static_cast<B>(1u) << (sizeof(D) * CHAR_BIT);
     while (val > 0) {
       num.digits.push_back(val % base);
