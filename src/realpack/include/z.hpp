@@ -476,6 +476,7 @@ constexpr z<C> div_n(z<C> u, z<C> v, z<C>* r = nullptr) {
         // d3. [calculate q-hat]
         D r_hat_;
         auto q_hat = details::div_2ul(u.digits[j + n], u.digits[j + n - 1], v.digits[n - 1], r_hat_);
+        static_assert((sizeof(Q) > sizeof(D)) && (alignof(Q) > alignof(D)));
         const auto base = Q{1u} << (sizeof(D) * CHAR_BIT);
         Q r_hat = r_hat_;
         for (;;) {
