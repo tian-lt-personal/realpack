@@ -61,8 +61,12 @@ jobs:
       working-directory: ${{ steps.strings.outputs.build-output-dir }}
       run: ctest --build-config ${{ matrix.build_type }} -T Test -T Coverage
 
-    - name: Upload test results
+    - name: Upload code coverage
       uses: actions/upload-artifact@v4
       with:
         name: coverage-${{ matrix.cpp_compiler }}
-        path: ${{ steps.strings.outputs.build-output-dir }}/Testing
+        path: |
+          ${{ steps.strings.outputs.build-output-dir }}/**/*.o
+          ${{ steps.strings.outputs.build-output-dir }}/**/*.gcno 
+          ${{ steps.strings.outputs.build-output-dir }}/**/*.gcda
+          ${{ steps.strings.outputs.build-output-dir }}/**/*.gcov
