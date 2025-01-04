@@ -107,25 +107,25 @@ TEST(n_tests, details_nlz) {
 TEST(n_tests, details_bit_shift) {
   {
     real::z<small> zero;
-    real::details::bit_shift<typename small::value_type>(zero.digits, 0);
+    real::details::bit_shift(zero.digits, 0);
     EXPECT_TRUE(real::is_zero(zero));
   }
   {
     real::z<small> zero;
-    real::details::bit_shift<typename small::value_type>(zero.digits, 6);
+    real::details::bit_shift(zero.digits, 6);
     EXPECT_TRUE(real::is_zero(zero));
   }
   {
     auto num = real::identity<small>();
     auto expected = real::mul_z(num, pow_of_2<small>(7));
-    real::details::bit_shift<typename small::value_type>(num.digits, 7);
+    real::details::bit_shift(num.digits, 7);
     EXPECT_EQ(real::cmp_z(num, expected), 0);
   }
   {
     real::z<small> num;
     real::init(num, 8365473u);
     auto expected = real::mul_z(num, pow_of_2<small>(3));
-    auto cy = real::details::bit_shift<typename small::value_type>(num.digits, 3);
+    auto cy = real::details::bit_shift(num.digits, 3);
     if (cy > 0) {
       num.digits.push_back(cy);
     }
@@ -135,7 +135,7 @@ TEST(n_tests, details_bit_shift) {
     real::z<small> num;
     real::init(num, 99382171723ull);
     auto expected = real::mul_z(num, pow_of_2<small>(6));
-    auto cy = real::details::bit_shift<typename small::value_type>(num.digits, 6);
+    auto cy = real::details::bit_shift(num.digits, 6);
     if (cy > 0) {
       num.digits.push_back(cy);
     }
@@ -145,7 +145,7 @@ TEST(n_tests, details_bit_shift) {
     real::z<middle> num;
     real::init(num, 9382723635117365ull);
     auto expected = real::mul_z(num, pow_of_2<middle>(6));
-    auto cy = real::details::bit_shift<typename middle::value_type>(num.digits, 6);
+    auto cy = real::details::bit_shift(num.digits, 6);
     if (cy > 0) {
       num.digits.push_back(cy);
     }
@@ -155,7 +155,7 @@ TEST(n_tests, details_bit_shift) {
     real::z<small> expected;
     real::init(expected, 1234u);
     auto num = real::mul_z(expected, pow_of_2<small>(7));
-    auto cy = real::details::bit_shift<typename small::value_type>(num.digits, -7);
+    auto cy = real::details::bit_shift(num.digits, -7);
     real::norm_n(num);
     EXPECT_EQ(cy, 0);
     EXPECT_EQ(real::cmp_z(num, expected), 0);
@@ -164,7 +164,7 @@ TEST(n_tests, details_bit_shift) {
     real::z<small> expected;
     real::init(expected, 7462981237123ull);
     auto num = real::mul_z(expected, pow_of_2<small>(4));
-    auto cy = real::details::bit_shift<typename small::value_type>(num.digits, -4);
+    auto cy = real::details::bit_shift(num.digits, -4);
     real::norm_n(num);
     EXPECT_EQ(cy, 0);
     EXPECT_EQ(real::cmp_z(num, expected), 0);

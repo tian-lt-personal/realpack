@@ -10,8 +10,6 @@
 #include <limits>
 #include <optional>
 #include <ranges>
-#include <span>
-#include <stack>
 #include <string_view>
 #include <vector>
 
@@ -21,6 +19,9 @@ namespace details {
 
 using z_max_digit_type = uint32_t;
 using z_default_container = std::vector<z_max_digit_type>;
+
+template <class C>
+using digit_t = typename C::value_type;
 
 constexpr bool is_ws(char ch) { return ch == ' ' || ch == '\t' || ch == '\v' || ch == '\f'; }
 constexpr bool is_decimal(char ch) { return '0' <= ch && ch <= '9'; }
@@ -65,8 +66,9 @@ constexpr T nlz(T x) {
   return count;
 }
 
-template <std::unsigned_integral D>
-constexpr D bit_shift(std::span<D> digits, signed offset) {
+template <class C>
+constexpr digit_t<C> bit_shift(C& digits, signed offset) {
+  using D = digit_t<C>;
   assert((sizeof(D) * CHAR_BIT) > std::abs(offset));
   if (offset > 0) {
     // left shift
@@ -123,9 +125,6 @@ auto div_2ul(D u1, D u0, D v, D* r) {
     return q;
   }
 };
-
-template <class C>
-using digit_t = typename C::value_type;
 
 }  // namespace details
 
@@ -423,8 +422,8 @@ constexpr z<C> div_n(z<C> u, z<C> v, z<C>* r = nullptr) {
       // algorithm d (division of nonnegative integers) in TAOCP volume 2.
       // d1. [normalize]
       const auto s = details::nlz(v.digits.back());
-      details::bit_shift<D>(v.digits, s);
-      u.digits.push_back(details::bit_shift<D>(u.digits, s));
+      details::bit_shift(v.digits, s);
+      u.digits.push_back(details::bit_shift(u.digits, s));
       using Q = decltype(details::div_2ul<D>(0, 0, 0, nullptr));
       static_assert((sizeof(Q) > sizeof(D)) && (alignof(Q) > alignof(D)));
       // d2. [initialize]
@@ -546,7 +545,7 @@ template <z_digit_container C>
 constexpr void mul_2exp_z(z<C>& num, size_t exp) {
   using D = details::digit_t<C>;
   if (exp < sizeof(D) * CHAR_BIT) {
-    auto cy = details::bit_shift<D>(num.digits, static_cast<signed>(exp));
+    auto cy = details::bit_shift(num.digits, static_cast<signed>(exp));
     if (cy > 0) {
       num.digits.push_back(cy);
     }
@@ -584,7 +583,7 @@ constexpr void ndiv_2exp_z(z<C>& num, size_t exp) {
   using D = details::digit_t<C>;
   if (exp < sizeof(D) * CHAR_BIT) {
     auto rnd = num.digits.empty() ? false : ((1u << (exp - 1)) & num.digits.front()) > 0;
-    details::bit_shift<D>(num.digits, -static_cast<signed>(exp));
+    details::bit_shift(num.digits, -static_cast<signed>(exp));
     if (rnd) {
       auto one = identity<C>();
       one.sign = num.sign;
