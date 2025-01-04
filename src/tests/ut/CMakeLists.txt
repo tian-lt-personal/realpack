@@ -1,4 +1,5 @@
 include(FetchContent)
+
 # The policy uses the download time for timestamp, instead of the timestamp in the archive. This
 # allows for proper rebuilds when a projects URL changes.
 if(POLICY CMP0135)
@@ -15,15 +16,21 @@ set(BUILD_GMOCK OFF CACHE BOOL "" FORCE) # Disable GMock
 FetchContent_MakeAvailable(googletest)
 
 add_executable(realpack_ut
-               coro_tests.cpp
-               create_tests.cpp
-               n_tests.cpp
-               op_tests.cpp
-               r_tests.cpp
-               to_tests.cpp
-               z_tests.cpp)
+  coro_tests.cpp
+  create_tests.cpp
+  n_tests.cpp
+  op_tests.cpp
+  r_tests.cpp
+  to_tests.cpp
+  z_tests.cpp)
 target_link_libraries(realpack_ut PRIVATE
-                      realpack
-                      gtest_main)
+  realpack
+  gtest_main)
+
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+  target_compile_options(realpack_ut PRIVATE -coverage)
+  target_link_options(realpack_ut PRIVATE --coverage)
+endif()
+
 include(GoogleTest)
 gtest_discover_tests(realpack_ut)
