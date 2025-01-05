@@ -2,11 +2,20 @@
 #define REALPACK_INC_CORO_HPP
 
 #include <coroutine>
-#include <optional>
 #include <semaphore>
 #include <stdexcept>
+#include <variant>
 
 namespace real::coro {
+
+namespace details {
+
+template <class... Fs>
+struct visitor_set : Fs... {
+  using Fs::operator()...;
+};
+
+}  // namespace details
 
 template <class T>
 class lazy_promise;
@@ -45,13 +54,14 @@ class lazy_promise {
   }
   template <class U>
   void return_value(U&& value) {
-    val_ = std::forward<U>(value);
+    assert(std::holds_alternative<std::monostate>(state_));
+    state_ = std::forward<U>(value);
   }
-  void unhandled_exception() { std::terminate(); }
+  void unhandled_exception() noexcept { state_ = std::current_exception(); }
 
  private:
   std::coroutine_handle<> cont_;
-  std::optional<T> val_;
+  std::variant<std::monostate, T, std::exception_ptr> state_ = std::monostate{};
 };
 
 template <class T>
@@ -62,7 +72,15 @@ class lazy<T>::awaiter : public std::suspend_always {
     coro_.promise().cont_ = cont;
     return coro_;
   }
-  T await_resume() noexcept(std::is_nothrow_move_constructible_v<T>) { return std::move(*coro_.promise().val_); }
+  T await_resume() {
+    return std::visit(
+        details::visitor_set{
+            [](T& val) -> T&& { return std::move(val); },     // normal path
+            [](std::monostate) -> T&& { std::terminate(); },  // unassigned
+            [](std::exception_ptr& ex) -> T&& { std::rethrow_exception(std::move(ex)); }  // contains exception
+        },
+        coro_.promise().state_);
+  }
 
  private:
   std::coroutine_handle<lazy_promise<T>> coro_;
@@ -72,15 +90,7 @@ typename lazy<T>::awaiter lazy<T>::operator co_await() noexcept {
   return lazy<T>::awaiter{coro_};
 }
 
-struct forget {
-  struct promise_type {
-    constexpr forget get_return_object() noexcept { return forget{}; }
-    constexpr auto initial_suspend() noexcept { return std::suspend_never{}; }
-    constexpr auto final_suspend() noexcept { return std::suspend_never{}; }
-    constexpr void return_void() noexcept {}
-    void unhandled_exception() { std::terminate(); }
-  };
-};
+struct forget {};
 
 template <class T>
 T sync_get(lazy<T> awaitable) {
@@ -96,6 +106,17 @@ namespace std {
 template <class T, class... Args>
 struct coroutine_traits<real::coro::lazy<T>, Args...> {
   using promise_type = real::coro::lazy_promise<T>;
+};
+
+template <class... Args>
+struct coroutine_traits<real::coro::forget, Args...> {
+  struct promise_type {
+    constexpr auto get_return_object() noexcept { return real::coro::forget{}; }
+    constexpr auto initial_suspend() noexcept { return std::suspend_never{}; }
+    constexpr auto final_suspend() noexcept { return std::suspend_never{}; }
+    constexpr void return_void() noexcept {}
+    void unhandled_exception() { std::terminate(); }
+  };
 };
 
 }  // namespace std

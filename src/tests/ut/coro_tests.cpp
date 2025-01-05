@@ -1,3 +1,6 @@
+// std headers
+#include <exception>
+
 // gtest headers
 #include <gtest/gtest.h>
 
@@ -5,6 +8,12 @@
 #include <_coro.hpp>
 
 namespace coro = real::coro;
+
+namespace {
+
+struct test_error : std::exception {};
+
+}  // namespace
 
 TEST(coro_tests, lazy) {
   int side_effect = 0;
@@ -26,4 +35,21 @@ TEST(coro_tests, lazy) {
     EXPECT_EQ(two, 2);
   }();
   EXPECT_EQ(side_effect, 2);
+}
+
+TEST(coro_tests, lazy_with_exception) {
+  []() -> coro::forget {
+    try {
+      co_await [](bool x) -> coro::lazy<int> {
+        if (x) {
+          throw test_error{};
+        } else {
+          co_return 0;
+        }
+      }(true);
+    } catch (const test_error&) {
+      co_return;
+    }
+    std::terminate();
+  }();
 }
