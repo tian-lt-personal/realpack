@@ -14,6 +14,8 @@ template <class... Fs>
 struct visitor_set : Fs... {
   using Fs::operator()...;
 };
+template <class... Fs>
+visitor_set(Fs...) -> visitor_set<Fs...>;  // deduction guide for some old compilers.
 
 }  // namespace details
 
@@ -75,8 +77,8 @@ class lazy<T>::awaiter : public std::suspend_always {
   T await_resume() {
     return std::visit(
         details::visitor_set{
-            [](T& val) -> T&& { return std::move(val); },     // normal path
-            [](std::monostate) -> T&& { std::terminate(); },  // unassigned
+            [](T& val) -> T&& { return std::move(val); },                                 // normal path
+            [](std::monostate) -> T&& { std::terminate(); },                              // unassigned
             [](std::exception_ptr& ex) -> T&& { std::rethrow_exception(std::move(ex)); }  // contains exception
         },
         coro_.promise().state_);
