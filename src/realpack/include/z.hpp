@@ -22,15 +22,6 @@ using z_default_container = std::vector<z_max_digit_type>;
 template <class C>
 using digit_t = typename C::value_type;
 
-constexpr bool is_ws(char ch) { return ch == ' ' || ch == '\t' || ch == '\v' || ch == '\f'; }
-constexpr bool is_decimal(char ch) { return '0' <= ch && ch <= '9'; }
-constexpr std::optional<unsigned> char2decimal(char ch) {
-  if (is_decimal(ch))
-    return static_cast<unsigned>(ch - '0');
-  else
-    return std::nullopt;
-}
-
 template <class MaxD, std::unsigned_integral T>
 constexpr T umul(T lhs, T rhs, T& o) {
   if constexpr (sizeof(T) >= sizeof(MaxD)) {
@@ -128,7 +119,7 @@ auto div_2ul(D u1, D u0, D v, D* r) {
 }  // namespace details
 
 struct z_error : std::domain_error {
-  z_error(const char* reason) : std::domain_error(reason) {}
+  explicit z_error(const char* reason) : std::domain_error(reason) {}
 };
 
 struct z_operation_error : z_error {
@@ -138,7 +129,7 @@ struct z_divided_by_zero_error : z_operation_error {
   z_divided_by_zero_error() : z_operation_error("divided by zero") {}
 };
 struct z_parse_error : z_error {
-  z_parse_error(const char* reason) : z_error(reason) {}
+  explicit z_parse_error(const char* reason) : z_error(reason) {}
 };
 
 #if defined(_DEBUG) || defined(DEBUG) || defined(REAL_ENABLE_ZERO_CHECK)
@@ -604,69 +595,6 @@ constexpr z<C> ndiv_2exp_z(const z<C>& num, size_t exp) {
   } else {
     return num;
   }
-}
-
-template <z_digit_container C>
-constexpr z<C>& init_decstr(z<C>& num, std::string_view str) {
-  // illustration:
-  // "    -       2024"
-  //  sign | gap |num
-  bool all0 = true;
-  enum class parse_state { sign, gap, num, done };
-  auto ps = parse_state::sign;
-  std::vector<unsigned> digits;
-  for (size_t i = 0; i < str.length() && ps != parse_state::done; ++i) {
-    auto ch = str[i];
-    switch (ps) {
-      case parse_state::sign:
-        if (details::is_ws(ch)) continue;
-        switch (ch) {
-          case '+':
-            ps = parse_state::gap;
-            break;
-          case '-':
-            num.sign = true;
-            ps = parse_state::gap;
-            break;
-          default:
-            if (details::is_decimal(ch)) {
-              ps = parse_state::num;
-              if (auto v = details::char2decimal(ch); v.has_value()) {
-                all0 &= *v == 0;
-                digits.push_back(*v);
-              } else
-                throw z_parse_error{"bad number symbol."};
-            } else
-              throw z_parse_error{"bad sign symbol."};
-        }
-        break;
-      case parse_state::gap:
-        if (details::is_ws(ch))
-          continue;
-        else {
-          ps = parse_state::num;
-        }
-        [[fallthrough]];
-      case parse_state::num: {
-        if (details::is_ws(ch)) {
-          ps = parse_state::done;
-          break;
-        }
-        if (auto v = details::char2decimal(ch); v.has_value()) {
-          all0 &= *v == 0;
-          digits.push_back(*v);
-        } else
-          throw z_parse_error{"bad number symbol."};
-        break;
-      }
-      default:
-        throw std::logic_error{"unhandled state."};
-    }
-  }
-  if (!all0) {
-    // TODO: convert the base 10 number to other bases.
-  }
-  return num;
 }
 
 }  // namespace real

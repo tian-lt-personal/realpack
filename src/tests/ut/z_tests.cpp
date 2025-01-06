@@ -121,10 +121,6 @@ TEST(z_tests, init_signed) {
   }
 }
 
-TEST(z_tests, init_decstr) {
-  // TODO
-}
-
 TEST(z_tests, neg_z) {
   {
     real::z zero;
