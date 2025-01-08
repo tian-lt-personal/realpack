@@ -553,3 +553,31 @@ TEST(n_tests, div_n) {
     EXPECT_EQ(real::cmp_n(r, expected_r), 0);
   }
 }
+
+TEST(n_tests, pow_n) {
+  {
+    real::z<small> zero;
+    auto num = real::pow_n(zero, 0);
+    EXPECT_EQ(real::cmp_n(num, real::identity<small>()), 0);
+  }
+  {
+    real::z<small> num;
+    real::init(num, 814237123u);
+    auto num2 = real::pow_n(num, 0);
+    EXPECT_EQ(real::cmp_n(num2, real::identity<small>()), 0);
+  }
+  {
+    real::z<small> five, expected;
+    real::init(five, 5u);
+    real::init(expected, 390625u);
+    auto num = real::pow_n(five, 8);
+    EXPECT_EQ(real::cmp_n(num, expected), 0);
+  }
+  {
+    real::z<middle> two, expected;
+    real::init(two, 2u);
+    real::init(expected, 524288u);
+    auto num = real::pow_n(two, 19);
+    EXPECT_EQ(real::cmp_n(num, expected), 0);
+  }
+}

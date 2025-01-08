@@ -313,3 +313,26 @@ TEST(z_tests, ndiv_2exp_z) {
     EXPECT_EQ(real::cmp_z(num, expected), 0);
   }
 }
+
+TEST(z_tests, pow_z) {
+  {
+    real::z minus_one;
+    real::init(minus_one, -1);
+    EXPECT_EQ(real::cmp_z(real::pow_z(minus_one, 0), real::identity()), 0);
+  }
+  {
+    real::z minus_one;
+    real::init(minus_one, -1);
+    EXPECT_EQ(real::cmp_z(real::pow_z(minus_one, 1), minus_one), 0);
+  }
+  {
+    real::z minus_one;
+    real::init(minus_one, -1);
+    EXPECT_EQ(real::cmp_z(real::pow_z(minus_one, 8245), minus_one), 0);
+  }
+  {
+    real::z minus_one;
+    real::init(minus_one, -1);
+    EXPECT_EQ(real::cmp_z(real::pow_z(minus_one, 9846), real::identity()), 0);
+  }
+}
