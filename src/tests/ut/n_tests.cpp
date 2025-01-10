@@ -1,3 +1,4 @@
+#include <random>
 // gtest headers
 #include <gtest/gtest.h>
 
@@ -576,6 +577,32 @@ TEST(n_tests, div_n) {
     EXPECT_EQ(real::cmp_n(q, expected_q), 0);
     EXPECT_EQ(real::cmp_n(r, expected_r), 0);
   }
+  {  // verify d3 - find q
+    auto u = real::create_z("16954565143506572417898428782");
+    auto v = real::create_z("7998594442358217071");
+    auto expected_r = real::create_z("6286695216167984451");
+    auto expected_q = real::create_z("2119693061");
+    real::z r;
+    auto q = real::div_n(u, v, &r);
+    EXPECT_EQ(real::cmp_n(q, expected_q), 0);
+    EXPECT_EQ(real::cmp_n(r, expected_r), 0);
+  }
+  //{  // find d5 & d6
+  //  std::random_device dev;
+  //  std::mt19937 gen{dev()};
+  //  std::uniform_int_distribution dist{1, std::numeric_limits<int>::max()};
+  //  while (true) {
+  //    real::z u, v;
+  //    u.digits.push_back(dist(gen));
+  //    u.digits.push_back(dist(gen));
+  //    u.digits.push_back(dist(gen));
+  //    u.digits.push_back(dist(gen));
+  //    v.digits.push_back(dist(gen));
+  //    v.digits.push_back(dist(gen));
+  //    real::z r;
+  //    real::div_n(u, v, &r);
+  //  }
+  //}
 }
 
 TEST(n_tests, pow_n) {
