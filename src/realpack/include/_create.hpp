@@ -115,28 +115,21 @@ C parse_unsigned_integer(std::string_view& str) {
     auto ten = create_z<C>(10u);
     auto raw = str.substr(beg, end - beg);
     str = str.substr(end);
-    constexpr auto rank = details::decimal_parsing_rank<D>() + 1;
-    unsigned int i = 1;
+    constexpr auto rank = details::decimal_parsing_rank<D>();
+    unsigned int i = 0u;
     for (auto iter = raw.rbegin(); iter != raw.rend(); ++iter, ++i) {
       if (auto val = char2decimal<D>(*iter); val.has_value()) {
-        if (i % rank != 0) {
-          d += static_cast<D>(details::pow10<D>(i % rank - 1) * (*val));
-        } else {
-          z<C> partial;
-          real::init(partial, d);
-          partial = real::mul_n(partial, real::pow_n(ten, ((i - 1) / rank) * (rank - 1)));
-          sum = real::add_n(partial, sum);
-          d = *val;
+        d += static_cast<D>(details::pow10<D>(i % rank) * (*val));
+        if (i % rank == rank - 1) {
+          sum = real::add_n(real::mul_n(real::pow_n(ten, rank * (i / rank)), create_z<C>(d)), sum);
+          d = 0u;
         }
       } else {
         throw z_parse_error{"bad unsigned integer string. (bad number sequence)"};
       }
     }
     if (d > 0u) {
-      z<C> partial;
-      real::init(partial, d);
-      partial = real::mul_n(partial, real::pow_n(ten, ((i - 1) / rank) * (rank - 1)));
-      sum = real::add_n(partial, sum);
+      sum = real::add_n(real::mul_n(real::pow_n(ten, rank * ((i - 1) / rank)), create_z<C>(d)), sum);
     }
     return std::move(sum.digits);
   }
