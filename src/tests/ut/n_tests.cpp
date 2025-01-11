@@ -1,4 +1,3 @@
-#include <random>
 // gtest headers
 #include <gtest/gtest.h>
 
@@ -522,7 +521,30 @@ TEST(n_tests, div_n) {
   {
     real::z<small> zero, one;
     real::init(one, 1);
-    real::div_n<small>(zero, one, nullptr);
+    auto q = real::div_n<small>(zero, one, nullptr);
+    EXPECT_TRUE(real::is_zero(q));
+  }
+  {
+    real::z<small> zero, one, r;
+    real::init(one, 1);
+    auto q = real::div_n(zero, one, &r);
+    EXPECT_TRUE(real::is_zero(q));
+    EXPECT_TRUE(real::is_zero(r));
+  }
+  {
+    real::z<small> r;
+    auto num1 = real::create_z<small>(1234);
+    auto num2 = real::create_z<small>(43210);
+    auto q = real::div_n(num1, num2, &r);
+    EXPECT_TRUE(real::is_zero(q));
+    EXPECT_EQ(real::cmp_n(num1, r), 0);
+  }
+  {
+    auto num = real::create_z<small>(87635271);
+    real::z<small> r;
+    auto q = real::div_n(num, num, &r);
+    EXPECT_EQ(real::cmp_n(q, real::identity<small>()), 0);
+    EXPECT_TRUE(real::is_zero(r));
   }
   {
     real::z<small> u, v, r, expected_q, expected_r;
@@ -577,7 +599,7 @@ TEST(n_tests, div_n) {
     EXPECT_EQ(real::cmp_n(q, expected_q), 0);
     EXPECT_EQ(real::cmp_n(r, expected_r), 0);
   }
-  {  // verify d3 - find q
+  {  // verify d3: find q
     auto u = real::create_z("16954565143506572417898428782");
     auto v = real::create_z("7998594442358217071");
     auto expected_r = real::create_z("6286695216167984451");
@@ -587,22 +609,40 @@ TEST(n_tests, div_n) {
     EXPECT_EQ(real::cmp_n(q, expected_q), 0);
     EXPECT_EQ(real::cmp_n(r, expected_r), 0);
   }
-  //{  // find d5 & d6
-  //  std::random_device dev;
-  //  std::mt19937 gen{dev()};
-  //  std::uniform_int_distribution dist{1, std::numeric_limits<int>::max()};
-  //  while (true) {
-  //    real::z u, v;
-  //    u.digits.push_back(dist(gen));
-  //    u.digits.push_back(dist(gen));
-  //    u.digits.push_back(dist(gen));
-  //    u.digits.push_back(dist(gen));
-  //    v.digits.push_back(dist(gen));
-  //    v.digits.push_back(dist(gen));
-  //    real::z r;
-  //    real::div_n(u, v, &r);
-  //  }
-  //}
+  {  // verify d5 & d6: test remainder & add back
+    {
+      auto u = real::create_z<small>("713934148952");
+      auto v = real::create_z<small>("12032463");
+      real::z<small> r;
+      auto q = real::div_n(u, v, &r);
+      EXPECT_EQ(real::cmp_n(q, real::create_z<small>("59333")), 0);
+      EXPECT_EQ(real::cmp_n(r, real::create_z<small>("12021773")), 0);
+    }
+    {
+      auto u = real::create_z<small>("614394062979");
+      auto v = real::create_z<small>("2619001");
+      real::z<small> r;
+      auto q = real::div_n(u, v, &r);
+      EXPECT_EQ(real::cmp_n(q, real::create_z<small>("234590")), 0);
+      EXPECT_EQ(real::cmp_n(r, real::create_z<small>("2618389")), 0);
+    }
+    {
+      auto u = real::create_z<small>("558987060890");
+      auto v = real::create_z<small>("5701164");
+      real::z<small> r;
+      auto q = real::div_n(u, v, &r);
+      EXPECT_EQ(real::cmp_n(q, real::create_z<small>("98047")), 0);
+      EXPECT_EQ(real::cmp_n(r, real::create_z<small>("5034182")), 0);
+    }
+    {
+      auto u = real::create_z<small>("964633280725");
+      auto v = real::create_z<small>("5314678");
+      real::z<small> r;
+      auto q = real::div_n(u, v, &r);
+      EXPECT_EQ(real::cmp_n(q, real::create_z<small>(181503)), 0);
+      EXPECT_EQ(real::cmp_n(r, real::create_z<small>(3279691)), 0);
+    }
+  }
 }
 
 TEST(n_tests, pow_n) {

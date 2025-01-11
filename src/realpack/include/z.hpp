@@ -395,6 +395,7 @@ template <z_digit_container C>
 constexpr z<C> div_n(z<C> u, z<C> v, z<C>* r = nullptr) {
   _REAL_CHECK_ZERO(v);
   using D = details::digit_t<C>;
+  constexpr auto d_bits = sizeof(D) * CHAR_BIT;
   if (is_zero(u)) {
     if (r != nullptr) {
       *r = {};
@@ -416,6 +417,7 @@ constexpr z<C> div_n(z<C> u, z<C> v, z<C>* r = nullptr) {
       u.digits.push_back(details::bit_shift(u.digits, s));
       using Q = decltype(details::div_2ul<D>(0, 0, 0, nullptr));
       static_assert((sizeof(Q) > sizeof(D)) && (alignof(Q) > alignof(D)));
+      constexpr auto base = Q{1u} << d_bits;
       // d2. [initialize]
       for (size_t l = 0; l <= m; ++l)  // loop on j >= 0
       {
@@ -423,10 +425,10 @@ constexpr z<C> div_n(z<C> u, z<C> v, z<C>* r = nullptr) {
         // d3. [calculate q-hat]
         D r_hat_;
         auto q_hat = details::div_2ul(u.digits[j + n], u.digits[j + n - 1], v.digits[n - 1], &r_hat_);
-        constexpr auto base = Q{1u} << (sizeof(D) * CHAR_BIT);
         Q r_hat = r_hat_;
         for (;;) {
-          if (q_hat == base || q_hat * v.digits[n - 2] > base * r_hat + u.digits[j + n - 2]) {
+          //assert(q_hat <= base && "div_2ul ensures q-hat is no larger than its base.");
+          if (q_hat >= base || q_hat * v.digits[n - 2] > base * r_hat + u.digits[j + n - 2]) {
             --q_hat;
             r_hat += v.digits[n - 1];
             if (r_hat < base) continue;  // loop: find q
@@ -440,7 +442,7 @@ constexpr z<C> div_n(z<C> u, z<C> v, z<C>* r = nullptr) {
           auto p = q_hat * v.digits[i];
           t = u.digits[i + j] - k - (p & (base - 1));
           u.digits[i + j] = static_cast<D>(t);
-          k = (p >> (sizeof(D) * CHAR_BIT)) - (t >> (sizeof(D) * CHAR_BIT));
+          k = (p >> d_bits) - (t >> d_bits);
         }
         t = I{u.digits[j + n]} - k;
         u.digits[j + n] = static_cast<D>(t);
@@ -453,7 +455,7 @@ constexpr z<C> div_n(z<C> u, z<C> v, z<C>* r = nullptr) {
           for (size_t i = 0; i < n; ++i) {
             t = static_cast<Q>(u.digits[i + j]) + v.digits[i] + k;
             u.digits[i + j] = static_cast<D>(t);
-            k = t >> (sizeof(D) * CHAR_BIT);
+            k = t >> d_bits;
           }
           u.digits[j + n] = static_cast<D>(u.digits[j + n] + k);
         }
@@ -463,7 +465,7 @@ constexpr z<C> div_n(z<C> u, z<C> v, z<C>* r = nullptr) {
         *r = {};
         r->digits.resize(n);
         for (size_t i = 0; i < n; ++i)
-          r->digits[i] = (u.digits[i] >> s) | (static_cast<Q>(u.digits[i + 1]) << ((sizeof(D) * CHAR_BIT) - s));
+          r->digits[i] = (u.digits[i] >> s) | (static_cast<Q>(u.digits[i + 1]) << (d_bits - s));
         r->digits[n - 1] = u.digits[n - 1] >> s;
         norm_n(*r);
       }
