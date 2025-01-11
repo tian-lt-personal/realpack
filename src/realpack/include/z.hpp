@@ -427,7 +427,6 @@ constexpr z<C> div_n(z<C> u, z<C> v, z<C>* r = nullptr) {
         auto q_hat = details::div_2ul(u.digits[j + n], u.digits[j + n - 1], v.digits[n - 1], &r_hat_);
         Q r_hat = r_hat_;
         for (;;) {
-          //assert(q_hat <= base && "div_2ul ensures q-hat is no larger than its base.");
           if (q_hat >= base || q_hat * v.digits[n - 2] > base * r_hat + u.digits[j + n - 2]) {
             --q_hat;
             r_hat += v.digits[n - 1];
