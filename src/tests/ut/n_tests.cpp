@@ -1,5 +1,3 @@
-#define REAL_ENABLE_ZERO_CHECK
-
 // gtest headers
 #include <gtest/gtest.h>
 

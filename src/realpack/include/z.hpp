@@ -132,16 +132,6 @@ struct z_parse_error : z_error {
   explicit z_parse_error(const char* reason) : z_error(reason) {}
 };
 
-#if defined(_DEBUG) || defined(DEBUG) || defined(REAL_ENABLE_ZERO_CHECK)
-#define _REAL_CHECK_ZERO(Z) \
-  if (is_zero(Z)) throw z_divided_by_zero_error{};
-#define _REAL_CHECK_ZERO_D(D) \
-  if ((D) == 0) throw z_divided_by_zero_error{};
-#else
-#define _REAL_CHECK_ZERO(Z)
-#define _REAL_CHECK_ZERO_D(D)
-#endif
-
 template <class T>
 concept z_digit_container = std::ranges::contiguous_range<T> && std::ranges::sized_range<T> && requires {
   typename T::value_type;
@@ -163,6 +153,22 @@ constexpr bool is_zero(const z<C>& num) noexcept {
   if (num.digits.size() == 0) return true;
   return std::ranges::all_of(num.digits, [](typename z<C>::digit_type x) { return x == 0; });
 }
+
+namespace details {
+
+template <class C>
+void check_zero(const z<C>& num) {
+  if (is_zero(num)) {
+    throw z_divided_by_zero_error{};
+  }
+}
+void check_zero(const std::unsigned_integral auto& digit) {
+  if (digit == 0) {
+    throw z_divided_by_zero_error{};
+  }
+}
+
+}  // namespace details
 
 template <z_digit_container C = details::z_default_container>
 constexpr z<C> identity() {
@@ -371,7 +377,7 @@ template <z_digit_container C>
 constexpr z<C> div_n(z<C> u, typename C::value_type v, typename C::value_type* r = nullptr) {
   using D = details::digit_t<C>;
   static_assert(sizeof(D) <= sizeof(details::z_max_digit_type));
-  _REAL_CHECK_ZERO_D(v);
+  details::check_zero(v);
   D _r = 0u;
   z<C> q;
   auto& w = q.digits;
@@ -393,7 +399,7 @@ constexpr z<C> div_n(z<C> u, typename C::value_type v, typename C::value_type* r
 // returns: the quotient of (dividend / divisor), and output its remainder
 template <z_digit_container C>
 constexpr z<C> div_n(z<C> u, z<C> v, z<C>* r = nullptr) {
-  _REAL_CHECK_ZERO(v);
+  details::check_zero(v);
   using D = details::digit_t<C>;
   constexpr auto d_bits = sizeof(D) * CHAR_BIT;
   if (is_zero(u)) {
@@ -618,6 +624,4 @@ constexpr z<C> ndiv_2exp_z(const z<C>& num, size_t exp) {
 
 }  // namespace real
 
-#undef _REAL_CHECK_ZERO
-#undef _REAL_CHECK_ZERO_D
 #endif  // !REALPACK_INC_Z_HPP
