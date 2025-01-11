@@ -1,6 +1,14 @@
 #ifndef REALPACK_INC_Z_HPP
 #define REALPACK_INC_Z_HPP
 
+#ifdef min
+#undef min
+#endif
+
+#ifdef max
+#undef max
+#endif
+
 // std headers
 #include <algorithm>
 #include <cassert>
@@ -8,7 +16,6 @@
 #include <concepts>
 #include <cstdint>
 #include <limits>
-#include <optional>
 #include <string_view>
 #include <vector>
 
@@ -150,8 +157,7 @@ struct z {
 
 template <z_digit_container C>
 constexpr bool is_zero(const z<C>& num) noexcept {
-  if (num.digits.size() == 0) return true;
-  return std::ranges::all_of(num.digits, [](typename z<C>::digit_type x) { return x == 0; });
+  return num.digits.size() == 0;
 }
 
 namespace details {
