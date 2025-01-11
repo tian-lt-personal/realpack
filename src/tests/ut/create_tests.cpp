@@ -53,7 +53,7 @@ TEST(create_tests, z_from_string) {
   }
   {
     auto expected = real::create_z<middle>(1234567890ull);
-    auto num = real::create_z<middle>("   1234567890");
+    auto num = real::create_z<middle>(" +  1234567890");
     EXPECT_EQ(real::cmp_z(num, expected), 0);
   }
   {
@@ -111,4 +111,24 @@ TEST(create_tests, z_from_string) {
         "6919797333582169537678511931189480");
     EXPECT_EQ(real::cmp_z(expected, real::mul_z(num1, num2)), 0);
   }
+}
+
+TEST(create_tests, z_from_string_errors) {
+  constexpr auto verify = [](std::string_view text) {
+    bool has_error = false;
+    try {
+      std::ignore = real::create_z(text);
+    } catch (const real::z_parse_error&) {
+      has_error = true;
+    }
+    EXPECT_TRUE(has_error);
+  };
+  verify("");
+  verify("-");
+  verify("--");
+  verify("+");
+  verify("++++");
+  verify(" - +");
+  verify(" - x");
+  verify("abc");
 }

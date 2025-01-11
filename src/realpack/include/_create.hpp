@@ -75,8 +75,14 @@ inline bool parse_sign_opt(std::string_view& str) {
         ++i;
         res = true;
         break;
-      } else {
+      } else if (ch == '+') {
+        ++i;
+        res = false;
         break;
+      } else if (is_decimal(ch)) {
+        break;
+      } else {
+        throw z_parse_error{"bad sign characters. (unknown character)"};
       }
     } else {
       continue;

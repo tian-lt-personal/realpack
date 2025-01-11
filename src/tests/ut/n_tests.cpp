@@ -540,6 +540,14 @@ TEST(n_tests, div_n) {
     EXPECT_EQ(real::cmp_n(num1, r), 0);
   }
   {
+    real::z<small> r;
+    auto num1 = real::create_z<small>(123456);
+    auto num2 = real::create_z<small>(4);
+    auto q = real::div_n(num1, num2, &r);
+    EXPECT_EQ(real::cmp_n(q, real::create_z<small>(30864)), 0);
+    EXPECT_TRUE(real::is_zero(r));
+  }
+  {
     auto num = real::create_z<small>(87635271);
     real::z<small> r;
     auto q = real::div_n(num, num, &r);
@@ -642,6 +650,20 @@ TEST(n_tests, div_n) {
       EXPECT_EQ(real::cmp_n(q, real::create_z<small>(181503)), 0);
       EXPECT_EQ(real::cmp_n(r, real::create_z<small>(3279691)), 0);
     }
+  }
+}
+
+TEST(n_tests, div_n_divided_by_zero) {
+  {
+    using C = real::details::z_default_container;
+    bool has_error = false;
+    real::z zero;
+    try {
+      real::div_n<C>(real::identity(), zero, nullptr);
+    } catch (const real::z_divided_by_zero_error&) {
+      has_error = true;
+    }
+    EXPECT_TRUE(has_error);
   }
 }
 
