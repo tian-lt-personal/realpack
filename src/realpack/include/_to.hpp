@@ -18,6 +18,7 @@ namespace details {}
 
 template <z_digit_container C>
 std::string to_decimal_string(const z<C>& num) {
+  std::ignore = num;
   return {};  // TODO
 }
 
