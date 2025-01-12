@@ -380,7 +380,7 @@ constexpr z<C> mul_n(const z<C>& lhs, const z<C>& rhs) {
 // ignores: the signs of `u` and `v`
 // returns: the quotient of `u/v`, and output its remainder via `r`
 template <z_digit_container C>
-constexpr z<C> div_n(z<C> u, typename C::value_type v, typename C::value_type* r = nullptr) {
+constexpr z<C> div_n(const z<C>& u, typename C::value_type v, typename C::value_type* r = nullptr) {
   using D = details::digit_t<C>;
   static_assert(sizeof(D) <= sizeof(details::z_max_digit_type));
   details::check_zero(v);

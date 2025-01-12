@@ -14,12 +14,42 @@
 
 namespace real {
 
-namespace details {}
+namespace details {
+
+template <class D>
+void append_value(std::string& out, D value, bool fullfill) {
+  constexpr auto rank = details::decimal_parsing_rank<D>();
+  for (unsigned int i = 0; i < rank; ++i) {
+    if (!fullfill && value == 0) {
+      break;
+    }
+    out.push_back((value % 10) + '0');
+    value /= 10;
+  }
+}
+
+}  // namespace details
 
 template <z_digit_container C>
-std::string to_decimal_string(const z<C>& num) {
-  std::ignore = num;
-  return {};  // TODO
+std::string to_decimal_string(z<C> num) {
+  if (is_zero(num)) {
+    return "0";
+  }
+  std::string res;
+  bool sign = num.sign;
+  using D = details::digit_t<C>;
+  constexpr auto rank = details::decimal_parsing_rank<D>();
+  const auto v10 = details::pow10<D>(rank);
+  while (!is_zero(num)) {
+    D r;
+    num = div_n(num, v10, &r);
+    details::append_value(res, r, !is_zero(num));
+  }
+  if (sign) {
+    res.push_back('-');
+  }
+  std::reverse(res.begin(), res.end());
+  return res;
 }
 
 template <std::integral N, z_digit_container C>

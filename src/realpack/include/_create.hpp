@@ -84,8 +84,6 @@ inline bool parse_sign_opt(std::string_view& str) {
       } else {
         throw z_parse_error{"bad sign characters. (unknown character)"};
       }
-    } else {
-      continue;
     }
   }
   str = str.substr(i);
