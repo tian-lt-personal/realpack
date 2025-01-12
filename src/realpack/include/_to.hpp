@@ -16,6 +16,11 @@ namespace real {
 
 namespace details {}
 
+template <z_digit_container C>
+std::string to_decimal_string(const z<C>& num) {
+  return {};  // TODO
+}
+
 template <std::integral N, z_digit_container C>
 constexpr N to_int(const z<C>&) {
   if constexpr (std::is_unsigned_v<N>) {

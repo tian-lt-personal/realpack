@@ -152,6 +152,9 @@ constexpr z<C> create_z(std::string_view str) {
   z<C> num;
   num.sign = details::parse_sign_opt(str);
   num.digits = details::parse_unsigned_integer<C>(str);
+  if (!str.empty()) {
+    throw z_parse_error{"bad integer number string. (bad ending)"};
+  }
   return num;
 }
 

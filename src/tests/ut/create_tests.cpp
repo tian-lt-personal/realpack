@@ -131,4 +131,6 @@ TEST(create_tests, z_from_string_errors) {
   verify(" - +");
   verify(" - x");
   verify("abc");
+  verify("123a");
+  verify(" 567 ");
 }

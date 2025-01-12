@@ -8,9 +8,9 @@ namespace real {
 
 template <z_digit_container C>
 struct fx {
-  // base = 2 ^ bits_of<C::digit_type>()
-  z<C> co;     // coefficient
-  size_t exp;  // exponent
+  // base = 2 ^ bits_of<typename C::digit_type>()
+  z<C> co;      // coefficient
+  size_t nexp;  // exponent in negative
 };
 
 // requires: v != 0
@@ -19,11 +19,14 @@ struct fx {
 // 2. | res - (u/v) | < base ^ (-n).
 template <z_digit_container C>
 fx<C> frac_n(const z<C>& u, const z<C>& v, size_t n) {
-  (void)n;
+  fx<C> res;
   z<C> r;
   auto q = div_n(u, v, &r);
-
-  return {};
+  shift_n(r, n);
+  res.co = div_n<C>(r, v, nullptr);
+  res.co.digits.insert(res.co.digits.end(), q.digits.begin(), q.digits.end());
+  res.nexp = n;
+  return res;
 }
 
 }  // namespace real
