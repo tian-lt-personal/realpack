@@ -2,11 +2,13 @@
 #define REALPACK_INC_TO_HPP
 
 // std headers
+#include <algorithm>
 #include <concepts>
 #include <optional>
 
 // real headers
 #include "r.hpp"
+#include "s.hpp"
 #include "z.hpp"
 
 // util headers
@@ -49,6 +51,21 @@ std::string to_decimal_string(z<C> num) {
     res.push_back('-');
   }
   std::reverse(res.begin(), res.end());
+  return res;
+}
+
+template <z_digit_container C>
+std::string to_decimal_string(fx<C> frac) {
+  assert(frac.coeff.digits.size() >= frac.nexp);
+  z<C> integers;
+  integers.sign = frac.coeff.sign;
+  std::copy(frac.coeff.digits.begin() + frac.nexp, frac.coeff.digits.end(), std::back_inserter(integers.digits));
+  frac.coeff.digits.resize(frac.nexp);
+  auto res = to_decimal_string(std::move(integers));
+  res.push_back('.');
+  frac.coeff = mul_n(frac.coeff, pow_n(create_z<C>(10), frac.nexp));
+  shift_n(frac.coeff, frac.nexp, true);
+  res.append_range(to_decimal_string(std::move(frac.coeff)));
   return res;
 }
 

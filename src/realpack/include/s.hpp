@@ -6,10 +6,11 @@
 
 namespace real {
 
+// fx: floating point represention for rational numbers with specified precisions.
 template <z_digit_container C>
 struct fx {
   // base = 2 ^ bits_of<typename C::digit_type>()
-  z<C> co;      // coefficient
+  z<C> coeff;   // coefficient
   size_t nexp;  // exponent in negative
 };
 
@@ -18,13 +19,15 @@ struct fx {
 // 1. res <= floating point notation of (u/v),
 // 2. | res - (u/v) | < base ^ (-n).
 template <z_digit_container C>
-fx<C> frac_n(const z<C>& u, const z<C>& v, size_t n) {
+fx<C> frac_n(z<C> u, z<C> v, size_t n) {
   fx<C> res;
   z<C> r;
-  auto q = div_n(u, v, &r);
+  bool sign = u.sign != v.sign;
+  auto q = div_n(std::move(u), v, &r);
   shift_n(r, n);
-  res.co = div_n<C>(r, v, nullptr);
-  res.co.digits.insert(res.co.digits.end(), q.digits.begin(), q.digits.end());
+  res.coeff = div_n<C>(std::move(r), std::move(v), nullptr);
+  res.coeff.digits.insert(res.coeff.digits.end(), q.digits.begin(), q.digits.end());
+  res.coeff.sign = sign;
   res.nexp = n;
   return res;
 }

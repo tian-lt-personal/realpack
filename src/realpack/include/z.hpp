@@ -507,17 +507,17 @@ constexpr z<C> div_n(z<C> u, z<C> v, z<C>* r = nullptr) {
 
 // returns: num ^ exp
 template <z_digit_container C>
-constexpr z<C> pow_n(const z<C>& num, unsigned int exp) {
+constexpr z<C> pow_n(const z<C>& num, size_t exp) {
   z<C> res = identity<C>();
-  for (unsigned int i = 0; i < exp; ++i) {
+  for (size_t i = 0; i < exp; ++i) {
     res = mul_n(res, num);
   }
   return res;
 }
 template <z_digit_container C>
-constexpr z<C> pow_z(const z<C>& num, unsigned int exp) {
+constexpr z<C> pow_z(const z<C>& num, size_t exp) {
   z<C> res = identity<C>();
-  for (unsigned int i = 0; i < exp; ++i) {
+  for (size_t i = 0; i < exp; ++i) {
     res = mul_z(res, num);
   }
   return res;
