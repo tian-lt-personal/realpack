@@ -65,7 +65,8 @@ std::string to_decimal_string(fx<C> frac) {
   res.push_back('.');
   frac.coeff = mul_n(frac.coeff, pow_n(create_z<C>(10), frac.nexp));
   shift_n(frac.coeff, frac.nexp, true);
-  res.append_range(to_decimal_string(std::move(frac.coeff)));
+  auto trailing = to_decimal_string(std::move(frac.coeff));
+  res.insert(res.end(), trailing.begin(), trailing.end());
   return res;
 }
 
