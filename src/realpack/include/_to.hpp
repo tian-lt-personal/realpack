@@ -55,7 +55,7 @@ std::string to_decimal_string(z<C> num) {
 }
 
 template <z_digit_container C>
-std::string to_decimal_string(fx<C> frac) {
+std::string to_decimal_string(fx<C> frac, size_t n) {
   assert(frac.coeff.digits.size() >= frac.nexp);
   z<C> integers;
   integers.sign = frac.coeff.sign;
@@ -63,10 +63,10 @@ std::string to_decimal_string(fx<C> frac) {
   frac.coeff.digits.resize(frac.nexp);
   auto res = to_decimal_string(std::move(integers));
   res.push_back('.');
-  frac.coeff = mul_n(frac.coeff, pow_n(create_z<C>(10), frac.nexp));
+  frac.coeff = mul_n(frac.coeff, pow_n(create_z<C>(10), n));
   shift_n(frac.coeff, frac.nexp, true);
   auto trailing = to_decimal_string(std::move(frac.coeff));
-  res.insert(res.end(), trailing.begin(), trailing.end());
+  res.append(trailing);
   return res;
 }
 

@@ -19,7 +19,7 @@ struct fx {
 // 1. res <= floating point notation of (u/v),
 // 2. | res - (u/v) | < base ^ (-n).
 template <z_digit_container C>
-fx<C> frac_n(z<C> u, z<C> v, size_t n) {
+fx<C> frac(z<C> u, z<C> v, size_t n) {
   fx<C> res;
   z<C> r;
   bool sign = u.sign != v.sign;
