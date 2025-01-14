@@ -157,7 +157,7 @@ TEST(n_tests, details_bit_shift) {
     real::init(expected, 1234u);
     auto num = real::mul_z(expected, pow_of_2<small>(7));
     auto cy = real::details::bit_shift(num.digits, -7);
-    real::norm_n(num);
+    real::norm_z(num);
     EXPECT_EQ(cy, 0);
     EXPECT_EQ(real::cmp_z(num, expected), 0);
   }
@@ -166,7 +166,7 @@ TEST(n_tests, details_bit_shift) {
     real::init(expected, 7462981237123ull);
     auto num = real::mul_z(expected, pow_of_2<small>(4));
     auto cy = real::details::bit_shift(num.digits, -4);
-    real::norm_n(num);
+    real::norm_z(num);
     EXPECT_EQ(cy, 0);
     EXPECT_EQ(real::cmp_z(num, expected), 0);
   }
@@ -191,39 +191,6 @@ TEST(n_tests, cmp_n) {
     real::init(b, 664321);
     EXPECT_LT(real::cmp_n(a, b), 0);
     EXPECT_GT(real::cmp_n(b, a), 0);
-  }
-}
-
-TEST(n_tests, norm_n) {
-  {
-    real::z zero;
-    real::norm_n(zero);
-    EXPECT_TRUE(real::is_zero(zero));
-    EXPECT_FALSE(zero.sign);
-    EXPECT_TRUE(zero.digits.empty());
-  }
-  {
-    real::z zero;
-    zero.sign = true;
-    for (int i = 1; i < 10; ++i) {
-      zero.digits.push_back(0);
-    }
-    real::norm_n(zero);
-    EXPECT_TRUE(real::is_zero(zero));
-    EXPECT_FALSE(zero.sign);
-    EXPECT_TRUE(zero.digits.empty());
-  }
-  {
-    real::z num, expected;
-    real::init(num, -12345);
-    expected = num;
-    for (int i = 1; i < 20; ++i) {
-      num.digits.push_back(0);
-    }
-    real::norm_n(num);
-    EXPECT_EQ(real::cmp_n(num, expected), 0);
-    EXPECT_EQ(num.sign, expected.sign);
-    EXPECT_EQ(num.digits.size(), expected.digits.size());
   }
 }
 

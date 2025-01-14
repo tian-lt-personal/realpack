@@ -263,7 +263,7 @@ constexpr z<C> neg_z(const z<C>& num) {
 // effects: remove redundant zeros in digits.
 // returns: ref to `num`
 template <z_digit_container C>
-constexpr z<C>& norm_n(z<C>& num) {
+constexpr z<C>& norm_z(z<C>& num) {
   using D = details::digit_t<C>;
   auto pos = std::find_if(num.digits.rbegin(), num.digits.rend(), [](D x) { return x != 0; });
   num.digits.resize(std::size(num.digits) - std::distance(num.digits.rbegin(), pos));
@@ -346,7 +346,7 @@ constexpr z<C> sub_n(const z<C>& lhs, const z<C>& rhs) {
     r.digits.push_back(t);
   }
   assert(cy == 0);
-  norm_n(r);
+  norm_z(r);
   return r;
 };
 
@@ -372,7 +372,7 @@ constexpr z<C> mul_n(const z<C>& lhs, const z<C>& rhs) {
     }
     r.digits[j + lhs.digits.size()] = cy;
   }
-  norm_n(r);
+  norm_z(r);
   return r;
 }
 
@@ -393,7 +393,7 @@ constexpr z<C> div_n(const z<C>& u, typename C::value_type v, typename C::value_
     auto j = n - i - 1;
     w[j] = static_cast<D>(details::div_2ul(_r, u.digits[j], v, &_r));
   }
-  norm_n(q);
+  norm_z(q);
   if (r != nullptr) {
     *r = static_cast<D>(_r);
   }
@@ -478,9 +478,9 @@ constexpr z<C> div_n(z<C> u, z<C> v, z<C>* r = nullptr) {
         for (size_t i = 0; i < n; ++i)
           r->digits[i] = (u.digits[i] >> s) | (static_cast<Q>(u.digits[i + 1]) << (d_bits - s));
         r->digits[n - 1] = u.digits[n - 1] >> s;
-        norm_n(*r);
+        norm_z(*r);
       }
-      norm_n(q);
+      norm_z(q);
       return q;
     } else {
       assert(v.digits.size() == 1);

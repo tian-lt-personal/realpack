@@ -137,6 +137,39 @@ TEST(z_tests, neg_z) {
   }
 }
 
+TEST(z_tests, norm_z) {
+  {
+    real::z zero;
+    real::norm_z(zero);
+    EXPECT_TRUE(real::is_zero(zero));
+    EXPECT_FALSE(zero.sign);
+    EXPECT_TRUE(zero.digits.empty());
+  }
+  {
+    real::z zero;
+    zero.sign = true;
+    for (int i = 1; i < 10; ++i) {
+      zero.digits.push_back(0);
+    }
+    real::norm_z(zero);
+    EXPECT_TRUE(real::is_zero(zero));
+    EXPECT_FALSE(zero.sign);
+    EXPECT_TRUE(zero.digits.empty());
+  }
+  {
+    real::z num, expected;
+    real::init(num, -12345);
+    expected = num;
+    for (int i = 1; i < 20; ++i) {
+      num.digits.push_back(0);
+    }
+    real::norm_z(num);
+    EXPECT_EQ(real::cmp_n(num, expected), 0);
+    EXPECT_EQ(num.sign, expected.sign);
+    EXPECT_EQ(num.digits.size(), expected.digits.size());
+  }
+}
+
 TEST(z_tests, add_z) {
   {
     real::z zero;
