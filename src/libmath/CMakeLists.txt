@@ -9,7 +9,7 @@ target_link_libraries(realpack_math PUBLIC
 )
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-  target_compile_options(realpack_math PRIVATE -stdlib=libc++---------)
+  target_compile_options(realpack_math PRIVATE -stdlib=libc++)
 endif()
 
 if(MSVC)
