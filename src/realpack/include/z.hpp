@@ -66,7 +66,7 @@ constexpr int nlz(T x) {
 template <class C>
 constexpr digit_t<C> bit_shift(C& digits, signed offset) {
   using D = digit_t<C>;
-  assert((sizeof(D) * CHAR_BIT) > std::abs(offset));
+  assert((sizeof(D) * CHAR_BIT) > (size_t)std::abs(offset));
   if (offset > 0) {
     // left shift
     const D mask = ((1u << offset) - 1) << (sizeof(D) * CHAR_BIT - offset);
