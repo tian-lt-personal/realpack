@@ -5,6 +5,7 @@ project(realpack
         LANGUAGES CXX)
 
 add_subdirectory(realpack)
+add_subdirectory(libmath)
 
 include(CTest)
 if (BUILD_TESTING)
