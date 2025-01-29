@@ -47,7 +47,7 @@ jobs:
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
 
     - name: Install libc++ on Ubuntu
-      if: matrix.c_compiler == clang
+      if: matrix.c_compiler == 'clang'
       run: sudo apt-get install libc++-dev libc++abi-dev
 
     - name: Configure CMake
