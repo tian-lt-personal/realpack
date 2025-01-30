@@ -38,17 +38,16 @@
 /**************** End of %include directives **********************************/
 /* These constants specify the various numeric values for terminal symbols.
 ***************** Begin token definitions *************************************/
-#ifndef PLUS
-#define PLUS                            1
-#define MINUS                           2
-#define MUL                             3
-#define DIV                             4
-#define EXP                             5
-#define COMMA                           6
-#define LPAREN                          7
-#define RPAREN                          8
-#define VALUE                           9
-#define ID                             10
+#ifndef SEMICOL
+#define SEMICOL                         1
+#define PLUS                            2
+#define MINUS                           3
+#define MUL                             4
+#define DIV                             5
+#define EXP                             6
+#define VALUE                           7
+#define LPAREN                          8
+#define RPAREN                          9
 #endif
 /**************** End token definitions ***************************************/
 
@@ -113,7 +112,7 @@
 #endif
 /************* Begin control #defines *****************************************/
 #define YYCODETYPE unsigned char
-#define YYNOCODE 15
+#define YYNOCODE 23
 #define YYACTIONTYPE unsigned char
 #define ParseTOKENTYPE void*
 typedef union {
@@ -136,18 +135,18 @@ typedef union {
 #define ParseCTX_PARAM
 #define ParseCTX_FETCH
 #define ParseCTX_STORE
-#define YYNSTATE             20
-#define YYNRULE              12
+#define YYNSTATE             17
+#define YYNRULE              20
 #define YYNRULE_WITH_ACTION  0
-#define YYNTOKEN             11
-#define YY_MAX_SHIFT         19
-#define YY_MIN_SHIFTREDUCE   24
-#define YY_MAX_SHIFTREDUCE   35
-#define YY_ERROR_ACTION      36
-#define YY_ACCEPT_ACTION     37
-#define YY_NO_ACTION         38
-#define YY_MIN_REDUCE        39
-#define YY_MAX_REDUCE        50
+#define YYNTOKEN             10
+#define YY_MAX_SHIFT         16
+#define YY_MIN_SHIFTREDUCE   29
+#define YY_MAX_SHIFTREDUCE   48
+#define YY_ERROR_ACTION      49
+#define YY_ACCEPT_ACTION     50
+#define YY_NO_ACTION         51
+#define YY_MIN_REDUCE        52
+#define YY_MAX_REDUCE        71
 #define YY_MIN_DSTRCTR       0
 #define YY_MAX_DSTRCTR       0
 /************* End control #defines *******************************************/
@@ -232,40 +231,42 @@ typedef union {
 **  yy_default[]       Default action for each state.
 **
 *********** Begin parsing tables **********************************************/
-#define YY_ACTTAB_COUNT (51)
+#define YY_ACTTAB_COUNT (65)
 static const YYACTIONTYPE yy_action[] = {
- /*     0 */    38,    8,    7,    6,    5,    4,    9,    9,   30,   39,
- /*    10 */     8,    7,    6,    5,    4,    8,    7,    6,    5,    4,
- /*    20 */     3,    4,   31,   16,   17,   17,   37,   10,   10,   11,
- /*    30 */    11,   49,   11,   11,   14,    6,    5,    4,   18,   18,
- /*    40 */    19,   19,   12,   12,   36,   13,   13,    1,   38,   33,
- /*    50 */     2,
+ /*     0 */    50,   13,   13,   13,   12,   12,   12,   10,   10,   10,
+ /*    10 */    14,   14,   14,   53,   53,   12,   12,   12,   10,   10,
+ /*    20 */    10,   14,   14,   14,    8,    8,    8,   10,   10,   10,
+ /*    30 */    14,   14,   14,    9,    9,    9,   14,   14,   14,   11,
+ /*    40 */    11,   11,   14,   14,   14,   15,   15,   15,   16,   16,
+ /*    50 */    16,    4,    3,   47,    2,    6,    5,   69,   48,    4,
+ /*    60 */     3,   52,    1,   51,    7,
 };
 static const YYCODETYPE yy_lookahead[] = {
- /*     0 */    15,    1,    2,    3,    4,    5,   12,   13,    8,    0,
- /*    10 */     1,    2,    3,    4,    5,    1,    2,    3,    4,    5,
- /*    20 */     7,    5,    9,   10,   12,   13,   11,   12,   13,   12,
- /*    30 */    13,   14,   12,   13,   14,    3,    4,    5,   12,   13,
- /*    40 */    12,   13,   12,   13,    6,   12,   13,    6,   15,    8,
- /*    50 */     7,   15,   15,   15,   15,   15,   15,   15,   15,   15,
- /*    60 */    15,   15,
+ /*     0 */    10,   11,   12,   13,   14,   15,   16,   17,   18,   19,
+ /*    10 */    20,   21,   22,   12,   13,   14,   15,   16,   17,   18,
+ /*    20 */    19,   20,   21,   22,   14,   15,   16,   17,   18,   19,
+ /*    30 */    20,   21,   22,   17,   18,   19,   20,   21,   22,   17,
+ /*    40 */    18,   19,   20,   21,   22,   20,   21,   22,   20,   21,
+ /*    50 */    22,    2,    3,    7,    8,    4,    5,   22,    9,    2,
+ /*    60 */     3,    0,    1,   23,    6,   23,   23,   23,   23,   23,
+ /*    70 */    23,   23,   23,   23,   23,
 };
-#define YY_SHIFT_COUNT    (19)
+#define YY_SHIFT_COUNT    (16)
 #define YY_SHIFT_MIN      (0)
-#define YY_SHIFT_MAX      (43)
+#define YY_SHIFT_MAX      (61)
 static const unsigned char yy_shift_ofst[] = {
- /*     0 */    13,   13,   13,   13,   13,   13,   13,   13,   13,    0,
- /*    10 */     9,   14,   32,   32,   41,   38,   43,   16,   16,   16,
+ /*     0 */    46,   46,   46,   46,   46,   46,   46,   46,   49,   51,
+ /*    10 */    51,   51,   57,   61,   58,   58,   58,
 };
-#define YY_REDUCE_COUNT (8)
-#define YY_REDUCE_MIN   (-6)
-#define YY_REDUCE_MAX   (33)
+#define YY_REDUCE_COUNT (7)
+#define YY_REDUCE_MIN   (-10)
+#define YY_REDUCE_MAX   (35)
 static const signed char yy_reduce_ofst[] = {
- /*     0 */    15,   17,   20,   -6,   12,   26,   28,   30,   33,
+ /*     0 */   -10,    1,   10,   16,   22,   25,   28,   35,
 };
 static const YYACTIONTYPE yy_default[] = {
- /*     0 */    36,   36,   36,   36,   36,   36,   36,   36,   36,   36,
- /*    10 */    36,   50,   41,   40,   36,   49,   36,   44,   43,   42,
+ /*     0 */    49,   49,   49,   49,   49,   49,   49,   49,   49,   61,
+ /*    10 */    59,   60,   56,   49,   64,   66,   65,
 };
 /********** End of lemon-generated parsing tables *****************************/
 
@@ -369,20 +370,28 @@ void ParseTrace(FILE *TraceFILE, char *zTracePrompt){
 ** are required.  The following table supplies these names */
 static const char *const yyTokenName[] = { 
   /*    0 */ "$",
-  /*    1 */ "PLUS",
-  /*    2 */ "MINUS",
-  /*    3 */ "MUL",
-  /*    4 */ "DIV",
-  /*    5 */ "EXP",
-  /*    6 */ "COMMA",
-  /*    7 */ "LPAREN",
-  /*    8 */ "RPAREN",
-  /*    9 */ "VALUE",
-  /*   10 */ "ID",
-  /*   11 */ "prog",
-  /*   12 */ "expr",
-  /*   13 */ "func",
-  /*   14 */ "param_seq",
+  /*    1 */ "SEMICOL",
+  /*    2 */ "PLUS",
+  /*    3 */ "MINUS",
+  /*    4 */ "MUL",
+  /*    5 */ "DIV",
+  /*    6 */ "EXP",
+  /*    7 */ "VALUE",
+  /*    8 */ "LPAREN",
+  /*    9 */ "RPAREN",
+  /*   10 */ "tu",
+  /*   11 */ "compound_stmt",
+  /*   12 */ "stmt",
+  /*   13 */ "eval_stmt",
+  /*   14 */ "expr",
+  /*   15 */ "expr_sum",
+  /*   16 */ "expr_sub",
+  /*   17 */ "term",
+  /*   18 */ "expr_mul",
+  /*   19 */ "expr_div",
+  /*   20 */ "factor",
+  /*   21 */ "expr_exp",
+  /*   22 */ "atom",
 };
 #endif /* defined(YYCOVERAGE) || !defined(NDEBUG) */
 
@@ -390,18 +399,26 @@ static const char *const yyTokenName[] = {
 /* For tracing reduce actions, the names of all rules are required.
 */
 static const char *const yyRuleName[] = {
- /*   0 */ "prog ::= expr",
- /*   1 */ "expr ::= expr PLUS expr",
- /*   2 */ "expr ::= expr MINUS expr",
- /*   3 */ "expr ::= expr MUL expr",
- /*   4 */ "expr ::= expr DIV expr",
- /*   5 */ "expr ::= expr EXP expr",
- /*   6 */ "expr ::= LPAREN expr RPAREN",
- /*   7 */ "expr ::= VALUE",
- /*   8 */ "expr ::= func",
- /*   9 */ "func ::= ID LPAREN param_seq RPAREN",
- /*  10 */ "param_seq ::= param_seq COMMA param_seq",
- /*  11 */ "param_seq ::= expr",
+ /*   0 */ "tu ::= compound_stmt",
+ /*   1 */ "compound_stmt ::= compound_stmt SEMICOL stmt",
+ /*   2 */ "compound_stmt ::= stmt",
+ /*   3 */ "stmt ::= eval_stmt",
+ /*   4 */ "eval_stmt ::= expr",
+ /*   5 */ "expr ::= expr_sum",
+ /*   6 */ "expr ::= expr_sub",
+ /*   7 */ "expr ::= term",
+ /*   8 */ "expr_sum ::= expr PLUS term",
+ /*   9 */ "expr_sub ::= expr MINUS term",
+ /*  10 */ "term ::= expr_mul",
+ /*  11 */ "term ::= expr_div",
+ /*  12 */ "term ::= factor",
+ /*  13 */ "expr_mul ::= term MUL factor",
+ /*  14 */ "expr_div ::= term DIV factor",
+ /*  15 */ "factor ::= expr_exp",
+ /*  16 */ "factor ::= atom",
+ /*  17 */ "expr_exp ::= factor EXP atom",
+ /*  18 */ "atom ::= VALUE",
+ /*  19 */ "atom ::= LPAREN expr RPAREN",
 };
 #endif /* NDEBUG */
 
@@ -822,35 +839,51 @@ static void yy_shift(
 /* For rule J, yyRuleInfoLhs[J] contains the symbol on the left-hand side
 ** of that rule */
 static const YYCODETYPE yyRuleInfoLhs[] = {
-    11,  /* (0) prog ::= expr */
-    12,  /* (1) expr ::= expr PLUS expr */
-    12,  /* (2) expr ::= expr MINUS expr */
-    12,  /* (3) expr ::= expr MUL expr */
-    12,  /* (4) expr ::= expr DIV expr */
-    12,  /* (5) expr ::= expr EXP expr */
-    12,  /* (6) expr ::= LPAREN expr RPAREN */
-    12,  /* (7) expr ::= VALUE */
-    12,  /* (8) expr ::= func */
-    13,  /* (9) func ::= ID LPAREN param_seq RPAREN */
-    14,  /* (10) param_seq ::= param_seq COMMA param_seq */
-    14,  /* (11) param_seq ::= expr */
+    10,  /* (0) tu ::= compound_stmt */
+    11,  /* (1) compound_stmt ::= compound_stmt SEMICOL stmt */
+    11,  /* (2) compound_stmt ::= stmt */
+    12,  /* (3) stmt ::= eval_stmt */
+    13,  /* (4) eval_stmt ::= expr */
+    14,  /* (5) expr ::= expr_sum */
+    14,  /* (6) expr ::= expr_sub */
+    14,  /* (7) expr ::= term */
+    15,  /* (8) expr_sum ::= expr PLUS term */
+    16,  /* (9) expr_sub ::= expr MINUS term */
+    17,  /* (10) term ::= expr_mul */
+    17,  /* (11) term ::= expr_div */
+    17,  /* (12) term ::= factor */
+    18,  /* (13) expr_mul ::= term MUL factor */
+    19,  /* (14) expr_div ::= term DIV factor */
+    20,  /* (15) factor ::= expr_exp */
+    20,  /* (16) factor ::= atom */
+    21,  /* (17) expr_exp ::= factor EXP atom */
+    22,  /* (18) atom ::= VALUE */
+    22,  /* (19) atom ::= LPAREN expr RPAREN */
 };
 
 /* For rule J, yyRuleInfoNRhs[J] contains the negative of the number
 ** of symbols on the right-hand side of that rule. */
 static const signed char yyRuleInfoNRhs[] = {
-   -1,  /* (0) prog ::= expr */
-   -3,  /* (1) expr ::= expr PLUS expr */
-   -3,  /* (2) expr ::= expr MINUS expr */
-   -3,  /* (3) expr ::= expr MUL expr */
-   -3,  /* (4) expr ::= expr DIV expr */
-   -3,  /* (5) expr ::= expr EXP expr */
-   -3,  /* (6) expr ::= LPAREN expr RPAREN */
-   -1,  /* (7) expr ::= VALUE */
-   -1,  /* (8) expr ::= func */
-   -4,  /* (9) func ::= ID LPAREN param_seq RPAREN */
-   -3,  /* (10) param_seq ::= param_seq COMMA param_seq */
-   -1,  /* (11) param_seq ::= expr */
+   -1,  /* (0) tu ::= compound_stmt */
+   -3,  /* (1) compound_stmt ::= compound_stmt SEMICOL stmt */
+   -1,  /* (2) compound_stmt ::= stmt */
+   -1,  /* (3) stmt ::= eval_stmt */
+   -1,  /* (4) eval_stmt ::= expr */
+   -1,  /* (5) expr ::= expr_sum */
+   -1,  /* (6) expr ::= expr_sub */
+   -1,  /* (7) expr ::= term */
+   -3,  /* (8) expr_sum ::= expr PLUS term */
+   -3,  /* (9) expr_sub ::= expr MINUS term */
+   -1,  /* (10) term ::= expr_mul */
+   -1,  /* (11) term ::= expr_div */
+   -1,  /* (12) term ::= factor */
+   -3,  /* (13) expr_mul ::= term MUL factor */
+   -3,  /* (14) expr_div ::= term DIV factor */
+   -1,  /* (15) factor ::= expr_exp */
+   -1,  /* (16) factor ::= atom */
+   -3,  /* (17) expr_exp ::= factor EXP atom */
+   -1,  /* (18) atom ::= VALUE */
+   -3,  /* (19) atom ::= LPAREN expr RPAREN */
 };
 
 static void yy_accept(yyParser*);  /* Forward Declaration */
@@ -892,18 +925,26 @@ static YYACTIONTYPE yy_reduce(
   */
 /********** Begin reduce actions **********************************************/
       default:
-      /* (0) prog ::= expr */ yytestcase(yyruleno==0);
-      /* (1) expr ::= expr PLUS expr */ yytestcase(yyruleno==1);
-      /* (2) expr ::= expr MINUS expr */ yytestcase(yyruleno==2);
-      /* (3) expr ::= expr MUL expr */ yytestcase(yyruleno==3);
-      /* (4) expr ::= expr DIV expr */ yytestcase(yyruleno==4);
-      /* (5) expr ::= expr EXP expr */ yytestcase(yyruleno==5);
-      /* (6) expr ::= LPAREN expr RPAREN */ yytestcase(yyruleno==6);
-      /* (7) expr ::= VALUE */ yytestcase(yyruleno==7);
-      /* (8) expr ::= func (OPTIMIZED OUT) */ assert(yyruleno!=8);
-      /* (9) func ::= ID LPAREN param_seq RPAREN */ yytestcase(yyruleno==9);
-      /* (10) param_seq ::= param_seq COMMA param_seq */ yytestcase(yyruleno==10);
-      /* (11) param_seq ::= expr */ yytestcase(yyruleno==11);
+      /* (0) tu ::= compound_stmt */ yytestcase(yyruleno==0);
+      /* (1) compound_stmt ::= compound_stmt SEMICOL stmt */ yytestcase(yyruleno==1);
+      /* (2) compound_stmt ::= stmt (OPTIMIZED OUT) */ assert(yyruleno!=2);
+      /* (3) stmt ::= eval_stmt (OPTIMIZED OUT) */ assert(yyruleno!=3);
+      /* (4) eval_stmt ::= expr */ yytestcase(yyruleno==4);
+      /* (5) expr ::= expr_sum (OPTIMIZED OUT) */ assert(yyruleno!=5);
+      /* (6) expr ::= expr_sub (OPTIMIZED OUT) */ assert(yyruleno!=6);
+      /* (7) expr ::= term */ yytestcase(yyruleno==7);
+      /* (8) expr_sum ::= expr PLUS term */ yytestcase(yyruleno==8);
+      /* (9) expr_sub ::= expr MINUS term */ yytestcase(yyruleno==9);
+      /* (10) term ::= expr_mul (OPTIMIZED OUT) */ assert(yyruleno!=10);
+      /* (11) term ::= expr_div (OPTIMIZED OUT) */ assert(yyruleno!=11);
+      /* (12) term ::= factor */ yytestcase(yyruleno==12);
+      /* (13) expr_mul ::= term MUL factor */ yytestcase(yyruleno==13);
+      /* (14) expr_div ::= term DIV factor */ yytestcase(yyruleno==14);
+      /* (15) factor ::= expr_exp (OPTIMIZED OUT) */ assert(yyruleno!=15);
+      /* (16) factor ::= atom (OPTIMIZED OUT) */ assert(yyruleno!=16);
+      /* (17) expr_exp ::= factor EXP atom */ yytestcase(yyruleno==17);
+      /* (18) atom ::= VALUE */ yytestcase(yyruleno==18);
+      /* (19) atom ::= LPAREN expr RPAREN */ yytestcase(yyruleno==19);
         break;
 /********** End reduce actions ************************************************/
   };
