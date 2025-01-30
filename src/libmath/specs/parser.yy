@@ -5,6 +5,7 @@
 #endif
 #ifdef __GNUC__ // including clang
 #pragma GCC diagnostic ignored "-Wunused-parameter"
+#pragma GCC diagnostic ignored "-Wtype-limits"
 #endif
 
 }
