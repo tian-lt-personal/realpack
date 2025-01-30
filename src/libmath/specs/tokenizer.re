@@ -25,6 +25,9 @@ namespace real::math::parse {
 
   ws = [\t\v\b\f\n\r ]*;
   id = [a-zA-Z_][a-zA-Z0-9_]*;
+  dot = ".";
+  comma = ",";
+  decimal = [0-9]+ | [0-9]+ dot | dot [0-9]+ | [0-9]+ dot [0-9]+;
   plus = "+";
   minus = "-";
   mul = "*";
@@ -34,23 +37,22 @@ namespace real::math::parse {
   rparen = ")";
   exp = "^";
   eql = "=";
-  dot = ".";
-  comma = ",";
 
-  *      { return std::unexpected{token_error{.code = token_error_code::bad_token, .what = std::nullopt}}; }
-  ws     { continue; }
-  @t1 id { return token{.type = token_type::id, .str = get_string(in_, t1)}; }
-  plus   { return token{.type = token_type::plus, .str = std::nullopt}; }
-  minus  { return token{.type = token_type::minus, .str = std::nullopt}; }
-  mul    { return token{.type = token_type::mul, .str = std::nullopt}; }
-  div    { return token{.type = token_type::div, .str = std::nullopt}; }
-  perc   { return token{.type = token_type::perc, .str = std::nullopt}; }
-  lparen { return token{.type = token_type::lparen, .str = std::nullopt}; }
-  rparen { return token{.type = token_type::rparen, .str = std::nullopt}; }
-  exp    { return token{.type = token_type::exp, .str = std::nullopt}; }
-  eql    { return token{.type = token_type::eql, .str = std::nullopt}; }
-  dot    { return token{.type = token_type::dot, .str = std::nullopt}; }
-  comma  { return token{.type = token_type::comma, .str = std::nullopt}; }
+  *           { return std::unexpected{token_error{.code = token_error_code::bad_token, .what = std::nullopt}}; }
+  ws          { continue; }
+  @t1 decimal { return token{.type = token_type::value, .str = get_string(in_, t1)}; }
+  @t1 id      { return token{.type = token_type::id, .str = get_string(in_, t1)}; }
+  plus        { return token{.type = token_type::plus, .str = std::nullopt}; }
+  minus       { return token{.type = token_type::minus, .str = std::nullopt}; }
+  mul         { return token{.type = token_type::mul, .str = std::nullopt}; }
+  div         { return token{.type = token_type::div, .str = std::nullopt}; }
+  perc        { return token{.type = token_type::perc, .str = std::nullopt}; }
+  lparen      { return token{.type = token_type::lparen, .str = std::nullopt}; }
+  rparen      { return token{.type = token_type::rparen, .str = std::nullopt}; }
+  exp         { return token{.type = token_type::exp, .str = std::nullopt}; }
+  eql         { return token{.type = token_type::eql, .str = std::nullopt}; }
+  dot         { return token{.type = token_type::dot, .str = std::nullopt}; }
+  comma       { return token{.type = token_type::comma, .str = std::nullopt}; }
 */
     } // end of try
     catch(const std::ios_base::failure& ex) {
