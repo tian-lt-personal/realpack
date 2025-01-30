@@ -30,9 +30,10 @@
 #pragma warning(disable: 4100)
 #endif
 #ifdef __GNUC__ // including clang
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 #endif
 
-#line 36 "../source/parser.c"
+#line 37 "../source/parser.c"
 /**************** End of %include directives **********************************/
 /* These constants specify the various numeric values for terminal symbols.
 ***************** Begin token definitions *************************************/
