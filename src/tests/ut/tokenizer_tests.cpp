@@ -16,7 +16,41 @@ std::istringstream create_stream(std::string text) {
   iss.exceptions(std::ios::failbit);
   return iss;
 }
+
 }  // namespace
+
+TEST(tokenizer_tests, tokenstream) {
+  {
+    auto stream = create_stream("a + b = c");
+    parse::tokenizer get_token{stream};
+    auto t = get_token();
+    EXPECT_TRUE(t.has_value());
+    EXPECT_EQ(t->type, parse::token_type::id);
+    EXPECT_EQ(t->str, "a");
+
+    t = get_token();
+    EXPECT_TRUE(t.has_value());
+    EXPECT_EQ(t->type, parse::token_type::plus);
+
+    t = get_token();
+    EXPECT_TRUE(t.has_value());
+    EXPECT_EQ(t->type, parse::token_type::id);
+    EXPECT_EQ(t->str, "b");
+
+    t = get_token();
+    EXPECT_TRUE(t.has_value());
+    EXPECT_EQ(t->type, parse::token_type::eql);
+
+    t = get_token();
+    EXPECT_TRUE(t.has_value());
+    EXPECT_EQ(t->type, parse::token_type::id);
+    EXPECT_EQ(t->str, "c");
+
+    t = get_token();
+    EXPECT_FALSE(t.has_value());
+    EXPECT_EQ(t.error().code, parse::token_error_code::eof);
+  }
+}
 
 TEST(tokenizer_tests, empty) {
   {
@@ -202,5 +236,18 @@ TEST(tokenizer_tests, parenthesis) {
     t = get_token();
     EXPECT_TRUE(t.has_value());
     EXPECT_EQ(t->type, parse::token_type::rparen);
+  }
+}
+
+TEST(tokenizer_tests, separators) {
+  {
+    auto stream = create_stream(".,");
+    parse::tokenizer get_token{stream};
+    auto t = get_token();
+    EXPECT_TRUE(t.has_value());
+    EXPECT_EQ(t->type, parse::token_type::dot);
+    t = get_token();
+    EXPECT_TRUE(t.has_value());
+    EXPECT_EQ(t->type, parse::token_type::comma);
   }
 }

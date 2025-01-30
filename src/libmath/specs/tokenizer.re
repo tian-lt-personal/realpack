@@ -34,6 +34,8 @@ namespace real::math::parse {
   rparen = ")";
   exp = "^";
   eql = "=";
+  dot = ".";
+  comma = ",";
 
   *      { return std::unexpected{token_error{.code = token_error_code::bad_token, .what = std::nullopt}}; }
   ws     { continue; }
@@ -47,6 +49,8 @@ namespace real::math::parse {
   rparen { return token{.type = token_type::rparen, .str = std::nullopt}; }
   exp    { return token{.type = token_type::exp, .str = std::nullopt}; }
   eql    { return token{.type = token_type::eql, .str = std::nullopt}; }
+  dot    { return token{.type = token_type::dot, .str = std::nullopt}; }
+  comma  { return token{.type = token_type::comma, .str = std::nullopt}; }
 */
     } // end of try
     catch(const std::ios_base::failure& ex) {
