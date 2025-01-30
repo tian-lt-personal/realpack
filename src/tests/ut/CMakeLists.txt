@@ -23,9 +23,11 @@ add_executable(realpack_ut
   r_tests.cpp
   s_tests.cpp
   to_tests.cpp
-  z_tests.cpp)
+  z_tests.cpp
+  tokenizer_tests.cpp)
 target_link_libraries(realpack_ut PRIVATE
   realpack
+  realpack_math
   gtest_main)
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
