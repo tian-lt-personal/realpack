@@ -41,7 +41,14 @@
 #ifndef PLUS
 #define PLUS                            1
 #define MINUS                           2
-#define VALUE                           3
+#define MUL                             3
+#define DIV                             4
+#define EXP                             5
+#define COMMA                           6
+#define LPAREN                          7
+#define RPAREN                          8
+#define VALUE                           9
+#define ID                             10
 #endif
 /**************** End token definitions ***************************************/
 
@@ -106,7 +113,7 @@
 #endif
 /************* Begin control #defines *****************************************/
 #define YYCODETYPE unsigned char
-#define YYNOCODE 6
+#define YYNOCODE 15
 #define YYACTIONTYPE unsigned char
 #define ParseTOKENTYPE void*
 typedef union {
@@ -129,18 +136,18 @@ typedef union {
 #define ParseCTX_PARAM
 #define ParseCTX_FETCH
 #define ParseCTX_STORE
-#define YYNSTATE             3
-#define YYNRULE              3
+#define YYNSTATE             20
+#define YYNRULE              12
 #define YYNRULE_WITH_ACTION  0
-#define YYNTOKEN             4
-#define YY_MAX_SHIFT         2
-#define YY_MIN_SHIFTREDUCE   5
-#define YY_MAX_SHIFTREDUCE   7
-#define YY_ERROR_ACTION      8
-#define YY_ACCEPT_ACTION     9
-#define YY_NO_ACTION         10
-#define YY_MIN_REDUCE        11
-#define YY_MAX_REDUCE        13
+#define YYNTOKEN             11
+#define YY_MAX_SHIFT         19
+#define YY_MIN_SHIFTREDUCE   24
+#define YY_MAX_SHIFTREDUCE   35
+#define YY_ERROR_ACTION      36
+#define YY_ACCEPT_ACTION     37
+#define YY_NO_ACTION         38
+#define YY_MIN_REDUCE        39
+#define YY_MAX_REDUCE        50
 #define YY_MIN_DSTRCTR       0
 #define YY_MAX_DSTRCTR       0
 /************* End control #defines *******************************************/
@@ -225,27 +232,40 @@ typedef union {
 **  yy_default[]       Default action for each state.
 **
 *********** Begin parsing tables **********************************************/
-#define YY_ACTTAB_COUNT (6)
+#define YY_ACTTAB_COUNT (51)
 static const YYACTIONTYPE yy_action[] = {
- /*     0 */     9,    2,   11,    1,    7,   12,
+ /*     0 */    38,    8,    7,    6,    5,    4,    9,    9,   30,   39,
+ /*    10 */     8,    7,    6,    5,    4,    8,    7,    6,    5,    4,
+ /*    20 */     3,    4,   31,   16,   17,   17,   37,   10,   10,   11,
+ /*    30 */    11,   49,   11,   11,   14,    6,    5,    4,   18,   18,
+ /*    40 */    19,   19,   12,   12,   36,   13,   13,    1,   38,   33,
+ /*    50 */     2,
 };
 static const YYCODETYPE yy_lookahead[] = {
- /*     0 */     4,    5,    0,    1,    3,    5,    6,    6,    6,    4,
+ /*     0 */    15,    1,    2,    3,    4,    5,   12,   13,    8,    0,
+ /*    10 */     1,    2,    3,    4,    5,    1,    2,    3,    4,    5,
+ /*    20 */     7,    5,    9,   10,   12,   13,   11,   12,   13,   12,
+ /*    30 */    13,   14,   12,   13,   14,    3,    4,    5,   12,   13,
+ /*    40 */    12,   13,   12,   13,    6,   12,   13,    6,   15,    8,
+ /*    50 */     7,   15,   15,   15,   15,   15,   15,   15,   15,   15,
+ /*    60 */    15,   15,
 };
-#define YY_SHIFT_COUNT    (2)
+#define YY_SHIFT_COUNT    (19)
 #define YY_SHIFT_MIN      (0)
-#define YY_SHIFT_MAX      (2)
+#define YY_SHIFT_MAX      (43)
 static const unsigned char yy_shift_ofst[] = {
- /*     0 */     1,    1,    2,
+ /*     0 */    13,   13,   13,   13,   13,   13,   13,   13,   13,    0,
+ /*    10 */     9,   14,   32,   32,   41,   38,   43,   16,   16,   16,
 };
-#define YY_REDUCE_COUNT (1)
-#define YY_REDUCE_MIN   (-4)
-#define YY_REDUCE_MAX   (0)
+#define YY_REDUCE_COUNT (8)
+#define YY_REDUCE_MIN   (-6)
+#define YY_REDUCE_MAX   (33)
 static const signed char yy_reduce_ofst[] = {
- /*     0 */    -4,    0,
+ /*     0 */    15,   17,   20,   -6,   12,   26,   28,   30,   33,
 };
 static const YYACTIONTYPE yy_default[] = {
- /*     0 */     8,    8,    8,
+ /*     0 */    36,   36,   36,   36,   36,   36,   36,   36,   36,   36,
+ /*    10 */    36,   50,   41,   40,   36,   49,   36,   44,   43,   42,
 };
 /********** End of lemon-generated parsing tables *****************************/
 
@@ -351,9 +371,18 @@ static const char *const yyTokenName[] = {
   /*    0 */ "$",
   /*    1 */ "PLUS",
   /*    2 */ "MINUS",
-  /*    3 */ "VALUE",
-  /*    4 */ "prog",
-  /*    5 */ "expr",
+  /*    3 */ "MUL",
+  /*    4 */ "DIV",
+  /*    5 */ "EXP",
+  /*    6 */ "COMMA",
+  /*    7 */ "LPAREN",
+  /*    8 */ "RPAREN",
+  /*    9 */ "VALUE",
+  /*   10 */ "ID",
+  /*   11 */ "prog",
+  /*   12 */ "expr",
+  /*   13 */ "func",
+  /*   14 */ "param_seq",
 };
 #endif /* defined(YYCOVERAGE) || !defined(NDEBUG) */
 
@@ -363,7 +392,16 @@ static const char *const yyTokenName[] = {
 static const char *const yyRuleName[] = {
  /*   0 */ "prog ::= expr",
  /*   1 */ "expr ::= expr PLUS expr",
- /*   2 */ "expr ::= VALUE",
+ /*   2 */ "expr ::= expr MINUS expr",
+ /*   3 */ "expr ::= expr MUL expr",
+ /*   4 */ "expr ::= expr DIV expr",
+ /*   5 */ "expr ::= expr EXP expr",
+ /*   6 */ "expr ::= LPAREN expr RPAREN",
+ /*   7 */ "expr ::= VALUE",
+ /*   8 */ "expr ::= func",
+ /*   9 */ "func ::= ID LPAREN param_seq RPAREN",
+ /*  10 */ "param_seq ::= param_seq COMMA param_seq",
+ /*  11 */ "param_seq ::= expr",
 };
 #endif /* NDEBUG */
 
@@ -784,9 +822,18 @@ static void yy_shift(
 /* For rule J, yyRuleInfoLhs[J] contains the symbol on the left-hand side
 ** of that rule */
 static const YYCODETYPE yyRuleInfoLhs[] = {
-     4,  /* (0) prog ::= expr */
-     5,  /* (1) expr ::= expr PLUS expr */
-     5,  /* (2) expr ::= VALUE */
+    11,  /* (0) prog ::= expr */
+    12,  /* (1) expr ::= expr PLUS expr */
+    12,  /* (2) expr ::= expr MINUS expr */
+    12,  /* (3) expr ::= expr MUL expr */
+    12,  /* (4) expr ::= expr DIV expr */
+    12,  /* (5) expr ::= expr EXP expr */
+    12,  /* (6) expr ::= LPAREN expr RPAREN */
+    12,  /* (7) expr ::= VALUE */
+    12,  /* (8) expr ::= func */
+    13,  /* (9) func ::= ID LPAREN param_seq RPAREN */
+    14,  /* (10) param_seq ::= param_seq COMMA param_seq */
+    14,  /* (11) param_seq ::= expr */
 };
 
 /* For rule J, yyRuleInfoNRhs[J] contains the negative of the number
@@ -794,7 +841,16 @@ static const YYCODETYPE yyRuleInfoLhs[] = {
 static const signed char yyRuleInfoNRhs[] = {
    -1,  /* (0) prog ::= expr */
    -3,  /* (1) expr ::= expr PLUS expr */
-   -1,  /* (2) expr ::= VALUE */
+   -3,  /* (2) expr ::= expr MINUS expr */
+   -3,  /* (3) expr ::= expr MUL expr */
+   -3,  /* (4) expr ::= expr DIV expr */
+   -3,  /* (5) expr ::= expr EXP expr */
+   -3,  /* (6) expr ::= LPAREN expr RPAREN */
+   -1,  /* (7) expr ::= VALUE */
+   -1,  /* (8) expr ::= func */
+   -4,  /* (9) func ::= ID LPAREN param_seq RPAREN */
+   -3,  /* (10) param_seq ::= param_seq COMMA param_seq */
+   -1,  /* (11) param_seq ::= expr */
 };
 
 static void yy_accept(yyParser*);  /* Forward Declaration */
@@ -838,7 +894,16 @@ static YYACTIONTYPE yy_reduce(
       default:
       /* (0) prog ::= expr */ yytestcase(yyruleno==0);
       /* (1) expr ::= expr PLUS expr */ yytestcase(yyruleno==1);
-      /* (2) expr ::= VALUE */ yytestcase(yyruleno==2);
+      /* (2) expr ::= expr MINUS expr */ yytestcase(yyruleno==2);
+      /* (3) expr ::= expr MUL expr */ yytestcase(yyruleno==3);
+      /* (4) expr ::= expr DIV expr */ yytestcase(yyruleno==4);
+      /* (5) expr ::= expr EXP expr */ yytestcase(yyruleno==5);
+      /* (6) expr ::= LPAREN expr RPAREN */ yytestcase(yyruleno==6);
+      /* (7) expr ::= VALUE */ yytestcase(yyruleno==7);
+      /* (8) expr ::= func (OPTIMIZED OUT) */ assert(yyruleno!=8);
+      /* (9) func ::= ID LPAREN param_seq RPAREN */ yytestcase(yyruleno==9);
+      /* (10) param_seq ::= param_seq COMMA param_seq */ yytestcase(yyruleno==10);
+      /* (11) param_seq ::= expr */ yytestcase(yyruleno==11);
         break;
 /********** End reduce actions ************************************************/
   };
