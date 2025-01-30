@@ -2,6 +2,7 @@
 #define REALPACK_INC_CORO_HPP
 
 #include <coroutine>
+#include <exception>
 #include <semaphore>
 #include <stdexcept>
 #include <variant>
