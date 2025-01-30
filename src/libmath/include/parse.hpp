@@ -8,7 +8,7 @@
 
 namespace real::math::parse {
 
-enum struct token_type { value, id, plus, minus, mul, div, perc, lparen, rparen, exp, eql };
+enum struct token_type { value, id, plus, minus, mul, div, perc, lparen, rparen, exp, eql, dot, comma };
 enum struct token_error_code { eof, bad_token, stream_error };
 
 struct token_error {
@@ -18,7 +18,7 @@ struct token_error {
 
 struct token {
   token_type type;
-  std::optional<std::string> str; // TODO: use range
+  std::optional<std::string> str;  // TODO: use range
 };
 
 class tokenizer {

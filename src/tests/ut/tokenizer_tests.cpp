@@ -66,6 +66,33 @@ TEST(tokenizer_tests, ids) {
     EXPECT_TRUE(t->str.has_value());
     EXPECT_EQ(*t->str, "abc");
   }
+  {
+    auto stream = create_stream("a0");
+    parse::tokenizer get_token{stream};
+    auto t = get_token();
+    EXPECT_TRUE(t.has_value());
+    EXPECT_EQ(t->type, parse::token_type::id);
+    EXPECT_TRUE(t->str.has_value());
+    EXPECT_EQ(*t->str, "a0");
+  }
+  {
+    auto stream = create_stream("_123");
+    parse::tokenizer get_token{stream};
+    auto t = get_token();
+    EXPECT_TRUE(t.has_value());
+    EXPECT_EQ(t->type, parse::token_type::id);
+    EXPECT_TRUE(t->str.has_value());
+    EXPECT_EQ(*t->str, "_123");
+  }
+  {
+    auto stream = create_stream("auwne__8320__");
+    parse::tokenizer get_token{stream};
+    auto t = get_token();
+    EXPECT_TRUE(t.has_value());
+    EXPECT_EQ(t->type, parse::token_type::id);
+    EXPECT_TRUE(t->str.has_value());
+    EXPECT_EQ(*t->str, "auwne__8320__");
+  }
 }
 
 TEST(tokenizer_tests, whitespaces) {
@@ -110,5 +137,70 @@ TEST(tokenizer_tests, whitespaces) {
     EXPECT_EQ(t->type, parse::token_type::id);
     EXPECT_TRUE(t->str.has_value());
     EXPECT_EQ(*t->str, "def");
+  }
+}
+
+TEST(tokenizer_tests, operators) {
+  {
+    auto stream = create_stream("+");
+    parse::tokenizer get_token{stream};
+    auto t = get_token();
+    EXPECT_TRUE(t.has_value());
+    EXPECT_EQ(t->type, parse::token_type::plus);
+  }
+  {
+    auto stream = create_stream("-");
+    parse::tokenizer get_token{stream};
+    auto t = get_token();
+    EXPECT_TRUE(t.has_value());
+    EXPECT_EQ(t->type, parse::token_type::minus);
+  }
+  {
+    auto stream = create_stream("*");
+    parse::tokenizer get_token{stream};
+    auto t = get_token();
+    EXPECT_TRUE(t.has_value());
+    EXPECT_EQ(t->type, parse::token_type::mul);
+  }
+  {
+    auto stream = create_stream("/");
+    parse::tokenizer get_token{stream};
+    auto t = get_token();
+    EXPECT_TRUE(t.has_value());
+    EXPECT_EQ(t->type, parse::token_type::div);
+  }
+  {
+    auto stream = create_stream("%");
+    parse::tokenizer get_token{stream};
+    auto t = get_token();
+    EXPECT_TRUE(t.has_value());
+    EXPECT_EQ(t->type, parse::token_type::perc);
+  }
+  {
+    auto stream = create_stream("^");
+    parse::tokenizer get_token{stream};
+    auto t = get_token();
+    EXPECT_TRUE(t.has_value());
+    EXPECT_EQ(t->type, parse::token_type::exp);
+  }
+  {
+    auto stream = create_stream("=");
+    parse::tokenizer get_token{stream};
+    auto t = get_token();
+    EXPECT_TRUE(t.has_value());
+    EXPECT_EQ(t->type, parse::token_type::eql);
+  }
+}
+
+TEST(tokenizer_tests, parenthesis) {
+  {
+    auto stream = create_stream("()");
+    parse::tokenizer get_token{stream};
+    auto t = get_token();
+    EXPECT_TRUE(t.has_value());
+    EXPECT_EQ(t->type, parse::token_type::lparen);
+    t = get_token();
+    EXPECT_TRUE(t.has_value());
+    EXPECT_EQ(t->type, parse::token_type::rparen);
   }
 }
