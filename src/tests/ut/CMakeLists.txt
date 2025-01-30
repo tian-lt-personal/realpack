@@ -30,6 +30,10 @@ target_link_libraries(realpack_ut PRIVATE
   realpack_math
   gtest_main)
 
+if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+  target_compile_options(realpack_ut PRIVATE -stdlib=libc++)
+endif()
+
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
   target_compile_options(realpack_ut PRIVATE -coverage)
   target_link_options(realpack_ut PRIVATE --coverage)
