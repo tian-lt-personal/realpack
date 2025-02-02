@@ -14,8 +14,9 @@
 #pragma warning(disable: 4189)
 #endif
 #ifdef __GNUC__ // including clang
-#pragma GCC diagnostic ignored "-Wunused-parameter"
 #pragma GCC diagnostic ignored "-Wtype-limits"
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+#pragma GCC diagnostic ignored "-Wunused-variable"
 #endif
 
 #define YYMALLOCARGTYPE size_t
