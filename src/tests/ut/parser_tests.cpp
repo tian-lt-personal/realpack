@@ -25,3 +25,28 @@ TEST(parser_tests, sub) {
     parse::parse(stream);
   }
 }
+
+TEST(parser_tests, error_when_empty) {
+  {
+    bool has_error = false;
+    auto stream = create_stream("");
+    try {
+      parse::parse(stream);
+    }
+    catch(const parse::parse_error&) {
+      has_error = true;
+    }
+    EXPECT_TRUE(has_error);
+  }
+  {
+    bool has_error = false;
+    auto stream = create_stream("\t \n \r\n");
+    try {
+      parse::parse(stream);
+    }
+    catch(const parse::parse_error&) {
+      has_error = true;
+    }
+    EXPECT_TRUE(has_error);
+  }
+}

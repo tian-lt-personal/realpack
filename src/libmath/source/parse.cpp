@@ -101,6 +101,9 @@ void parse(std::istream& stream) {
     }
   }
   RealMathParse(parser.get(), 0, nullptr, &context);
+  if (context.error.has_value()) {
+    throw *context.error;
+  }
   if (!context.done) {
     throw parse_error{"the input is not accepted."};
   }
