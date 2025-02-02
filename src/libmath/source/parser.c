@@ -37,13 +37,14 @@
 #pragma warning(disable: 4189)
 #endif
 #ifdef __GNUC__ // including clang
-#pragma GCC diagnostic ignored "-Wunused-parameter"
 #pragma GCC diagnostic ignored "-Wtype-limits"
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+#pragma GCC diagnostic ignored "-Wunused-variable"
 #endif
 
 #define YYMALLOCARGTYPE size_t
 
-#line 47 "../source/parser.c"
+#line 48 "../source/parser.c"
 /**************** End of %include directives **********************************/
 /* These constants specify the various numeric values for terminal symbols.
 ***************** Begin token definitions *************************************/
@@ -1005,10 +1006,10 @@ static void yy_parse_failed(
   /* Here code is inserted which will be executed whenever the
   ** parser fails */
 /************ Begin %parse_failure code ***************************************/
-#line 26 "parser.yy"
+#line 27 "parser.yy"
 
   state->error = real::math::parse::parse_error{};
-#line 1011 "../source/parser.c"
+#line 1012 "../source/parser.c"
 /************ End %parse_failure code *****************************************/
   RealMathParseARG_STORE /* Suppress warning about unused %extra_argument variable */
   RealMathParseCTX_STORE
@@ -1052,10 +1053,10 @@ static void yy_accept(
   /* Here code is inserted which will be executed whenever the
   ** parser accepts */
 /*********** Begin %parse_accept code *****************************************/
-#line 29 "parser.yy"
+#line 30 "parser.yy"
 
   state->done = true;
-#line 1058 "../source/parser.c"
+#line 1059 "../source/parser.c"
 /*********** End %parse_accept code *******************************************/
   RealMathParseARG_STORE /* Suppress warning about unused %extra_argument variable */
   RealMathParseCTX_STORE
