@@ -1,8 +1,9 @@
 add_library(realpack_math
   source/tokenizer.cpp
-  source/tokenizer_utils.cpp
+  source/parse.cpp
   source/parser.c
 )
+set_source_files_properties(source/parser.c PROPERTIES LANGUAGE CXX)
 target_include_directories(realpack_math PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}/include
 )

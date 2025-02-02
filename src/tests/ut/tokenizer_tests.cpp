@@ -21,6 +21,27 @@ std::istringstream create_stream(std::string text) {
 
 TEST(tokenizer_tests, tokenstream) {
   {
+    auto stream = create_stream("1+2");
+    parse::tokenizer get_token{stream};
+    auto t = get_token();
+    EXPECT_TRUE(t.has_value());
+    EXPECT_EQ(t->type, parse::token_type::value);
+    EXPECT_EQ(t->str, "1");
+
+    t = get_token();
+    EXPECT_TRUE(t.has_value());
+    EXPECT_EQ(t->type, parse::token_type::plus);
+
+    t = get_token();
+    EXPECT_TRUE(t.has_value());
+    EXPECT_EQ(t->type, parse::token_type::value);
+    EXPECT_EQ(t->str, "2");
+
+    t = get_token();
+    EXPECT_FALSE(t.has_value());
+    EXPECT_EQ(t.error().code, parse::token_error_code::eof);
+  }
+  {
     auto stream = create_stream("a + b = c");
     parse::tokenizer get_token{stream};
     auto t = get_token();

@@ -1,0 +1,14 @@
+#define RMTOKEN_ID                               1
+#define RMTOKEN_PERC                             2
+#define RMTOKEN_EQ                               3
+#define RMTOKEN_DOT                              4
+#define RMTOKEN_COMMA                            5
+#define RMTOKEN_SEMICOL                          6
+#define RMTOKEN_PLUS                             7
+#define RMTOKEN_MINUS                            8
+#define RMTOKEN_MUL                              9
+#define RMTOKEN_DIV                             10
+#define RMTOKEN_EXP                             11
+#define RMTOKEN_VALUE                           12
+#define RMTOKEN_LPAREN                          13
+#define RMTOKEN_RPAREN                          14

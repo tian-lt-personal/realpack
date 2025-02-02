@@ -26,28 +26,42 @@
 ** input grammar file:
 */
 /************ Begin %include sections from the grammar ************************/
+#line 7 "parser.yy"
+
+
+#include "parse.hpp"
+
 #ifdef _MSC_VER
+#pragma warning(disable: 4065)
 #pragma warning(disable: 4100)
+#pragma warning(disable: 4189)
 #endif
 #ifdef __GNUC__ // including clang
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 #pragma GCC diagnostic ignored "-Wtype-limits"
 #endif
 
-#line 38 "../source/parser.c"
+#define YYMALLOCARGTYPE size_t
+
+#line 47 "../source/parser.c"
 /**************** End of %include directives **********************************/
 /* These constants specify the various numeric values for terminal symbols.
 ***************** Begin token definitions *************************************/
-#ifndef SEMICOL
-#define SEMICOL                         1
-#define PLUS                            2
-#define MINUS                           3
-#define MUL                             4
-#define DIV                             5
-#define EXP                             6
-#define VALUE                           7
-#define LPAREN                          8
-#define RPAREN                          9
+#ifndef RMTOKEN_ID
+#define RMTOKEN_ID                              1
+#define RMTOKEN_PERC                            2
+#define RMTOKEN_EQ                              3
+#define RMTOKEN_DOT                             4
+#define RMTOKEN_COMMA                           5
+#define RMTOKEN_SEMICOL                         6
+#define RMTOKEN_PLUS                            7
+#define RMTOKEN_MINUS                           8
+#define RMTOKEN_MUL                             9
+#define RMTOKEN_DIV                            10
+#define RMTOKEN_EXP                            11
+#define RMTOKEN_VALUE                          12
+#define RMTOKEN_LPAREN                         13
+#define RMTOKEN_RPAREN                         14
 #endif
 /**************** End token definitions ***************************************/
 
@@ -67,7 +81,7 @@
 **    YYACTIONTYPE       is the data type used for "action codes" - numbers
 **                       that indicate what to do in response to the next
 **                       token.
-**    ParseTOKENTYPE     is the data type used for minor type for terminal
+**    RealMathParseTOKENTYPE     is the data type used for minor type for terminal
 **                       symbols.  Background: A "minor type" is a semantic
 **                       value associated with a terminal or non-terminal
 **                       symbols.  For example, for an "ID" terminal symbol,
@@ -78,16 +92,16 @@
 **                       symbols.
 **    YYMINORTYPE        is the data type used for all minor types.
 **                       This is typically a union of many types, one of
-**                       which is ParseTOKENTYPE.  The entry in the union
+**                       which is RealMathParseTOKENTYPE.  The entry in the union
 **                       for terminal symbols is called "yy0".
 **    YYSTACKDEPTH       is the maximum depth of the parser's stack.  If
 **                       zero the stack is dynamically sized using realloc()
-**    ParseARG_SDECL     A static variable declaration for the %extra_argument
-**    ParseARG_PDECL     A parameter declaration for the %extra_argument
-**    ParseARG_PARAM     Code to pass %extra_argument as a subroutine parameter
-**    ParseARG_STORE     Code to store %extra_argument into yypParser
-**    ParseARG_FETCH     Code to extract %extra_argument from yypParser
-**    ParseCTX_*         As ParseARG_ except for %extra_context
+**    RealMathParseARG_SDECL     A static variable declaration for the %extra_argument
+**    RealMathParseARG_PDECL     A parameter declaration for the %extra_argument
+**    RealMathParseARG_PARAM     Code to pass %extra_argument as a subroutine parameter
+**    RealMathParseARG_STORE     Code to store %extra_argument into yypParser
+**    RealMathParseARG_FETCH     Code to extract %extra_argument from yypParser
+**    RealMathParseCTX_*         As RealMathParseARG_ except for %extra_context
 **    YYREALLOC          Name of the realloc() function to use
 **    YYFREE             Name of the free() function to use
 **    YYDYNSTACK         True if stack space should be extended on heap
@@ -112,33 +126,33 @@
 #endif
 /************* Begin control #defines *****************************************/
 #define YYCODETYPE unsigned char
-#define YYNOCODE 23
+#define YYNOCODE 28
 #define YYACTIONTYPE unsigned char
-#define ParseTOKENTYPE void*
+#define RealMathParseTOKENTYPE  real::math::parse::token* 
 typedef union {
   int yyinit;
-  ParseTOKENTYPE yy0;
+  RealMathParseTOKENTYPE yy0;
 } YYMINORTYPE;
 #ifndef YYSTACKDEPTH
 #define YYSTACKDEPTH 100
 #endif
-#define ParseARG_SDECL
-#define ParseARG_PDECL
-#define ParseARG_PARAM
-#define ParseARG_FETCH
-#define ParseARG_STORE
+#define RealMathParseARG_SDECL  real::math::parse::parse_state* state ;
+#define RealMathParseARG_PDECL , real::math::parse::parse_state* state 
+#define RealMathParseARG_PARAM ,state 
+#define RealMathParseARG_FETCH  real::math::parse::parse_state* state =yypParser->state ;
+#define RealMathParseARG_STORE yypParser->state =state ;
 #define YYREALLOC realloc
 #define YYFREE free
 #define YYDYNSTACK 0
-#define ParseCTX_SDECL
-#define ParseCTX_PDECL
-#define ParseCTX_PARAM
-#define ParseCTX_FETCH
-#define ParseCTX_STORE
+#define RealMathParseCTX_SDECL
+#define RealMathParseCTX_PDECL
+#define RealMathParseCTX_PARAM
+#define RealMathParseCTX_FETCH
+#define RealMathParseCTX_STORE
 #define YYNSTATE             17
 #define YYNRULE              20
 #define YYNRULE_WITH_ACTION  0
-#define YYNTOKEN             10
+#define YYNTOKEN             15
 #define YY_MAX_SHIFT         16
 #define YY_MIN_SHIFTREDUCE   29
 #define YY_MAX_SHIFTREDUCE   48
@@ -231,38 +245,38 @@ typedef union {
 **  yy_default[]       Default action for each state.
 **
 *********** Begin parsing tables **********************************************/
-#define YY_ACTTAB_COUNT (65)
+#define YY_ACTTAB_COUNT (64)
 static const YYACTIONTYPE yy_action[] = {
  /*     0 */    50,   13,   13,   13,   12,   12,   12,   10,   10,   10,
  /*    10 */    14,   14,   14,   53,   53,   12,   12,   12,   10,   10,
  /*    20 */    10,   14,   14,   14,    8,    8,    8,   10,   10,   10,
  /*    30 */    14,   14,   14,    9,    9,    9,   14,   14,   14,   11,
  /*    40 */    11,   11,   14,   14,   14,   15,   15,   15,   16,   16,
- /*    50 */    16,    4,    3,   47,    2,    6,    5,   69,   48,    4,
- /*    60 */     3,   52,    1,   51,    7,
+ /*    50 */    16,    4,    3,   47,    2,    6,    5,   52,   48,    4,
+ /*    60 */     3,   69,    7,    1,
 };
 static const YYCODETYPE yy_lookahead[] = {
- /*     0 */    10,   11,   12,   13,   14,   15,   16,   17,   18,   19,
- /*    10 */    20,   21,   22,   12,   13,   14,   15,   16,   17,   18,
- /*    20 */    19,   20,   21,   22,   14,   15,   16,   17,   18,   19,
- /*    30 */    20,   21,   22,   17,   18,   19,   20,   21,   22,   17,
- /*    40 */    18,   19,   20,   21,   22,   20,   21,   22,   20,   21,
- /*    50 */    22,    2,    3,    7,    8,    4,    5,   22,    9,    2,
- /*    60 */     3,    0,    1,   23,    6,   23,   23,   23,   23,   23,
- /*    70 */    23,   23,   23,   23,   23,
+ /*     0 */    15,   16,   17,   18,   19,   20,   21,   22,   23,   24,
+ /*    10 */    25,   26,   27,   17,   18,   19,   20,   21,   22,   23,
+ /*    20 */    24,   25,   26,   27,   19,   20,   21,   22,   23,   24,
+ /*    30 */    25,   26,   27,   22,   23,   24,   25,   26,   27,   22,
+ /*    40 */    23,   24,   25,   26,   27,   25,   26,   27,   25,   26,
+ /*    50 */    27,    7,    8,   12,   13,    9,   10,    0,   14,    7,
+ /*    60 */     8,   27,   11,    6,   28,   28,   28,   28,   28,   28,
+ /*    70 */    28,   28,   28,   28,   28,   28,   28,   28,   15,
 };
 #define YY_SHIFT_COUNT    (16)
 #define YY_SHIFT_MIN      (0)
-#define YY_SHIFT_MAX      (61)
+#define YY_SHIFT_MAX      (57)
 static const unsigned char yy_shift_ofst[] = {
- /*     0 */    46,   46,   46,   46,   46,   46,   46,   46,   49,   51,
- /*    10 */    51,   51,   57,   61,   58,   58,   58,
+ /*     0 */    41,   41,   41,   41,   41,   41,   41,   41,   44,   46,
+ /*    10 */    46,   46,   52,   57,   51,   51,   51,
 };
 #define YY_REDUCE_COUNT (7)
-#define YY_REDUCE_MIN   (-10)
-#define YY_REDUCE_MAX   (35)
+#define YY_REDUCE_MIN   (-15)
+#define YY_REDUCE_MAX   (34)
 static const signed char yy_reduce_ofst[] = {
- /*     0 */   -10,    1,   10,   16,   22,   25,   28,   35,
+ /*     0 */   -15,   -4,    5,   11,   17,   20,   23,   34,
 };
 static const YYACTIONTYPE yy_default[] = {
  /*     0 */    49,   49,   49,   49,   49,   49,   49,   49,   49,   61,
@@ -324,8 +338,8 @@ struct yyParser {
 #ifndef YYNOERRORRECOVERY
   int yyerrcnt;                 /* Shifts left before out of the error */
 #endif
-  ParseARG_SDECL                /* A place to hold %extra_argument */
-  ParseCTX_SDECL                /* A place to hold %extra_context */
+  RealMathParseARG_SDECL                /* A place to hold %extra_argument */
+  RealMathParseCTX_SDECL                /* A place to hold %extra_context */
   yyStackEntry *yystackEnd;           /* Last entry in the stack */
   yyStackEntry *yystack;              /* The parser stack */
   yyStackEntry yystk0[YYSTACKDEPTH];  /* Initial stack space */
@@ -357,7 +371,7 @@ static char *yyTracePrompt = 0;
 ** Outputs:
 ** None.
 */
-void ParseTrace(FILE *TraceFILE, char *zTracePrompt){
+void RealMathParseTrace(FILE *TraceFILE, char *zTracePrompt){
   yyTraceFILE = TraceFILE;
   yyTracePrompt = zTracePrompt;
   if( yyTraceFILE==0 ) yyTracePrompt = 0;
@@ -370,28 +384,33 @@ void ParseTrace(FILE *TraceFILE, char *zTracePrompt){
 ** are required.  The following table supplies these names */
 static const char *const yyTokenName[] = { 
   /*    0 */ "$",
-  /*    1 */ "SEMICOL",
-  /*    2 */ "PLUS",
-  /*    3 */ "MINUS",
-  /*    4 */ "MUL",
-  /*    5 */ "DIV",
-  /*    6 */ "EXP",
-  /*    7 */ "VALUE",
-  /*    8 */ "LPAREN",
-  /*    9 */ "RPAREN",
-  /*   10 */ "tu",
-  /*   11 */ "compound_stmt",
-  /*   12 */ "stmt",
-  /*   13 */ "eval_stmt",
-  /*   14 */ "expr",
-  /*   15 */ "expr_sum",
-  /*   16 */ "expr_sub",
-  /*   17 */ "term",
-  /*   18 */ "expr_mul",
-  /*   19 */ "expr_div",
-  /*   20 */ "factor",
-  /*   21 */ "expr_exp",
-  /*   22 */ "atom",
+  /*    1 */ "ID",
+  /*    2 */ "PERC",
+  /*    3 */ "EQ",
+  /*    4 */ "DOT",
+  /*    5 */ "COMMA",
+  /*    6 */ "SEMICOL",
+  /*    7 */ "PLUS",
+  /*    8 */ "MINUS",
+  /*    9 */ "MUL",
+  /*   10 */ "DIV",
+  /*   11 */ "EXP",
+  /*   12 */ "VALUE",
+  /*   13 */ "LPAREN",
+  /*   14 */ "RPAREN",
+  /*   15 */ "tu",
+  /*   16 */ "compound_stmt",
+  /*   17 */ "stmt",
+  /*   18 */ "eval_stmt",
+  /*   19 */ "expr",
+  /*   20 */ "expr_sum",
+  /*   21 */ "expr_sub",
+  /*   22 */ "term",
+  /*   23 */ "expr_mul",
+  /*   24 */ "expr_div",
+  /*   25 */ "factor",
+  /*   26 */ "expr_exp",
+  /*   27 */ "atom",
 };
 #endif /* defined(YYCOVERAGE) || !defined(NDEBUG) */
 
@@ -465,7 +484,7 @@ static int yyGrowStack(yyParser *p){
 #endif
 
 /* Datatype of the argument to the memory allocated passed as the
-** second argument to ParseAlloc() below.  This can be changed by
+** second argument to RealMathParseAlloc() below.  This can be changed by
 ** putting an appropriate #define in the %include section of the input
 ** grammar.
 */
@@ -475,9 +494,9 @@ static int yyGrowStack(yyParser *p){
 
 /* Initialize a new parser that has already been allocated.
 */
-void ParseInit(void *yypRawParser ParseCTX_PDECL){
+void RealMathParseInit(void *yypRawParser RealMathParseCTX_PDECL){
   yyParser *yypParser = (yyParser*)yypRawParser;
-  ParseCTX_STORE
+  RealMathParseCTX_STORE
 #ifdef YYTRACKMAXSTACKDEPTH
   yypParser->yyhwm = 0;
 #endif
@@ -491,7 +510,7 @@ void ParseInit(void *yypRawParser ParseCTX_PDECL){
   yypParser->yystack[0].major = 0;
 }
 
-#ifndef Parse_ENGINEALWAYSONSTACK
+#ifndef RealMathParse_ENGINEALWAYSONSTACK
 /* 
 ** This function allocates a new parser.
 ** The only argument is a pointer to a function which works like
@@ -502,18 +521,18 @@ void ParseInit(void *yypRawParser ParseCTX_PDECL){
 **
 ** Outputs:
 ** A pointer to a parser.  This pointer is used in subsequent calls
-** to Parse and ParseFree.
+** to RealMathParse and RealMathParseFree.
 */
-void *ParseAlloc(void *(*mallocProc)(YYMALLOCARGTYPE) ParseCTX_PDECL){
+void *RealMathParseAlloc(void *(*mallocProc)(YYMALLOCARGTYPE) RealMathParseCTX_PDECL){
   yyParser *yypParser;
   yypParser = (yyParser*)(*mallocProc)( (YYMALLOCARGTYPE)sizeof(yyParser) );
   if( yypParser ){
-    ParseCTX_STORE
-    ParseInit(yypParser ParseCTX_PARAM);
+    RealMathParseCTX_STORE
+    RealMathParseInit(yypParser RealMathParseCTX_PARAM);
   }
   return (void*)yypParser;
 }
-#endif /* Parse_ENGINEALWAYSONSTACK */
+#endif /* RealMathParse_ENGINEALWAYSONSTACK */
 
 
 /* The following function deletes the "minor type" or semantic value
@@ -528,8 +547,8 @@ static void yy_destructor(
   YYCODETYPE yymajor,     /* Type code for object to destroy */
   YYMINORTYPE *yypminor   /* The object to be destroyed */
 ){
-  ParseARG_FETCH
-  ParseCTX_FETCH
+  RealMathParseARG_FETCH
+  RealMathParseCTX_FETCH
   switch( yymajor ){
     /* Here is inserted the actions which take place when a
     ** terminal or non-terminal is destroyed.  This can happen
@@ -571,7 +590,7 @@ static void yy_pop_parser_stack(yyParser *pParser){
 /*
 ** Clear all secondary memory allocations from the parser
 */
-void ParseFinalize(void *p){
+void RealMathParseFinalize(void *p){
   yyParser *pParser = (yyParser*)p;
 
   /* In-lined version of calling yy_pop_parser_stack() for each
@@ -596,7 +615,7 @@ void ParseFinalize(void *p){
 #endif
 }
 
-#ifndef Parse_ENGINEALWAYSONSTACK
+#ifndef RealMathParse_ENGINEALWAYSONSTACK
 /* 
 ** Deallocate and destroy a parser.  Destructors are called for
 ** all stack elements before shutting the parser down.
@@ -605,23 +624,23 @@ void ParseFinalize(void *p){
 ** is defined in a %include section of the input grammar) then it is
 ** assumed that the input pointer is never NULL.
 */
-void ParseFree(
+void RealMathParseFree(
   void *p,                    /* The parser to be deleted */
   void (*freeProc)(void*)     /* Function used to reclaim memory */
 ){
 #ifndef YYPARSEFREENEVERNULL
   if( p==0 ) return;
 #endif
-  ParseFinalize(p);
+  RealMathParseFinalize(p);
   (*freeProc)(p);
 }
-#endif /* Parse_ENGINEALWAYSONSTACK */
+#endif /* RealMathParse_ENGINEALWAYSONSTACK */
 
 /*
 ** Return the peak depth of the stack for a parser.
 */
 #ifdef YYTRACKMAXSTACKDEPTH
-int ParseStackPeak(void *p){
+int RealMathParseStackPeak(void *p){
   yyParser *pParser = (yyParser*)p;
   return pParser->yyhwm;
 }
@@ -645,7 +664,7 @@ static unsigned char yycoverage[YYNSTATE][YYNTOKEN];
 ** Return the number of missed state/lookahead combinations.
 */
 #if defined(YYCOVERAGE)
-int ParseCoverage(FILE *out){
+int RealMathParseCoverage(FILE *out){
   int stateno, iLookAhead, i;
   int nMissed = 0;
   for(stateno=0; stateno<YYNSTATE; stateno++){
@@ -763,8 +782,8 @@ static YYACTIONTYPE yy_find_reduce_action(
 ** The following routine is called if the stack overflows.
 */
 static void yyStackOverflow(yyParser *yypParser){
-   ParseARG_FETCH
-   ParseCTX_FETCH
+   RealMathParseARG_FETCH
+   RealMathParseCTX_FETCH
 #ifndef NDEBUG
    if( yyTraceFILE ){
      fprintf(yyTraceFILE,"%sStack Overflow!\n",yyTracePrompt);
@@ -775,8 +794,8 @@ static void yyStackOverflow(yyParser *yypParser){
    ** stack every overflows */
 /******** Begin %stack_overflow code ******************************************/
 /******** End %stack_overflow code ********************************************/
-   ParseARG_STORE /* Suppress warning about unused %extra_argument var */
-   ParseCTX_STORE
+   RealMathParseARG_STORE /* Suppress warning about unused %extra_argument var */
+   RealMathParseCTX_STORE
 }
 
 /*
@@ -807,7 +826,7 @@ static void yy_shift(
   yyParser *yypParser,          /* The parser to be shifted */
   YYACTIONTYPE yyNewState,      /* The new state to shift in */
   YYCODETYPE yyMajor,           /* The major token to shift in */
-  ParseTOKENTYPE yyMinor        /* The minor token to shift in */
+  RealMathParseTOKENTYPE yyMinor        /* The minor token to shift in */
 ){
   yyStackEntry *yytos;
   yypParser->yytos++;
@@ -839,26 +858,26 @@ static void yy_shift(
 /* For rule J, yyRuleInfoLhs[J] contains the symbol on the left-hand side
 ** of that rule */
 static const YYCODETYPE yyRuleInfoLhs[] = {
-    10,  /* (0) tu ::= compound_stmt */
-    11,  /* (1) compound_stmt ::= compound_stmt SEMICOL stmt */
-    11,  /* (2) compound_stmt ::= stmt */
-    12,  /* (3) stmt ::= eval_stmt */
-    13,  /* (4) eval_stmt ::= expr */
-    14,  /* (5) expr ::= expr_sum */
-    14,  /* (6) expr ::= expr_sub */
-    14,  /* (7) expr ::= term */
-    15,  /* (8) expr_sum ::= expr PLUS term */
-    16,  /* (9) expr_sub ::= expr MINUS term */
-    17,  /* (10) term ::= expr_mul */
-    17,  /* (11) term ::= expr_div */
-    17,  /* (12) term ::= factor */
-    18,  /* (13) expr_mul ::= term MUL factor */
-    19,  /* (14) expr_div ::= term DIV factor */
-    20,  /* (15) factor ::= expr_exp */
-    20,  /* (16) factor ::= atom */
-    21,  /* (17) expr_exp ::= factor EXP atom */
-    22,  /* (18) atom ::= VALUE */
-    22,  /* (19) atom ::= LPAREN expr RPAREN */
+    15,  /* (0) tu ::= compound_stmt */
+    16,  /* (1) compound_stmt ::= compound_stmt SEMICOL stmt */
+    16,  /* (2) compound_stmt ::= stmt */
+    17,  /* (3) stmt ::= eval_stmt */
+    18,  /* (4) eval_stmt ::= expr */
+    19,  /* (5) expr ::= expr_sum */
+    19,  /* (6) expr ::= expr_sub */
+    19,  /* (7) expr ::= term */
+    20,  /* (8) expr_sum ::= expr PLUS term */
+    21,  /* (9) expr_sub ::= expr MINUS term */
+    22,  /* (10) term ::= expr_mul */
+    22,  /* (11) term ::= expr_div */
+    22,  /* (12) term ::= factor */
+    23,  /* (13) expr_mul ::= term MUL factor */
+    24,  /* (14) expr_div ::= term DIV factor */
+    25,  /* (15) factor ::= expr_exp */
+    25,  /* (16) factor ::= atom */
+    26,  /* (17) expr_exp ::= factor EXP atom */
+    27,  /* (18) atom ::= VALUE */
+    27,  /* (19) atom ::= LPAREN expr RPAREN */
 };
 
 /* For rule J, yyRuleInfoNRhs[J] contains the negative of the number
@@ -902,14 +921,14 @@ static YYACTIONTYPE yy_reduce(
   yyParser *yypParser,         /* The parser */
   unsigned int yyruleno,       /* Number of the rule by which to reduce */
   int yyLookahead,             /* Lookahead token, or YYNOCODE if none */
-  ParseTOKENTYPE yyLookaheadToken  /* Value of the lookahead token */
-  ParseCTX_PDECL                   /* %extra_context */
+  RealMathParseTOKENTYPE yyLookaheadToken  /* Value of the lookahead token */
+  RealMathParseCTX_PDECL                   /* %extra_context */
 ){
   int yygoto;                     /* The next state */
   YYACTIONTYPE yyact;             /* The next action */
   yyStackEntry *yymsp;            /* The top of the parser's stack */
   int yysize;                     /* Amount to pop the stack */
-  ParseARG_FETCH
+  RealMathParseARG_FETCH
   (void)yyLookahead;
   (void)yyLookaheadToken;
   yymsp = yypParser->yytos;
@@ -975,8 +994,8 @@ static YYACTIONTYPE yy_reduce(
 static void yy_parse_failed(
   yyParser *yypParser           /* The parser */
 ){
-  ParseARG_FETCH
-  ParseCTX_FETCH
+  RealMathParseARG_FETCH
+  RealMathParseCTX_FETCH
 #ifndef NDEBUG
   if( yyTraceFILE ){
     fprintf(yyTraceFILE,"%sFail!\n",yyTracePrompt);
@@ -986,9 +1005,13 @@ static void yy_parse_failed(
   /* Here code is inserted which will be executed whenever the
   ** parser fails */
 /************ Begin %parse_failure code ***************************************/
+#line 26 "parser.yy"
+
+  state->error = real::math::parse::parse_error{};
+#line 1011 "../source/parser.c"
 /************ End %parse_failure code *****************************************/
-  ParseARG_STORE /* Suppress warning about unused %extra_argument variable */
-  ParseCTX_STORE
+  RealMathParseARG_STORE /* Suppress warning about unused %extra_argument variable */
+  RealMathParseCTX_STORE
 }
 #endif /* YYNOERRORRECOVERY */
 
@@ -998,15 +1021,15 @@ static void yy_parse_failed(
 static void yy_syntax_error(
   yyParser *yypParser,           /* The parser */
   int yymajor,                   /* The major type of the error token */
-  ParseTOKENTYPE yyminor         /* The minor type of the error token */
+  RealMathParseTOKENTYPE yyminor         /* The minor type of the error token */
 ){
-  ParseARG_FETCH
-  ParseCTX_FETCH
+  RealMathParseARG_FETCH
+  RealMathParseCTX_FETCH
 #define TOKEN yyminor
 /************ Begin %syntax_error code ****************************************/
 /************ End %syntax_error code ******************************************/
-  ParseARG_STORE /* Suppress warning about unused %extra_argument variable */
-  ParseCTX_STORE
+  RealMathParseARG_STORE /* Suppress warning about unused %extra_argument variable */
+  RealMathParseCTX_STORE
 }
 
 /*
@@ -1015,8 +1038,8 @@ static void yy_syntax_error(
 static void yy_accept(
   yyParser *yypParser           /* The parser */
 ){
-  ParseARG_FETCH
-  ParseCTX_FETCH
+  RealMathParseARG_FETCH
+  RealMathParseCTX_FETCH
 #ifndef NDEBUG
   if( yyTraceFILE ){
     fprintf(yyTraceFILE,"%sAccept!\n",yyTracePrompt);
@@ -1029,14 +1052,18 @@ static void yy_accept(
   /* Here code is inserted which will be executed whenever the
   ** parser accepts */
 /*********** Begin %parse_accept code *****************************************/
+#line 29 "parser.yy"
+
+  state->done = true;
+#line 1058 "../source/parser.c"
 /*********** End %parse_accept code *******************************************/
-  ParseARG_STORE /* Suppress warning about unused %extra_argument variable */
-  ParseCTX_STORE
+  RealMathParseARG_STORE /* Suppress warning about unused %extra_argument variable */
+  RealMathParseCTX_STORE
 }
 
 /* The main parser program.
 ** The first argument is a pointer to a structure obtained from
-** "ParseAlloc" which describes the current state of the parser.
+** "RealMathParseAlloc" which describes the current state of the parser.
 ** The second argument is the major token number.  The third is
 ** the minor token.  The fourth optional argument is whatever the
 ** user wants (and specified in the grammar) and is available for
@@ -1053,11 +1080,11 @@ static void yy_accept(
 ** Outputs:
 ** None.
 */
-void Parse(
+void RealMathParse(
   void *yyp,                   /* The parser */
   int yymajor,                 /* The major token code number */
-  ParseTOKENTYPE yyminor       /* The value for the token */
-  ParseARG_PDECL               /* Optional %extra_argument parameter */
+  RealMathParseTOKENTYPE yyminor       /* The value for the token */
+  RealMathParseARG_PDECL               /* Optional %extra_argument parameter */
 ){
   YYMINORTYPE yyminorunion;
   YYACTIONTYPE yyact;   /* The parser action. */
@@ -1068,8 +1095,8 @@ void Parse(
   int yyerrorhit = 0;   /* True if yymajor has invoked an error */
 #endif
   yyParser *yypParser = (yyParser*)yyp;  /* The parser */
-  ParseCTX_FETCH
-  ParseARG_STORE
+  RealMathParseCTX_FETCH
+  RealMathParseARG_STORE
 
   assert( yypParser->yytos!=0 );
 #if !defined(YYERRORSYMBOL) && !defined(YYNOERRORRECOVERY)
@@ -1131,7 +1158,7 @@ void Parse(
           }
         }
       }
-      yyact = yy_reduce(yypParser,yyruleno,yymajor,yyminor ParseCTX_PARAM);
+      yyact = yy_reduce(yypParser,yyruleno,yymajor,yyminor RealMathParseCTX_PARAM);
     }else if( yyact <= YY_MAX_SHIFTREDUCE ){
       yy_shift(yypParser,yyact,(YYCODETYPE)yymajor,yyminor);
 #ifndef YYNOERRORRECOVERY
@@ -1263,7 +1290,7 @@ void Parse(
 ** Return the fallback token corresponding to canonical token iToken, or
 ** 0 if iToken has no fallback.
 */
-int ParseFallback(int iToken){
+int RealMathParseFallback(int iToken){
 #ifdef YYFALLBACK
   assert( iToken<(int)(sizeof(yyFallback)/sizeof(yyFallback[0])) );
   return yyFallback[iToken];

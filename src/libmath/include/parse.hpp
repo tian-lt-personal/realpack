@@ -1,9 +1,11 @@
 #ifndef REAL_MATH_PARSE_HPP
 #define REAL_MATH_PARSE_HPP
 
+#include <cstdint>
 #include <expected>
 #include <istream>
 #include <optional>
+#include <stdexcept>
 #include <string>
 
 namespace real::math::parse {
@@ -30,6 +32,18 @@ class tokenizer {
   explicit tokenizer(std::istream& in) : in_(in) {};
   std::expected<token, token_error> operator()();
 };
+
+struct parse_error : std::runtime_error {
+  parse_error();
+  explicit parse_error(const char* msg);
+};
+
+struct parse_state {
+  std::optional<parse_error> error;
+  bool done = false;
+};
+
+void parse(std::istream& stream);
 
 }  // namespace real::math::parse
 

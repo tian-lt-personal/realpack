@@ -20,6 +20,7 @@ add_executable(realpack_ut
   create_tests.cpp
   n_tests.cpp
   op_tests.cpp
+  parser_tests.cpp
   r_tests.cpp
   s_tests.cpp
   to_tests.cpp
