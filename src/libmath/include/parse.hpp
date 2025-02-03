@@ -1,14 +1,25 @@
 #ifndef REAL_MATH_PARSE_HPP
 #define REAL_MATH_PARSE_HPP
 
+#include <any>
 #include <cstdint>
 #include <expected>
 #include <istream>
 #include <optional>
+#include <set>
 #include <stdexcept>
 #include <string>
 
 namespace real::math::parse {
+
+namespace ast {
+
+struct compound_stmt {};
+struct doc {
+  compound_stmt* root;
+};
+
+}  // namespace ast
 
 enum struct token_type { value, id, plus, minus, mul, div, perc, lparen, rparen, exp, eql, dot, comma };
 enum struct token_error_code { eof, bad_token, stream_error };
@@ -39,6 +50,7 @@ struct parse_error : std::runtime_error {
 };
 
 struct parse_state {
+  std::set<std::any> objs;
   std::optional<parse_error> error;
   bool done = false;
 };

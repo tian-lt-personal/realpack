@@ -21,19 +21,22 @@
 
 #define YYMALLOCARGTYPE size_t
 
+namespace parse = real::math::parse;
+namespace ast = real::math::parse::ast;
+
 }
 
-%extra_argument { real::math::parse::parse_state* state }
+%extra_argument { parse::parse_state* state }
 %parse_failure {
-  state->error = real::math::parse::parse_error{};
+  state->error = parse::parse_error{};
 }
 %parse_accept {
   state->done = true;
 }
 
-%start_symbol tu 
+%start_symbol doc
 
-tu ::= compound_stmt.
+doc ::= compound_stmt.
 compound_stmt ::= compound_stmt SEMICOL stmt.
 compound_stmt ::= stmt.
 
