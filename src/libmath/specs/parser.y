@@ -6,6 +6,8 @@
 
 %include {
 
+#include <expected>
+
 #include "parse.hpp"
 
 #ifdef _MSC_VER
@@ -28,13 +30,12 @@ namespace ast = real::math::parse::ast;
 
 %extra_argument { parse::parse_state* state }
 %parse_failure {
-  state->error = parse::parse_error{};
+  state->result = std::unexpected(parse::parse_error{});
 }
 %parse_accept {
   state->done = true;
 }
 
-%type doc { parse::pool_ptr<ast::doc> }
 %type compound_stmt { parse::pool_ptr<ast::compound_stmt> }
 %type stmt { parse::pool_ptr<ast::stmt> }
 %type eval_stmt { parse::pool_ptr<ast::eval_stmt> }
@@ -42,11 +43,16 @@ namespace ast = real::math::parse::ast;
 %type atom { parse::pool_ptr<ast::atom> }
 %type factor { parse::pool_ptr<ast::factor> }
 %type expr_exp { parse::pool_ptr<ast::expr_exp> }
+%type expr_sum { parse::pool_ptr<ast::expr_sum> }
+%type expr_sub { parse::pool_ptr<ast::expr_sub> }
+%type expr_mul { parse::pool_ptr<ast::expr_mul> }
+%type expr_div { parse::pool_ptr<ast::expr_div> }
+%type term { parse::pool_ptr<ast::term> }
 
 %start_symbol doc
 
-doc(DOC) ::= compound_stmt(CSTMT). {
-  DOC = ast::create_node(state, ast::doc{.root = CSTMT});
+doc ::= compound_stmt(CSTMT). {
+  state->result = ast::create_node(state, ast::doc{.root = CSTMT});
 }
 compound_stmt(GROUP) ::= compound_stmt(SUBGROUP) SEMICOL stmt(STMT). {
   ast::compound_stmt group;
@@ -67,22 +73,50 @@ eval_stmt(ESTMT) ::= expr(EXPR). { ESTMT = EXPR; }
 %left MUL DIV.
 %right EXP.
 
-expr ::= expr_sum.
-expr ::= expr_sub.
-expr ::= term.
+expr(EXPR) ::= expr_sum(SUM). {
+  EXPR = ast::create_node(state, ast::expr{SUM});
+}
+expr(EXPR) ::= expr_sub(SUB). {
+  EXPR = ast::create_node(state, ast::expr{SUB});
+}
+expr(EXPR) ::= term(TERM). {
+  EXPR = ast::create_node(state, ast::expr{TERM});
+}
 
-expr_sum ::= expr PLUS term.
-expr_sub ::= expr MINUS term.
+expr_sum(SUM) ::= expr(SUMMAND) PLUS term(ADDEND). {
+  ast::expr_sum sum{.summand = SUMMAND, .addend = ADDEND};
+  SUM = ast::create_node(state, std::move(sum));
+}
+expr_sub(SUB) ::= expr(MINUEND) MINUS term(SUBTRAHEND). {
+  ast::expr_sub sub{.minuend = MINUEND, .subtrahend = SUBTRAHEND};
+  SUB = ast::create_node(state, std::move(sub));
+}
 
-term ::= expr_mul.
-term ::= expr_div.
-term ::= factor.
+term(TERM) ::= expr_mul(EXPR). {
+  TERM = ast::create_node(state, ast::term{EXPR});
+}
+term(TERM) ::= expr_div(EXPR). {
+  TERM = ast::create_node(state, ast::term{EXPR});
+}
+term(TERM) ::= factor(FAC). {
+  TERM = ast::create_node(state, ast::term{FAC});
+}
 
-expr_mul ::= term MUL factor.
-expr_div ::= term DIV factor.
+expr_mul(MUL) ::= term(MULTIPLICAND) MUL factor(MULTIPLIER). {
+  ast::expr_mul mul{.multiplicand = MULTIPLICAND, .multiplier = MULTIPLIER};
+  MUL = ast::create_node(state, std::move(mul));
+}
+expr_div(DIV) ::= term(DIVIDEND) DIV factor(DIVISOR). {
+  ast::expr_div div{.dividend = DIVIDEND, .divisor = DIVISOR};
+  DIV = ast::create_node(state, std::move(div));
+}
 
-factor ::= expr_exp.
-factor ::= atom.
+factor(FAC) ::= expr_exp(EXPR). {
+  FAC = ast::create_node(state, ast::factor{EXPR});
+}
+factor(FAC) ::= atom(ATOM). {
+  FAC = ast::create_node(state, ast::factor{ATOM});
+}
 
 expr_exp(EXPR) ::= factor(BASE) EXP atom(EXP). {
   ast::expr_exp exp{.base = BASE, .exp = EXP};

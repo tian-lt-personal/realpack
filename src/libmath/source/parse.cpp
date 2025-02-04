@@ -96,13 +96,13 @@ void parse(std::istream& stream) {
       throw;
     }
     RealMathParse(parser.get(), lookup_major(token->type), &*token, &context);
-    if (context.error.has_value()) {
-      throw *context.error;
+    if (!context.result.has_value()) {
+      throw context.result.error();
     }
   }
   RealMathParse(parser.get(), 0, nullptr, &context);
-  if (context.error.has_value()) {
-    throw *context.error;
+  if (!context.result.has_value()) {
+    throw context.result.error();
   }
   if (!context.done) {
     throw parse_error{"the input is not accepted."};

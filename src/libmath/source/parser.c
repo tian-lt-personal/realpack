@@ -29,6 +29,8 @@
 #line 7 "parser.y"
 
 
+#include <expected>
+
 #include "parse.hpp"
 
 #ifdef _MSC_VER
@@ -47,7 +49,7 @@
 namespace parse = real::math::parse;
 namespace ast = real::math::parse::ast;
 
-#line 51 "../source/parser.c"
+#line 53 "../source/parser.c"
 /**************** End of %include directives **********************************/
 /* These constants specify the various numeric values for terminal symbols.
 ***************** Begin token definitions *************************************/
@@ -136,12 +138,16 @@ namespace ast = real::math::parse::ast;
 typedef union {
   int yyinit;
   RealMathParseTOKENTYPE yy0;
+  parse::pool_ptr<ast::expr_sub> yy5;
   parse::pool_ptr<ast::eval_stmt> yy12;
   parse::pool_ptr<ast::expr> yy16;
+  parse::pool_ptr<ast::expr_div> yy18;
+  parse::pool_ptr<ast::expr_mul> yy25;
   parse::pool_ptr<ast::factor> yy28;
+  parse::pool_ptr<ast::expr_sum> yy29;
   parse::pool_ptr<ast::atom> yy30;
   parse::pool_ptr<ast::expr_exp> yy32;
-  parse::pool_ptr<ast::doc> yy43;
+  parse::pool_ptr<ast::term> yy41;
   parse::pool_ptr<ast::stmt> yy49;
   parse::pool_ptr<ast::compound_stmt> yy53;
 } YYMINORTYPE;
@@ -163,7 +169,7 @@ typedef union {
 #define RealMathParseCTX_STORE
 #define YYNSTATE             17
 #define YYNRULE              20
-#define YYNRULE_WITH_ACTION  8
+#define YYNRULE_WITH_ACTION  20
 #define YYNTOKEN             15
 #define YY_MAX_SHIFT         16
 #define YY_MIN_SHIFTREDUCE   29
@@ -259,22 +265,22 @@ typedef union {
 *********** Begin parsing tables **********************************************/
 #define YY_ACTTAB_COUNT (66)
 static const YYACTIONTYPE yy_action[] = {
- /*     0 */    50,   13,   54,   55,   12,   14,   14,   14,   12,   12,
- /*    10 */    10,   10,   10,   53,   55,   12,   14,   14,   14,   12,
- /*    20 */    12,   10,   10,   10,    8,   14,   14,   14,    8,    8,
- /*    30 */    10,   10,   10,   14,   14,   14,   35,    2,    9,    9,
- /*    40 */     9,   14,   14,   14,    6,    5,   11,   11,   11,   15,
- /*    50 */    15,   15,   16,   16,   16,    4,    3,    4,    3,   52,
- /*    60 */    57,   51,   36,    7,   51,    1,
+ /*     0 */    13,   54,   55,   12,   68,   14,   67,   57,   58,   62,
+ /*    10 */    63,   10,   50,   53,   55,   12,   68,   14,   67,   57,
+ /*    20 */    58,   62,   63,   10,    8,   68,   14,   67,   57,   58,
+ /*    30 */    62,   63,   10,   68,   14,   67,   47,    2,   62,   63,
+ /*    40 */     9,   68,   14,   67,    6,    5,   62,   63,   11,   68,
+ /*    50 */    15,   67,   68,   16,   67,    4,    3,    4,    3,   52,
+ /*    60 */    69,   51,   48,    7,   51,    1,
 };
 static const YYCODETYPE yy_lookahead[] = {
  /*     0 */    15,   16,   17,   18,   19,   20,   21,   22,   23,   24,
- /*    10 */    25,   26,   27,   17,   18,   19,   20,   21,   22,   23,
- /*    20 */    24,   25,   26,   27,   19,   20,   21,   22,   23,   24,
- /*    30 */    25,   26,   27,   20,   21,   22,   12,   13,   25,   26,
- /*    40 */    27,   20,   21,   22,    9,   10,   25,   26,   27,   20,
- /*    50 */    21,   22,   20,   21,   22,    7,    8,    7,    8,    0,
- /*    60 */    20,   28,   14,   11,   28,    6,   28,   28,   28,   28,
+ /*    10 */    25,   26,   27,   16,   17,   18,   19,   20,   21,   22,
+ /*    20 */    23,   24,   25,   26,   18,   19,   20,   21,   22,   23,
+ /*    30 */    24,   25,   26,   19,   20,   21,   12,   13,   24,   25,
+ /*    40 */    26,   19,   20,   21,    9,   10,   24,   25,   26,   19,
+ /*    50 */    20,   21,   19,   20,   21,    7,    8,    7,    8,    0,
+ /*    60 */    19,   28,   14,   11,   28,    6,   28,   28,   28,   28,
  /*    70 */    28,   28,   28,   28,   28,   28,   28,   28,   28,   15,
  /*    80 */    15,
 };
@@ -287,13 +293,13 @@ static const unsigned char yy_shift_ofst[] = {
 };
 #define YY_REDUCE_COUNT (7)
 #define YY_REDUCE_MIN   (-15)
-#define YY_REDUCE_MAX   (40)
+#define YY_REDUCE_MAX   (41)
 static const signed char yy_reduce_ofst[] = {
- /*     0 */   -15,   -4,    5,   13,   21,   29,   32,   40,
+ /*     0 */   -15,   -3,    6,   14,   22,   30,   33,   41,
 };
 static const YYACTIONTYPE yy_default[] = {
- /*     0 */    49,   49,   49,   49,   49,   49,   49,   49,   49,   64,
- /*    10 */    62,   63,   56,   49,   67,   69,   68,
+ /*     0 */    49,   49,   49,   49,   49,   49,   49,   49,   49,   61,
+ /*    10 */    59,   60,   56,   49,   64,   66,   65,
 };
 /********** End of lemon-generated parsing tables *****************************/
 
@@ -411,19 +417,19 @@ static const char *const yyTokenName[] = {
   /*   12 */ "VALUE",
   /*   13 */ "LPAREN",
   /*   14 */ "RPAREN",
-  /*   15 */ "doc",
-  /*   16 */ "compound_stmt",
-  /*   17 */ "stmt",
-  /*   18 */ "eval_stmt",
-  /*   19 */ "expr",
-  /*   20 */ "atom",
-  /*   21 */ "factor",
-  /*   22 */ "expr_exp",
-  /*   23 */ "expr_sum",
-  /*   24 */ "expr_sub",
-  /*   25 */ "term",
-  /*   26 */ "expr_mul",
-  /*   27 */ "expr_div",
+  /*   15 */ "compound_stmt",
+  /*   16 */ "stmt",
+  /*   17 */ "eval_stmt",
+  /*   18 */ "expr",
+  /*   19 */ "atom",
+  /*   20 */ "factor",
+  /*   21 */ "expr_exp",
+  /*   22 */ "expr_sum",
+  /*   23 */ "expr_sub",
+  /*   24 */ "expr_mul",
+  /*   25 */ "expr_div",
+  /*   26 */ "term",
+  /*   27 */ "doc",
 };
 #endif /* defined(YYCOVERAGE) || !defined(NDEBUG) */
 
@@ -436,21 +442,21 @@ static const char *const yyRuleName[] = {
  /*   2 */ "compound_stmt ::= stmt",
  /*   3 */ "stmt ::= eval_stmt",
  /*   4 */ "eval_stmt ::= expr",
- /*   5 */ "expr_exp ::= factor EXP atom",
- /*   6 */ "atom ::= VALUE",
- /*   7 */ "atom ::= LPAREN expr RPAREN",
- /*   8 */ "expr ::= expr_sum",
- /*   9 */ "expr ::= expr_sub",
- /*  10 */ "expr ::= term",
- /*  11 */ "expr_sum ::= expr PLUS term",
- /*  12 */ "expr_sub ::= expr MINUS term",
- /*  13 */ "term ::= expr_mul",
- /*  14 */ "term ::= expr_div",
- /*  15 */ "term ::= factor",
- /*  16 */ "expr_mul ::= term MUL factor",
- /*  17 */ "expr_div ::= term DIV factor",
- /*  18 */ "factor ::= expr_exp",
- /*  19 */ "factor ::= atom",
+ /*   5 */ "expr ::= expr_sum",
+ /*   6 */ "expr ::= expr_sub",
+ /*   7 */ "expr ::= term",
+ /*   8 */ "expr_sum ::= expr PLUS term",
+ /*   9 */ "expr_sub ::= expr MINUS term",
+ /*  10 */ "term ::= expr_mul",
+ /*  11 */ "term ::= expr_div",
+ /*  12 */ "term ::= factor",
+ /*  13 */ "expr_mul ::= term MUL factor",
+ /*  14 */ "expr_div ::= term DIV factor",
+ /*  15 */ "factor ::= expr_exp",
+ /*  16 */ "factor ::= atom",
+ /*  17 */ "expr_exp ::= factor EXP atom",
+ /*  18 */ "atom ::= VALUE",
+ /*  19 */ "atom ::= LPAREN expr RPAREN",
 };
 #endif /* NDEBUG */
 
@@ -871,26 +877,26 @@ static void yy_shift(
 /* For rule J, yyRuleInfoLhs[J] contains the symbol on the left-hand side
 ** of that rule */
 static const YYCODETYPE yyRuleInfoLhs[] = {
-    15,  /* (0) doc ::= compound_stmt */
-    16,  /* (1) compound_stmt ::= compound_stmt SEMICOL stmt */
-    16,  /* (2) compound_stmt ::= stmt */
-    17,  /* (3) stmt ::= eval_stmt */
-    18,  /* (4) eval_stmt ::= expr */
-    22,  /* (5) expr_exp ::= factor EXP atom */
-    20,  /* (6) atom ::= VALUE */
-    20,  /* (7) atom ::= LPAREN expr RPAREN */
-    19,  /* (8) expr ::= expr_sum */
-    19,  /* (9) expr ::= expr_sub */
-    19,  /* (10) expr ::= term */
-    23,  /* (11) expr_sum ::= expr PLUS term */
-    24,  /* (12) expr_sub ::= expr MINUS term */
-    25,  /* (13) term ::= expr_mul */
-    25,  /* (14) term ::= expr_div */
-    25,  /* (15) term ::= factor */
-    26,  /* (16) expr_mul ::= term MUL factor */
-    27,  /* (17) expr_div ::= term DIV factor */
-    21,  /* (18) factor ::= expr_exp */
-    21,  /* (19) factor ::= atom */
+    27,  /* (0) doc ::= compound_stmt */
+    15,  /* (1) compound_stmt ::= compound_stmt SEMICOL stmt */
+    15,  /* (2) compound_stmt ::= stmt */
+    16,  /* (3) stmt ::= eval_stmt */
+    17,  /* (4) eval_stmt ::= expr */
+    18,  /* (5) expr ::= expr_sum */
+    18,  /* (6) expr ::= expr_sub */
+    18,  /* (7) expr ::= term */
+    22,  /* (8) expr_sum ::= expr PLUS term */
+    23,  /* (9) expr_sub ::= expr MINUS term */
+    26,  /* (10) term ::= expr_mul */
+    26,  /* (11) term ::= expr_div */
+    26,  /* (12) term ::= factor */
+    24,  /* (13) expr_mul ::= term MUL factor */
+    25,  /* (14) expr_div ::= term DIV factor */
+    20,  /* (15) factor ::= expr_exp */
+    20,  /* (16) factor ::= atom */
+    21,  /* (17) expr_exp ::= factor EXP atom */
+    19,  /* (18) atom ::= VALUE */
+    19,  /* (19) atom ::= LPAREN expr RPAREN */
 };
 
 /* For rule J, yyRuleInfoNRhs[J] contains the negative of the number
@@ -901,21 +907,21 @@ static const signed char yyRuleInfoNRhs[] = {
    -1,  /* (2) compound_stmt ::= stmt */
    -1,  /* (3) stmt ::= eval_stmt */
    -1,  /* (4) eval_stmt ::= expr */
-   -3,  /* (5) expr_exp ::= factor EXP atom */
-   -1,  /* (6) atom ::= VALUE */
-   -3,  /* (7) atom ::= LPAREN expr RPAREN */
-   -1,  /* (8) expr ::= expr_sum */
-   -1,  /* (9) expr ::= expr_sub */
-   -1,  /* (10) expr ::= term */
-   -3,  /* (11) expr_sum ::= expr PLUS term */
-   -3,  /* (12) expr_sub ::= expr MINUS term */
-   -1,  /* (13) term ::= expr_mul */
-   -1,  /* (14) term ::= expr_div */
-   -1,  /* (15) term ::= factor */
-   -3,  /* (16) expr_mul ::= term MUL factor */
-   -3,  /* (17) expr_div ::= term DIV factor */
-   -1,  /* (18) factor ::= expr_exp */
-   -1,  /* (19) factor ::= atom */
+   -1,  /* (5) expr ::= expr_sum */
+   -1,  /* (6) expr ::= expr_sub */
+   -1,  /* (7) expr ::= term */
+   -3,  /* (8) expr_sum ::= expr PLUS term */
+   -3,  /* (9) expr_sub ::= expr MINUS term */
+   -1,  /* (10) term ::= expr_mul */
+   -1,  /* (11) term ::= expr_div */
+   -1,  /* (12) term ::= factor */
+   -3,  /* (13) expr_mul ::= term MUL factor */
+   -3,  /* (14) expr_div ::= term DIV factor */
+   -1,  /* (15) factor ::= expr_exp */
+   -1,  /* (16) factor ::= atom */
+   -3,  /* (17) expr_exp ::= factor EXP atom */
+   -1,  /* (18) atom ::= VALUE */
+   -3,  /* (19) atom ::= LPAREN expr RPAREN */
 };
 
 static void yy_accept(yyParser*);  /* Forward Declaration */
@@ -958,84 +964,171 @@ static YYACTIONTYPE yy_reduce(
 /********** Begin reduce actions **********************************************/
         YYMINORTYPE yylhsminor;
       case 0: /* doc ::= compound_stmt */
-#line 48 "parser.y"
+#line 54 "parser.y"
 {
-  yylhsminor.yy43 = ast::create_node(state, ast::doc{.root = yymsp[0].minor.yy53});
+  state->result = ast::create_node(state, ast::doc{.root = yymsp[0].minor.yy53});
 }
-#line 965 "../source/parser.c"
-  yymsp[0].minor.yy43 = yylhsminor.yy43;
+#line 971 "../source/parser.c"
         break;
       case 1: /* compound_stmt ::= compound_stmt SEMICOL stmt */
-#line 51 "parser.y"
+#line 57 "parser.y"
 {
   ast::compound_stmt group;
   group.statements = yymsp[-2].minor.yy53.get()->statements;
   group.statements.push_back(yymsp[0].minor.yy49);
   yylhsminor.yy53 = ast::create_node(state, std::move(group));
 }
-#line 976 "../source/parser.c"
+#line 981 "../source/parser.c"
   yymsp[-2].minor.yy53 = yylhsminor.yy53;
         break;
       case 2: /* compound_stmt ::= stmt */
-#line 57 "parser.y"
+#line 63 "parser.y"
 {
   ast::compound_stmt group;
   group.statements.push_back(yymsp[0].minor.yy49);
   yylhsminor.yy53 = ast::create_node(state, std::move(group));
 }
-#line 986 "../source/parser.c"
+#line 991 "../source/parser.c"
   yymsp[0].minor.yy53 = yylhsminor.yy53;
         break;
       case 3: /* stmt ::= eval_stmt */
-#line 63 "parser.y"
+#line 69 "parser.y"
 { yylhsminor.yy49 = yymsp[0].minor.yy12; }
-#line 992 "../source/parser.c"
+#line 997 "../source/parser.c"
   yymsp[0].minor.yy49 = yylhsminor.yy49;
         break;
       case 4: /* eval_stmt ::= expr */
-#line 64 "parser.y"
+#line 70 "parser.y"
 { yylhsminor.yy12 = yymsp[0].minor.yy16; }
-#line 998 "../source/parser.c"
+#line 1003 "../source/parser.c"
   yymsp[0].minor.yy12 = yylhsminor.yy12;
         break;
-      case 5: /* expr_exp ::= factor EXP atom */
-#line 87 "parser.y"
+      case 5: /* expr ::= expr_sum */
+#line 76 "parser.y"
+{
+  yylhsminor.yy16 = ast::create_node(state, ast::expr{yymsp[0].minor.yy29});
+}
+#line 1011 "../source/parser.c"
+  yymsp[0].minor.yy16 = yylhsminor.yy16;
+        break;
+      case 6: /* expr ::= expr_sub */
+#line 79 "parser.y"
+{
+  yylhsminor.yy16 = ast::create_node(state, ast::expr{yymsp[0].minor.yy5});
+}
+#line 1019 "../source/parser.c"
+  yymsp[0].minor.yy16 = yylhsminor.yy16;
+        break;
+      case 7: /* expr ::= term */
+#line 82 "parser.y"
+{
+  yylhsminor.yy16 = ast::create_node(state, ast::expr{yymsp[0].minor.yy41});
+}
+#line 1027 "../source/parser.c"
+  yymsp[0].minor.yy16 = yylhsminor.yy16;
+        break;
+      case 8: /* expr_sum ::= expr PLUS term */
+#line 86 "parser.y"
+{
+  ast::expr_sum sum{.summand = yymsp[-2].minor.yy16, .addend = yymsp[0].minor.yy41};
+  yylhsminor.yy29 = ast::create_node(state, std::move(sum));
+}
+#line 1036 "../source/parser.c"
+  yymsp[-2].minor.yy29 = yylhsminor.yy29;
+        break;
+      case 9: /* expr_sub ::= expr MINUS term */
+#line 90 "parser.y"
+{
+  ast::expr_sub sub{.minuend = yymsp[-2].minor.yy16, .subtrahend = yymsp[0].minor.yy41};
+  yylhsminor.yy5 = ast::create_node(state, std::move(sub));
+}
+#line 1045 "../source/parser.c"
+  yymsp[-2].minor.yy5 = yylhsminor.yy5;
+        break;
+      case 10: /* term ::= expr_mul */
+#line 95 "parser.y"
+{
+  yylhsminor.yy41 = ast::create_node(state, ast::term{yymsp[0].minor.yy25});
+}
+#line 1053 "../source/parser.c"
+  yymsp[0].minor.yy41 = yylhsminor.yy41;
+        break;
+      case 11: /* term ::= expr_div */
+#line 98 "parser.y"
+{
+  yylhsminor.yy41 = ast::create_node(state, ast::term{yymsp[0].minor.yy18});
+}
+#line 1061 "../source/parser.c"
+  yymsp[0].minor.yy41 = yylhsminor.yy41;
+        break;
+      case 12: /* term ::= factor */
+#line 101 "parser.y"
+{
+  yylhsminor.yy41 = ast::create_node(state, ast::term{yymsp[0].minor.yy28});
+}
+#line 1069 "../source/parser.c"
+  yymsp[0].minor.yy41 = yylhsminor.yy41;
+        break;
+      case 13: /* expr_mul ::= term MUL factor */
+#line 105 "parser.y"
+{
+  ast::expr_mul mul{.multiplicand = yymsp[-2].minor.yy41, .multiplier = yymsp[0].minor.yy28};
+  yylhsminor.yy25 = ast::create_node(state, std::move(mul));
+}
+#line 1078 "../source/parser.c"
+  yymsp[-2].minor.yy25 = yylhsminor.yy25;
+        break;
+      case 14: /* expr_div ::= term DIV factor */
+#line 109 "parser.y"
+{
+  ast::expr_div div{.dividend = yymsp[-2].minor.yy41, .divisor = yymsp[0].minor.yy28};
+  yylhsminor.yy18 = ast::create_node(state, std::move(div));
+}
+#line 1087 "../source/parser.c"
+  yymsp[-2].minor.yy18 = yylhsminor.yy18;
+        break;
+      case 15: /* factor ::= expr_exp */
+#line 114 "parser.y"
+{
+  yylhsminor.yy28 = ast::create_node(state, ast::factor{yymsp[0].minor.yy32});
+}
+#line 1095 "../source/parser.c"
+  yymsp[0].minor.yy28 = yylhsminor.yy28;
+        break;
+      case 16: /* factor ::= atom */
+#line 117 "parser.y"
+{
+  yylhsminor.yy28 = ast::create_node(state, ast::factor{yymsp[0].minor.yy30});
+}
+#line 1103 "../source/parser.c"
+  yymsp[0].minor.yy28 = yylhsminor.yy28;
+        break;
+      case 17: /* expr_exp ::= factor EXP atom */
+#line 121 "parser.y"
 {
   ast::expr_exp exp{.base = yymsp[-2].minor.yy28, .exp = yymsp[0].minor.yy30};
   yylhsminor.yy32 = ast::create_node(state, std::move(exp));
 }
-#line 1007 "../source/parser.c"
+#line 1112 "../source/parser.c"
   yymsp[-2].minor.yy32 = yylhsminor.yy32;
         break;
-      case 6: /* atom ::= VALUE */
-#line 92 "parser.y"
+      case 18: /* atom ::= VALUE */
+#line 126 "parser.y"
 { 
   //TODO: construct val properly.
   ast::value val{};
   yymsp[0].minor.yy30 = ast::create_node(state, ast::atom{val});
 }
-#line 1017 "../source/parser.c"
+#line 1122 "../source/parser.c"
         break;
-      case 7: /* atom ::= LPAREN expr RPAREN */
-#line 97 "parser.y"
+      case 19: /* atom ::= LPAREN expr RPAREN */
+#line 131 "parser.y"
 {
   yymsp[-2].minor.yy30 = ast::create_node(state, ast::atom{yymsp[-1].minor.yy16});
 }
-#line 1024 "../source/parser.c"
+#line 1129 "../source/parser.c"
         break;
       default:
-      /* (8) expr ::= expr_sum (OPTIMIZED OUT) */ assert(yyruleno!=8);
-      /* (9) expr ::= expr_sub (OPTIMIZED OUT) */ assert(yyruleno!=9);
-      /* (10) expr ::= term */ yytestcase(yyruleno==10);
-      /* (11) expr_sum ::= expr PLUS term */ yytestcase(yyruleno==11);
-      /* (12) expr_sub ::= expr MINUS term */ yytestcase(yyruleno==12);
-      /* (13) term ::= expr_mul (OPTIMIZED OUT) */ assert(yyruleno!=13);
-      /* (14) term ::= expr_div (OPTIMIZED OUT) */ assert(yyruleno!=14);
-      /* (15) term ::= factor */ yytestcase(yyruleno==15);
-      /* (16) expr_mul ::= term MUL factor */ yytestcase(yyruleno==16);
-      /* (17) expr_div ::= term DIV factor */ yytestcase(yyruleno==17);
-      /* (18) factor ::= expr_exp (OPTIMIZED OUT) */ assert(yyruleno!=18);
-      /* (19) factor ::= atom (OPTIMIZED OUT) */ assert(yyruleno!=19);
         break;
 /********** End reduce actions ************************************************/
   };
@@ -1077,10 +1170,10 @@ static void yy_parse_failed(
   /* Here code is inserted which will be executed whenever the
   ** parser fails */
 /************ Begin %parse_failure code ***************************************/
-#line 30 "parser.y"
+#line 32 "parser.y"
 
-  state->error = parse::parse_error{};
-#line 1083 "../source/parser.c"
+  state->result = std::unexpected(parse::parse_error{});
+#line 1176 "../source/parser.c"
 /************ End %parse_failure code *****************************************/
   RealMathParseARG_STORE /* Suppress warning about unused %extra_argument variable */
   RealMathParseCTX_STORE
@@ -1124,10 +1217,10 @@ static void yy_accept(
   /* Here code is inserted which will be executed whenever the
   ** parser accepts */
 /*********** Begin %parse_accept code *****************************************/
-#line 33 "parser.y"
+#line 35 "parser.y"
 
   state->done = true;
-#line 1130 "../source/parser.c"
+#line 1223 "../source/parser.c"
 /*********** End %parse_accept code *******************************************/
   RealMathParseARG_STORE /* Suppress warning about unused %extra_argument variable */
   RealMathParseCTX_STORE

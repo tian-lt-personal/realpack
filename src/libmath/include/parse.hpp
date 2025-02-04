@@ -72,24 +72,52 @@ class pool {
   std::vector<std::any> objs_;
 };
 
+namespace ast {
+struct doc;
+};
+
 struct parse_state {
   pool objects;
-  std::optional<parse_error> error;
+  std::expected<pool_ptr<ast::doc>, parse_error> result;
   bool done = false;
 };
 
 namespace ast {
 
-struct value {};
+// forward declarations:
 struct expr;
+struct expr_sum;
+struct expr_sub;
+struct expr_mul;
+struct expr_div;
+struct expr_exp;
+
+struct value {};
 using atom = std::variant<value, pool_ptr<expr>>;
-struct factor;
+using factor = std::variant<pool_ptr<expr_exp>, pool_ptr<atom>>;
 struct expr_exp {
   pool_ptr<factor> base;
   pool_ptr<atom> exp;
 };
-struct factor {};
-struct expr {};
+using term = std::variant<pool_ptr<expr_mul>, pool_ptr<expr_div>, pool_ptr<factor>>;
+struct expr_sum {
+  pool_ptr<expr> summand;
+  pool_ptr<term> addend;
+};
+
+struct expr_sub {
+  pool_ptr<expr> minuend;
+  pool_ptr<term> subtrahend;
+};
+struct expr_mul {
+  pool_ptr<term> multiplicand;
+  pool_ptr<factor> multiplier;
+};
+struct expr_div {
+  pool_ptr<term> dividend;
+  pool_ptr<factor> divisor;
+};
+struct expr : std::variant<pool_ptr<expr_sum>, pool_ptr<expr_sub>, pool_ptr<term>> {};
 using eval_stmt = expr;
 using stmt = eval_stmt;
 struct compound_stmt {
