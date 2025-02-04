@@ -69,10 +69,6 @@ compound_stmt(GROUP) ::= stmt(STMT). {
 stmt(STMT) ::= eval_stmt(ESTMT). { STMT = ESTMT; }
 eval_stmt(ESTMT) ::= expr(EXPR). { ESTMT = EXPR; }
 
-%left PLUS MINUS.
-%left MUL DIV.
-%right EXP.
-
 expr(EXPR) ::= expr_sum(SUM). {
   EXPR = ast::create_node(state, ast::expr{SUM});
 }

@@ -1004,7 +1004,7 @@ static YYACTIONTYPE yy_reduce(
   yymsp[0].minor.yy12 = yylhsminor.yy12;
         break;
       case 5: /* expr ::= expr_sum */
-#line 76 "parser.y"
+#line 72 "parser.y"
 {
   yylhsminor.yy16 = ast::create_node(state, ast::expr{yymsp[0].minor.yy29});
 }
@@ -1012,7 +1012,7 @@ static YYACTIONTYPE yy_reduce(
   yymsp[0].minor.yy16 = yylhsminor.yy16;
         break;
       case 6: /* expr ::= expr_sub */
-#line 79 "parser.y"
+#line 75 "parser.y"
 {
   yylhsminor.yy16 = ast::create_node(state, ast::expr{yymsp[0].minor.yy5});
 }
@@ -1020,7 +1020,7 @@ static YYACTIONTYPE yy_reduce(
   yymsp[0].minor.yy16 = yylhsminor.yy16;
         break;
       case 7: /* expr ::= term */
-#line 82 "parser.y"
+#line 78 "parser.y"
 {
   yylhsminor.yy16 = ast::create_node(state, ast::expr{yymsp[0].minor.yy41});
 }
@@ -1028,7 +1028,7 @@ static YYACTIONTYPE yy_reduce(
   yymsp[0].minor.yy16 = yylhsminor.yy16;
         break;
       case 8: /* expr_sum ::= expr PLUS term */
-#line 86 "parser.y"
+#line 82 "parser.y"
 {
   ast::expr_sum sum{.summand = yymsp[-2].minor.yy16, .addend = yymsp[0].minor.yy41};
   yylhsminor.yy29 = ast::create_node(state, std::move(sum));
@@ -1037,7 +1037,7 @@ static YYACTIONTYPE yy_reduce(
   yymsp[-2].minor.yy29 = yylhsminor.yy29;
         break;
       case 9: /* expr_sub ::= expr MINUS term */
-#line 90 "parser.y"
+#line 86 "parser.y"
 {
   ast::expr_sub sub{.minuend = yymsp[-2].minor.yy16, .subtrahend = yymsp[0].minor.yy41};
   yylhsminor.yy5 = ast::create_node(state, std::move(sub));
@@ -1046,7 +1046,7 @@ static YYACTIONTYPE yy_reduce(
   yymsp[-2].minor.yy5 = yylhsminor.yy5;
         break;
       case 10: /* term ::= expr_mul */
-#line 95 "parser.y"
+#line 91 "parser.y"
 {
   yylhsminor.yy41 = ast::create_node(state, ast::term{yymsp[0].minor.yy25});
 }
@@ -1054,7 +1054,7 @@ static YYACTIONTYPE yy_reduce(
   yymsp[0].minor.yy41 = yylhsminor.yy41;
         break;
       case 11: /* term ::= expr_div */
-#line 98 "parser.y"
+#line 94 "parser.y"
 {
   yylhsminor.yy41 = ast::create_node(state, ast::term{yymsp[0].minor.yy18});
 }
@@ -1062,7 +1062,7 @@ static YYACTIONTYPE yy_reduce(
   yymsp[0].minor.yy41 = yylhsminor.yy41;
         break;
       case 12: /* term ::= factor */
-#line 101 "parser.y"
+#line 97 "parser.y"
 {
   yylhsminor.yy41 = ast::create_node(state, ast::term{yymsp[0].minor.yy28});
 }
@@ -1070,7 +1070,7 @@ static YYACTIONTYPE yy_reduce(
   yymsp[0].minor.yy41 = yylhsminor.yy41;
         break;
       case 13: /* expr_mul ::= term MUL factor */
-#line 105 "parser.y"
+#line 101 "parser.y"
 {
   ast::expr_mul mul{.multiplicand = yymsp[-2].minor.yy41, .multiplier = yymsp[0].minor.yy28};
   yylhsminor.yy25 = ast::create_node(state, std::move(mul));
@@ -1079,7 +1079,7 @@ static YYACTIONTYPE yy_reduce(
   yymsp[-2].minor.yy25 = yylhsminor.yy25;
         break;
       case 14: /* expr_div ::= term DIV factor */
-#line 109 "parser.y"
+#line 105 "parser.y"
 {
   ast::expr_div div{.dividend = yymsp[-2].minor.yy41, .divisor = yymsp[0].minor.yy28};
   yylhsminor.yy18 = ast::create_node(state, std::move(div));
@@ -1088,7 +1088,7 @@ static YYACTIONTYPE yy_reduce(
   yymsp[-2].minor.yy18 = yylhsminor.yy18;
         break;
       case 15: /* factor ::= expr_exp */
-#line 114 "parser.y"
+#line 110 "parser.y"
 {
   yylhsminor.yy28 = ast::create_node(state, ast::factor{yymsp[0].minor.yy32});
 }
@@ -1096,7 +1096,7 @@ static YYACTIONTYPE yy_reduce(
   yymsp[0].minor.yy28 = yylhsminor.yy28;
         break;
       case 16: /* factor ::= atom */
-#line 117 "parser.y"
+#line 113 "parser.y"
 {
   yylhsminor.yy28 = ast::create_node(state, ast::factor{yymsp[0].minor.yy30});
 }
@@ -1104,7 +1104,7 @@ static YYACTIONTYPE yy_reduce(
   yymsp[0].minor.yy28 = yylhsminor.yy28;
         break;
       case 17: /* expr_exp ::= factor EXP atom */
-#line 121 "parser.y"
+#line 117 "parser.y"
 {
   ast::expr_exp exp{.base = yymsp[-2].minor.yy28, .exp = yymsp[0].minor.yy30};
   yylhsminor.yy32 = ast::create_node(state, std::move(exp));
@@ -1113,7 +1113,7 @@ static YYACTIONTYPE yy_reduce(
   yymsp[-2].minor.yy32 = yylhsminor.yy32;
         break;
       case 18: /* atom ::= VALUE */
-#line 126 "parser.y"
+#line 122 "parser.y"
 { 
   //TODO: construct val properly.
   ast::value val{};
@@ -1122,7 +1122,7 @@ static YYACTIONTYPE yy_reduce(
 #line 1122 "../source/parser.c"
         break;
       case 19: /* atom ::= LPAREN expr RPAREN */
-#line 131 "parser.y"
+#line 127 "parser.y"
 {
   yymsp[-2].minor.yy30 = ast::create_node(state, ast::atom{yymsp[-1].minor.yy16});
 }
