@@ -34,14 +34,34 @@ namespace ast = real::math::parse::ast;
   state->done = true;
 }
 
+%type doc { parse::pool_ptr<ast::doc> }
+%type compound_stmt { parse::pool_ptr<ast::compound_stmt> }
+%type stmt { parse::pool_ptr<ast::stmt> }
+%type eval_stmt { parse::pool_ptr<ast::eval_stmt> }
+%type expr { parse::pool_ptr<ast::expr> }
+%type atom { parse::pool_ptr<ast::atom> }
+%type factor { parse::pool_ptr<ast::factor> }
+%type expr_exp { parse::pool_ptr<ast::expr_exp> }
+
 %start_symbol doc
 
-doc ::= compound_stmt.
-compound_stmt ::= compound_stmt SEMICOL stmt.
-compound_stmt ::= stmt.
+doc(DOC) ::= compound_stmt(CSTMT). {
+  DOC = ast::create_node(state, ast::doc{.root = CSTMT});
+}
+compound_stmt(GROUP) ::= compound_stmt(SUBGROUP) SEMICOL stmt(STMT). {
+  ast::compound_stmt group;
+  group.statements = SUBGROUP.get()->statements;
+  group.statements.push_back(STMT);
+  GROUP = ast::create_node(state, std::move(group));
+}
+compound_stmt(GROUP) ::= stmt(STMT). {
+  ast::compound_stmt group;
+  group.statements.push_back(STMT);
+  GROUP = ast::create_node(state, std::move(group));
+}
 
-stmt ::= eval_stmt.
-eval_stmt ::= expr.
+stmt(STMT) ::= eval_stmt(ESTMT). { STMT = ESTMT; }
+eval_stmt(ESTMT) ::= expr(EXPR). { ESTMT = EXPR; }
 
 %left PLUS MINUS.
 %left MUL DIV.
@@ -64,7 +84,16 @@ expr_div ::= term DIV factor.
 factor ::= expr_exp.
 factor ::= atom.
 
-expr_exp ::= factor EXP atom.
+expr_exp(EXPR) ::= factor(BASE) EXP atom(EXP). {
+  ast::expr_exp exp{.base = BASE, .exp = EXP};
+  EXPR = ast::create_node(state, std::move(exp));
+}
 
-atom ::= VALUE.
-atom ::= LPAREN expr RPAREN.
+atom(ATOM) ::= VALUE. { 
+  //TODO: construct val properly.
+  ast::value val{};
+  ATOM = ast::create_node(state, ast::atom{val});
+}
+atom(ATOM) ::= LPAREN expr(EXPR) RPAREN. {
+  ATOM = ast::create_node(state, ast::atom{EXPR});
+}
